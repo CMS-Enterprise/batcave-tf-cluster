@@ -236,6 +236,10 @@ resource "kubernetes_config_map" "aws_auth" {
 
 # ### IAM policy to access KMS key
 
+data "aws_kms_alias" "sops" {
+  name = "alias/batcave-landing-sops"
+}
+
 resource "aws_iam_policy" "kms_policy" {
   name        = "${local.name}-kms_policy"
   path        = var.iam_role_path
@@ -247,7 +251,7 @@ resource "aws_iam_policy" "kms_policy" {
         "Sid" : "kmspolicy",
         "Action" : "kms:*",
         "Effect" : "Allow",
-        "Resource" : "*"
+        "Resource" : data.aws_kms_alias.sops.arn
       }
     ]
   })
