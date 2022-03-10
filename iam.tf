@@ -6,7 +6,7 @@ data "aws_kms_alias" "sops" {
 
 data "aws_iam_policy_document" "kms_policy" {
   statement {
-    sid = "kms-use"
+    sid     = "kms-use"
     actions = [
       "kms:*",
     ]
@@ -16,12 +16,12 @@ data "aws_iam_policy_document" "kms_policy" {
     ]
   }
   statement {
-    sid = "kms-list"
+    sid     = "kms-list"
     actions = [
       "kms:List*",
       "kms:Describe*",
     ]
-    resources = "*"
+    resources = ["*"]
   }
 }
 
@@ -42,10 +42,10 @@ resource "aws_iam_role_policy_attachment" "additional" {
 
 # Secrets Manager policy
 resource "aws_iam_policy" "secretsmanager_policy" {
-  name = "${local.name}-secretsmanager-policy"
-  path = var.iam_role_path
+  name        = "${local.name}-secretsmanager-policy"
+  path        = var.iam_role_path
   description = "IAM policy to access secretsm manager"
-  policy = jsonencode({
+  policy      = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
@@ -76,7 +76,7 @@ resource "aws_iam_policy" "s3_policy" {
   name        = "${local.name}-s3_policy"
   path        = var.iam_role_path
   description = "S3 access policy for nodes"
-  policy = jsonencode({
+  policy      = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
