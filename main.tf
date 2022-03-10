@@ -233,12 +233,6 @@ resource "kubernetes_config_map" "aws_auth" {
   depends_on = [module.eks]
 }
 
-resource "aws_iam_role_policy_attachment" "additional_policy_s3" {
-  for_each   = module.eks.self_managed_node_groups
-  policy_arn = aws_iam_policy.s3_policy.arn
-  role       = each.value.iam_role_name
-}
-
 ### Security group rules for cluster_primary_securiy_group_id
 resource "aws_security_group_rule" "allow_all_cluster_primary_2" {
   type                     = "ingress"
