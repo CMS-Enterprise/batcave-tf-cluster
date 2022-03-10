@@ -6,7 +6,7 @@ data "aws_kms_alias" "sops" {
 
 data "aws_iam_policy_document" "kms_policy" {
   statement {
-    sid     = "kms-use"
+    sid     = "kmsuse"
     actions = [
       "kms:*",
     ]
@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "kms_policy" {
     ]
   }
   statement {
-    sid     = "kms-list"
+    sid     = "kmslist"
     actions = [
       "kms:List*",
       "kms:Describe*",
