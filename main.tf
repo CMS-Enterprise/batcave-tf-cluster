@@ -233,55 +233,6 @@ resource "kubernetes_config_map" "aws_auth" {
   depends_on = [module.eks]
 }
 
-
-# ### IAM policy to access KMS key
-
-data "aws_kms_alias" "sops" {
-  name = "alias/batcave-landing-sops"
-}
-
-resource "aws_iam_policy" "kms_policy" {
-  name        = "${local.name}-kms_policy"
-  path        = var.iam_role_path
-  description = "IAM policy to access KMS key"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "kmspolicy",
-        "Action" : "kms:*",
-        "Effect" : "Allow",
-        "Resource" : data.aws_kms_alias.sops.arn
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "additional" {
-  for_each   = module.eks.self_managed_node_groups
-  policy_arn = aws_iam_policy.kms_policy.arn
-  role       = each.value.iam_role_name
-}
-
-
-### S3 access policy for nodes
-resource "aws_iam_policy" "s3_policy" {
-  name        = "${local.name}-s3_policy"
-  path        = var.iam_role_path
-  description = "S3 access policy for nodes"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "s3fullaccess",
-        "Action" : "s3:*",
-        "Effect" : "Allow",
-        "Resource" : "*"
-      }
-    ]
-  })
-}
-
 resource "aws_iam_role_policy_attachment" "additional_policy_s3" {
   for_each   = module.eks.self_managed_node_groups
   policy_arn = aws_iam_policy.s3_policy.arn
