@@ -4,22 +4,33 @@ data "aws_kms_alias" "sops" {
   name = "alias/batcave-landing-sops"
 }
 
+data "aws_iam_policy_document" "kms_policy" {
+  statement {
+    sid = "kms-use"
+    actions = [
+      "kms:*",
+    ]
+    resources = [
+      data.aws_kms_alias.sops.arn,
+      data.aws_kms_alias.sops.target_key_arn,
+    ]
+  }
+  statement {
+    sid = "kms-list"
+    actions = [
+      "kms:List*",
+      "kms:Describe*",
+    ]
+    resources = "*"
+  }
+}
+
 # KMS policy to allow sops key only
 resource "aws_iam_policy" "kms_policy" {
   name        = "${local.name}-kms_policy"
   path        = var.iam_role_path
   description = "IAM policy to access KMS key"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "kmspolicy",
-        "Action" : "kms:*",
-        "Effect" : "Allow",
-        "Resource" : data.aws_kms_alias.sops.arn
-      }
-    ]
-  })
+  policy      = data.aws_iam_policy_document.kms_policy.json
 }
 
 # Attach KMS policy to node IAM role
@@ -48,7 +59,7 @@ resource "aws_iam_policy" "secretsmanager_policy" {
         ],
         "Effect" : "Allow",
         "Resource" : "*"
-      }    
+      }
     ]
   })
 }
