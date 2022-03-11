@@ -4,6 +4,12 @@ locals {
   region          = var.region
 }
 
+data "aws_ami" "eks_ami"{
+  most_recent = true
+  name_regex = "^amzn2-eks-1.21-gi"
+  owners = ["743302140042"]
+}
+
 ################################################################################
 # EKS Module
 ################################################################################
@@ -66,7 +72,7 @@ module "eks" {
       iam_role_path                 = var.iam_role_path
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
       bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=general=true'"
-      ami_id                        = var.wg_ami_id
+      ami_id                        = data.aws_ami.eks_ami.id
       desired_size                  = var.desired_size
       max_size                      = var.max_size
       min_size                      = var.min_size
