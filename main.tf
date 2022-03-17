@@ -98,6 +98,7 @@ module "eks" {
       ]
     }
     gitlab-runners = {
+      count = 0
       name                          = "${var.cluster_name}-runners"
       subnet_ids                    = var.private_subnets
       instance_type                 = var.instance_type
