@@ -97,7 +97,7 @@ module "eks" {
         }
       ]
     }
-    gitlab-runners = {
+    var.cluster_name == "batcave-dev" ? gitlab-runners = {
       count = 0
       name                          = "${var.cluster_name}-runners"
       subnet_ids                    = var.private_subnets
@@ -129,7 +129,7 @@ module "eks" {
           propagate_at_launch = var.wg_tag_propagate_at_launch
         }
       ]
-    }
+    } : null
     # memory = {
     #   name                                    = "${var.cluster_name}-memory"
     #   subnet_ids                              = var.container_subnets
