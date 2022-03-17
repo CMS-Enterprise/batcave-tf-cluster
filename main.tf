@@ -238,16 +238,16 @@ locals {
         ],
       ))
     },
-    {
-      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.gitlab-runners.iam_role_name}"
-      username = "system:node:{{EC2PrivateDNSName}}"
-      groups = tolist(concat(
-        [
-          "system:bootstrappers",
-          "system:nodes",
-        ],
-      ))
-    }
+    # {
+    #   rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.gitlab-runners.iam_role_name}"
+    #   username = "system:node:{{EC2PrivateDNSName}}"
+    #   groups = tolist(concat(
+    #     [
+    #       "system:bootstrappers",
+    #       "system:nodes",
+    #     ],
+    #   ))
+    # }
     # {
     #   rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.memory.iam_role_name}"
     #   username = "system:node:{{EC2PrivateDNSName}}"
