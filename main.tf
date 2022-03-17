@@ -97,6 +97,38 @@ module "eks" {
         }
       ]
     }
+    gitlab-runners = {
+      name                          = "${var.cluster_name}-runners"
+      subnet_ids                    = var.private_subnets
+      instance_type                 = var.instance_type
+      iam_role_path                 = var.iam_role_path
+      iam_role_permissions_boundary = var.iam_role_permissions_boundary
+      bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=runners=true:NoSchedule'"
+      ami_id                        = var.wg_ami_id
+      desired_size                  = var.runners_desired_size
+      max_size                      = var.runners_max_size
+      min_size                      = var.runners_min_size
+      create_security_group         = false
+      block_device_mappings = [
+        {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size = "300"
+            volume_type = "gp3"
+            delete_on_termination = true
+            encrypted = true
+          }
+        }
+      ]
+
+      propagate_tags = [
+        {
+          key                 = "Node_type"
+          value               = "runners"
+          propagate_at_launch = var.wg_tag_propagate_at_launch
+        }
+      ]
+    }
     # memory = {
     #   name                                    = "${var.cluster_name}-memory"
     #   subnet_ids                              = var.container_subnets
@@ -197,6 +229,16 @@ locals {
 
     {
       rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.general.iam_role_name}"
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups = tolist(concat(
+        [
+          "system:bootstrappers",
+          "system:nodes",
+        ],
+      ))
+    },
+    {
+      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.gitlab-runners.iam_role_name}"
       username = "system:node:{{EC2PrivateDNSName}}"
       groups = tolist(concat(
         [
