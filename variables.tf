@@ -10,6 +10,15 @@ variable "cluster_version" {
   default = "1.21"
 }
 
+variable "runners_desired_size" {
+  default = 0
+}
+variable "runners_max_size" {
+  default = 0
+}
+variable "runners_min_size" {
+  default = 0
+}
 variable "desired_size" {
   default = 3
 }
