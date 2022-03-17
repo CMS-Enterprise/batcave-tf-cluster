@@ -4,10 +4,10 @@ locals {
   region          = var.region
 }
 
-data "aws_ami" "eks_ami"{
+data "aws_ami" "eks_ami" {
   most_recent = true
-  name_regex = "^amzn2-eks-gi-1.21"
-  owners = ["743302140042"]
+  name_regex  = "^amzn2-eks-gi-1.21"
+  owners      = ["743302140042"]
 }
 
 ################################################################################
@@ -45,26 +45,6 @@ module "eks" {
   }
   # Worker groups (using Launch Configurations)
   self_managed_node_groups = {
-    # bootstrap = {
-    #   name                                    = "${var.cluster_name}-bootstrap"
-    #   subnet_ids                              = var.container_subnets
-    #   instance_type                           = "m5.xlarge"
-    #   iam_role_path                           = var.iam_role_path
-    #   iam_role_permissions_boundary           = var.iam_role_permissions_boundary
-    #   bootstrap_extra_args                    = "--kubelet-extra-args '--node-labels=bootstrap=true --register-with-taints=CriticalAddonsOnly=true:NoSchedule'"
-    #   ami_id                                  = var.wg_ami_id
-    #   desired_capacity                        = 1
-    #   max_size                                = 1
-    #   min_size                                = 1
-    #   create_security_group                   = false
-    #   propagate_tags                          = [
-    #     {
-    #       key                                 = var.wg_tag_key
-    #       value                               = var.wg_tag_value
-    #       propagate_at_launch                 = var.wg_tag_propagate_at_launch
-    #     }
-    #   ]
-    # }
     general = {
       name                          = "${var.cluster_name}-general"
       subnet_ids                    = var.private_subnets
@@ -77,10 +57,10 @@ module "eks" {
       max_size                      = var.max_size
       min_size                      = var.min_size
       create_security_group         = false
-      block_device_mappings = [
+      block_device_mappings         = [
         {
           device_name = "/dev/xvda"
-          ebs = {
+          ebs         = {
             volume_size           = "300"
             volume_type           = "gp3"
             delete_on_termination = true
@@ -109,14 +89,14 @@ module "eks" {
       max_size                      = var.runners_max_size
       min_size                      = var.runners_min_size
       create_security_group         = false
-      block_device_mappings = [
+      block_device_mappings         = [
         {
           device_name = "/dev/xvda"
-          ebs = {
-            volume_size = "300"
-            volume_type = "gp3"
+          ebs         = {
+            volume_size           = "300"
+            volume_type           = "gp3"
             delete_on_termination = true
-            encrypted = true
+            encrypted             = true
           }
         }
       ]
@@ -129,48 +109,6 @@ module "eks" {
         }
       ]
     }
-    # memory = {
-    #   name                                    = "${var.cluster_name}-memory"
-    #   subnet_ids                              = var.container_subnets
-    #   instance_type                           = "r5.large"
-    #   iam_role_path                           = var.iam_role_path
-    #   iam_role_permissions_boundary           = var.iam_role_permissions_boundary
-    #   bootstrap_extra_args                    = "--kubelet-extra-args '--node-labels=memoryonly=true --register-with-taints=MemoryOnly=true:NoSchedule'"
-    #   ami_id                                  = var.wg_ami_id
-    #   desired_capacity                        = 1
-    #   max_size                                = 1
-    #   min_size                                = 1
-    #   create_security_group                   = false
-    #   propagate_tags                          = [
-    #     {
-    #       key                                 = "Node_type"
-    #       value                               = "Memory"
-    #       propagate_at_launch                 = var.wg_tag_propagate_at_launch
-    #     }
-    #   ]
-    # }
-
-    # cpu = {
-    #   name                                    = "${var.cluster_name}-cpu"
-    #   subnet_ids                              = var.container_subnets
-    #   instance_type                           = "c5.large"
-    #   iam_role_path                           = var.iam_role_path
-    #   iam_role_permissions_boundary           = var.iam_role_permissions_boundary
-    #   bootstrap_extra_args                    = "--kubelet-extra-args '--node-labels=cpuonly=true --register-with-taints=CpuOnly=true:NoSchedule'"
-    #   ami_id                                  = var.wg_ami_id
-    #   desired_capacity                        = 1
-    #   max_size                                = 1
-    #   min_size                                = 1
-    #   create_security_group                   = false
-
-    #   propagate_tags                          = [
-    #     {
-    #       key                                 = "Node_type"
-    #       value                               = "CPU"
-    #       propagate_at_launch                 = var.wg_tag_propagate_at_launch
-    #     }
-    #   ]
-    # }
   }
   tags = {
     Environment = var.environment
@@ -206,31 +144,10 @@ data "aws_caller_identity" "current" {}
 
 locals {
   configmap_roles = [
-    # {
-    #   rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.bootstrap.iam_role_name}"
-    #   username = "system:node:{{EC2PrivateDNSName}}"
-    #   groups = tolist(concat(
-    #     [
-    #       "system:bootstrappers",
-    #       "system:nodes",
-    #     ],
-    #   ))
-    # },
-    # {
-    # rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.cpu.iam_role_name}"
-    # username = "system:node:{{EC2PrivateDNSName}}"
-    # groups = tolist(concat(
-    #   [
-    #     "system:bootstrappers",
-    #     "system:nodes",
-    #   ],
-    # ))
-    # },
-
     {
       rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.general.iam_role_name}"
       username = "system:node:{{EC2PrivateDNSName}}"
-      groups = tolist(concat(
+      groups   = tolist(concat(
         [
           "system:bootstrappers",
           "system:nodes",
@@ -240,7 +157,7 @@ locals {
     {
       rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.gitlab-runners.iam_role_name}"
       username = "system:node:{{EC2PrivateDNSName}}"
-      groups = tolist(concat(
+      groups   = tolist(concat(
         [
           "system:bootstrappers",
           "system:nodes",
@@ -264,7 +181,7 @@ resource "kubernetes_config_map" "aws_auth" {
   metadata {
     name      = "aws-auth"
     namespace = "kube-system"
-    labels = merge(
+    labels    = merge(
       {
         "app.kubernetes.io/managed-by" = "Terraform"
       }
@@ -373,12 +290,12 @@ resource "aws_security_group_rule" "allow_all_cluster_primary_3_egress" {
 }
 
 resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists" {
-  type                     = "ingress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  prefix_list_ids          = var.cluster_additional_sg_prefix_lists
-  security_group_id =  module.eks.cluster_primary_security_group_id
+  type              = "ingress"
+  to_port           = 0
+  from_port         = 0
+  protocol          = "-1"
+  prefix_list_ids   = var.cluster_additional_sg_prefix_lists
+  security_group_id = module.eks.cluster_primary_security_group_id
 }
 
 
