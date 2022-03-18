@@ -6,7 +6,7 @@ locals {
 
 data "aws_ami" "eks_ami" {
   most_recent = true
-  name_regex  = "^amzn2-eks-gi-1.21"
+  name_regex  = "^amzn2-eks-1.21"
   owners      = ["743302140042"]
 }
 
@@ -84,7 +84,7 @@ module "eks" {
       iam_role_path                 = var.iam_role_path
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
       bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=runners=true:NoSchedule'"
-      ami_id                        = var.wg_ami_id
+      ami_id                        = data.aws_ami.eks_ami.id
       desired_size                  = var.runners_desired_size
       max_size                      = var.runners_max_size
       min_size                      = var.runners_min_size
