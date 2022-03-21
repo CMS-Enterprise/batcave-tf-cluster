@@ -57,10 +57,10 @@ module "eks" {
       max_size                      = var.max_size
       min_size                      = var.min_size
       create_security_group         = false
-      block_device_mappings         = [
+      block_device_mappings = [
         {
           device_name = "/dev/xvda"
-          ebs         = {
+          ebs = {
             volume_size           = "300"
             volume_type           = "gp3"
             delete_on_termination = true
@@ -89,10 +89,10 @@ module "eks" {
       max_size                      = var.runners_max_size
       min_size                      = var.runners_min_size
       create_security_group         = false
-      block_device_mappings         = [
+      block_device_mappings = [
         {
           device_name = "/dev/xvda"
-          ebs         = {
+          ebs = {
             volume_size           = "300"
             volume_type           = "gp3"
             delete_on_termination = true
@@ -112,6 +112,22 @@ module "eks" {
   }
   tags = {
     Environment = var.environment
+  }
+}
+
+resource "null_resource" "instance_cleanup" {
+  for_each = toset([var.cluster_name])
+  depends_on = [
+    module.eks
+  ]
+  triggers = {
+    cluster_arn = module.eks.cluster_arn
+  }
+  provisioner "local-exec" {
+    when = destroy
+    # Clean up nodes created by karpenter for this cluster to ensure a clean delete
+    command     = "aws ec2 terminate-instances --instance-ids $(aws ec2 describe-instances --filters \"Name=tag:kubernetes.io/cluster/${each.key},Values=owned\" \"Name=tag:karpenter.sh/provisioner-name,Values=*\" --query Reservations[].Instances[].InstanceId --output text) || true"
+    interpreter = ["/bin/bash", "-c"]
   }
 }
 
@@ -147,7 +163,7 @@ locals {
     {
       rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.general.iam_role_name}"
       username = "system:node:{{EC2PrivateDNSName}}"
-      groups   = tolist(concat(
+      groups = tolist(concat(
         [
           "system:bootstrappers",
           "system:nodes",
@@ -157,7 +173,7 @@ locals {
     {
       rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.gitlab-runners.iam_role_name}"
       username = "system:node:{{EC2PrivateDNSName}}"
-      groups   = tolist(concat(
+      groups = tolist(concat(
         [
           "system:bootstrappers",
           "system:nodes",
@@ -181,7 +197,7 @@ resource "kubernetes_config_map" "aws_auth" {
   metadata {
     name      = "aws-auth"
     namespace = "kube-system"
-    labels    = merge(
+    labels = merge(
       {
         "app.kubernetes.io/managed-by" = "Terraform"
       }
