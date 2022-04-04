@@ -95,3 +95,35 @@ resource "aws_iam_role_policy_attachment" "additional_policy_s3" {
   policy_arn = aws_iam_policy.s3_policy.arn
   role       = each.value.iam_role_name
 }
+
+### S3 access policy for nodes
+resource "aws_iam_policy" "velero_policy" {
+  name        = "${local.name}-velero_policy"
+  path        = var.iam_role_path
+  description = "Velero backup policy for nodes"
+  policy      = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "s3fullaccess",
+        "Action": [
+          "ec2:DescribeVolumes",
+          "ec2:DescribeSnapshots",
+          "ec2:CreateTags",
+          "ec2:CreateVolume",
+          "ec2:CreateSnapshot",
+          "ec2:DeleteSnapshot"
+        ],
+        "Effect" : "Allow",
+        "Resource" : "*"
+      }
+    ]
+  })
+}
+
+# Attach S3 policy to node IAM role
+resource "aws_iam_role_policy_attachment" "additional_policy_velero" {
+  for_each   = module.eks.self_managed_node_groups
+  policy_arn = aws_iam_policy.velero_policy.arn
+  role       = each.value.iam_role_name
+}
