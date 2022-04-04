@@ -105,7 +105,7 @@ resource "aws_iam_policy" "velero_policy" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-        "Sid" : "s3fullaccess",
+        "Sid" : "veleroaccess",
         "Action": [
           "ec2:DescribeVolumes",
           "ec2:DescribeSnapshots",
