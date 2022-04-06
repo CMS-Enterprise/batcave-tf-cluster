@@ -80,7 +80,7 @@ module "eks" {
     gitlab-runners = {
       name                          = "${var.cluster_name}-runners"
       subnet_ids                    = var.private_subnets
-      instance_type                 = var.instance_type
+      instance_type                 = var.runners_instance_type
       iam_role_path                 = var.iam_role_path
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
       bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=runners=true:NoSchedule'"

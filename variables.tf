@@ -10,6 +10,8 @@ variable "cluster_version" {
   default = "1.21"
 }
 
+### Default node group variables
+
 variable "desired_size" {
   default = 3
 }
@@ -19,8 +21,29 @@ variable "max_size" {
 variable "min_size" {
   default = 3
 }
+
 variable "instance_type" {
   default = "c5.2xlarge"
+}
+
+### Runner node group variables 
+variable "runners_desired_size" {
+  type    = number
+  default = 1
+}
+
+variable "runners_max_size" {
+  type    = number
+  default = 1
+}
+
+variable "runners_min_size" {
+  type    = number
+  default = 1
+}
+
+variable "instance_type" {
+  default = "c4.xlarge"
 }
 
 variable "cluster_name" {}
@@ -198,19 +221,4 @@ variable "cluster_security_group_additional_rules" {
   type        = map(any)
   description = "Map of security group rules to attach to the cluster security group, as you cannot change cluster security groups without replacing the instance"
   default     = {}
-}
-
-variable "runners_desired_size" {
-  type    = number
-  default = 1
-}
-
-variable "runners_max_size" {
-  type    = number
-  default = 1
-}
-
-variable "runners_min_size" {
-  type    = number
-  default = 1
 }
