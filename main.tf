@@ -31,6 +31,7 @@ module "eks" {
   cluster_endpoint_public_access          = var.cluster_endpoint_public_access
   cluster_enabled_log_types               = var.cluster_enabled_log_types
   cluster_security_group_additional_rules = var.cluster_security_group_additional_rules
+  cluster_additional_security_group_ids   = var.cluster_additional_security_group_ids
   enable_irsa                             = var.enable_irsa
 
   cluster_encryption_config = [
