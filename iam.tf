@@ -127,3 +127,35 @@ resource "aws_iam_role_policy_attachment" "additional_policy_velero" {
   policy_arn = aws_iam_policy.velero_policy.arn
   role       = each.value.iam_role_name
 }
+
+
+# Cloudwatch Logs policy
+data "aws_iam_policy_document" "cloudwatch_logs_policy" {
+  statement {
+    sid = "logs"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:DescribeLogStreams",
+    ]
+    resources = [
+      "arn:aws:logs:*:${data.aws_caller_identity.current.account_id}:*",
+    ]
+    effect = "Allow"
+  }
+}
+
+resource "aws_iam_policy" "cloudwatchlogs_policy" {
+  name        = "${local.name}-cloudwatchlogs-policy"
+  path        = var.iam_role_path
+  description = "IAM policy to access cloudwatch logs"
+  policy      = data.aws_iam_policy_document.cloudwatch_logs_policy.json
+}
+
+# Attach cloudwatchlogs policy to node IAM role
+resource "aws_iam_role_policy_attachment" "cloudwatchlogs" {
+  for_each   = module.eks.self_managed_node_groups
+  policy_arn = aws_iam_policy.cloudwatchlogs_policy.arn
+  role       = each.value.iam_role_name
+}
