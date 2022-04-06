@@ -159,3 +159,64 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
   policy_arn = aws_iam_policy.cloudwatch_logs.arn
   role       = each.value.iam_role_name
 }
+# SSM policy
+resource "aws_iam_policy" "ssm_managed_instance" {
+  name = "ssm-policy-${var.cluster_name}"
+  path = var.iam_role_path
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ssm:DescribeAssociation",
+          "ssm:GetDeployablePatchSnapshotForInstance",
+          "ssm:GetDocument",
+          "ssm:DescribeDocument",
+          "ssm:GetManifest",
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:ListAssociations",
+          "ssm:ListInstanceAssociations",
+          "ssm:PutInventory",
+          "ssm:PutComplianceItems",
+          "ssm:PutConfigurePackageResult",
+          "ssm:UpdateAssociationStatus",
+          "ssm:UpdateInstanceAssociationStatus",
+          "ssm:UpdateInstanceInformation"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "ec2messages:AcknowledgeMessage",
+          "ec2messages:DeleteMessage",
+          "ec2messages:FailMessage",
+          "ec2messages:GetEndpoint",
+          "ec2messages:GetMessages",
+          "ec2messages:SendReply"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# policy attachment
+resource "aws_iam_role_policy_attachment" "ssm_managed_instance" {
+  for_each   = module.eks.self_managed_node_groups
+  role       = each.value.iam_role_name
+  policy_arn = aws_iam_policy.ssm_managed_instance.arn
+}
+
