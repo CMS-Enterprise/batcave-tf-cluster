@@ -31,8 +31,11 @@ module "eks" {
   cluster_endpoint_public_access          = var.cluster_endpoint_public_access
   cluster_enabled_log_types               = var.cluster_enabled_log_types
   cluster_security_group_additional_rules = var.cluster_security_group_additional_rules
-  cluster_additional_security_group_ids   = var.cluster_additional_security_group_ids
   enable_irsa                             = var.enable_irsa
+
+  ## VERY IMPORTANT WARNING: Changing security group ids associated with a cluster will
+  ## ***DELETE AND RECREATE*** existing clusters.  Do not modify this for already existing clusters
+  cluster_additional_security_group_ids = []
 
   cluster_encryption_config = [
     {
