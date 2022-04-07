@@ -10,7 +10,7 @@ variable "cluster_version" {
   default = "1.21"
 }
 
-### Default node group variables
+### Default node group vars
 
 variable "desired_size" {
   default = 3
@@ -21,12 +21,12 @@ variable "max_size" {
 variable "min_size" {
   default = 3
 }
-
 variable "instance_type" {
   default = "c5.2xlarge"
 }
 
-### Runner node group variables 
+### Runners node group vars
+
 variable "runners_desired_size" {
   type    = number
   default = 1
@@ -40,10 +40,6 @@ variable "runners_max_size" {
 variable "runners_min_size" {
   type    = number
   default = 1
-}
-
-variable "runners_instance_type" {
-  default = "c4.xlarge"
 }
 
 variable "cluster_name" {}
@@ -207,10 +203,6 @@ variable "create_transport_nlb" {
   type        = bool
   default     = false
   description = "Optionally create a network load balancer in the transport subnet.  Requires VPC to be configured to fetch transport subnet data"
-}
-
-variable "cluster_additional_security_group_ids" {
-  type = list(string)
 }
 
 variable "cluster_additional_sg_prefix_lists" {
