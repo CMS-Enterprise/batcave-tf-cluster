@@ -33,6 +33,10 @@ module "eks" {
   cluster_security_group_additional_rules = var.cluster_security_group_additional_rules
   enable_irsa                             = var.enable_irsa
 
+  ## VERY IMPORTANT WARNING: Changing security group ids associated with a cluster will
+  ## ***DELETE AND RECREATE*** existing clusters.  Do not modify this for already existing clusters
+  cluster_additional_security_group_ids = []
+
   cluster_encryption_config = [
     {
       provider_key_arn = aws_kms_key.eks.arn
