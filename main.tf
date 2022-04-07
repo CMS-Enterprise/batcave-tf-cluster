@@ -318,6 +318,23 @@ resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists" {
   security_group_id = module.eks.cluster_primary_security_group_id
 }
 
+resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists_worker" {
+  type              = "ingress"
+  to_port           = 0
+  from_port         = 0
+  protocol          = "-1"
+  prefix_list_ids   = var.cluster_additional_sg_prefix_lists
+  security_group_id = module.eks.node_security_group_id
+}
+
+resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists_secondary" {
+  type              = "ingress"
+  to_port           = 0
+  from_port         = 0
+  protocol          = "-1"
+  prefix_list_ids   = var.cluster_additional_sg_prefix_lists
+  security_group_id = module.eks.cluster_security_group_id
+}
 
 # ### Security group rules for cluster_security_group_id
 resource "aws_security_group_rule" "allow_all_cluster_1_egress" {
