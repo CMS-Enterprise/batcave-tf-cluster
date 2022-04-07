@@ -42,6 +42,10 @@ variable "runners_min_size" {
   default = 1
 }
 
+variable "runners_instance_type" {
+  default = "c4.xlarge"
+}
+
 variable "cluster_name" {}
 
 variable "iam_role_path" {
