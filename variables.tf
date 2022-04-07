@@ -42,7 +42,7 @@ variable "runners_min_size" {
   default = 1
 }
 
-variable "instance_type" {
+variable "runners_instance_type" {
   default = "c4.xlarge"
 }
 
