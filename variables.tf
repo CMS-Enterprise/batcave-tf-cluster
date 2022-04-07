@@ -218,3 +218,22 @@ variable "cluster_security_group_additional_rules" {
   description = "Map of security group rules to attach to the cluster security group, as you cannot change cluster security groups without replacing the instance"
   default     = {}
 }
+
+variable "runners_desired_size" {
+  type    = number
+  default = 1
+}
+
+variable "runners_max_size" {
+  type    = number
+  default = 1
+}
+
+variable "runners_min_size" {
+  type    = number
+  default = 1
+}
+
+variable "vpc_eni_subnets" {
+  type = map(any)
+}
