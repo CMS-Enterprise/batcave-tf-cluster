@@ -6,7 +6,7 @@ data "aws_kms_alias" "sops" {
 
 data "aws_iam_policy_document" "kms_policy" {
   statement {
-    sid     = "kmsuse"
+    sid = "kmsuse"
     actions = [
       "kms:*",
     ]
@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "kms_policy" {
     ]
   }
   statement {
-    sid     = "kmslist"
+    sid = "kmslist"
     actions = [
       "kms:List*",
       "kms:Describe*",
@@ -45,7 +45,7 @@ resource "aws_iam_policy" "secretsmanager_policy" {
   name        = "${local.name}-secretsmanager-policy"
   path        = var.iam_role_path
   description = "IAM policy to access secretsm manager"
-  policy      = jsonencode({
+  policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
@@ -76,7 +76,7 @@ resource "aws_iam_policy" "s3_policy" {
   name        = "${local.name}-s3_policy"
   path        = var.iam_role_path
   description = "S3 access policy for nodes"
-  policy      = jsonencode({
+  policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
@@ -101,12 +101,12 @@ resource "aws_iam_policy" "velero_policy" {
   name        = "${local.name}-velero_policy"
   path        = var.iam_role_path
   description = "Velero backup policy for nodes"
-  policy      = jsonencode({
+  policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
         "Sid" : "veleroaccess",
-        "Action": [
+        "Action" : [
           "ec2:DescribeVolumes",
           "ec2:DescribeSnapshots",
           "ec2:CreateTags",
