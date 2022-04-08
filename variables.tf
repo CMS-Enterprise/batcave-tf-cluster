@@ -218,3 +218,29 @@ variable "cluster_security_group_additional_rules" {
   description = "Map of security group rules to attach to the cluster security group, as you cannot change cluster security groups without replacing the instance"
   default     = {}
 }
+
+
+#### BATIAI-330
+
+### Helm variables
+
+variable "helm_namespace" {
+    default = "karpenter"
+}
+variable "helm_create_namespace" {
+    type = bool
+    default = true
+}
+variable "helm_name" {
+    default = "karpenter"
+}
+
+### testing for deploying docker creds
+
+variable "registry_username" {
+    default = ""
+}
+
+variable "registry_password" {
+    default = ""
+}
