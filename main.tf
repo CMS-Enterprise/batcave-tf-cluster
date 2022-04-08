@@ -218,6 +218,28 @@ resource "kubernetes_config_map" "aws_auth" {
   depends_on = [module.eks]
 }
 
+resource "kubernetes_secret" "private-registry" {
+
+  metadata {
+    name = "private-registry"
+    namespace = var.helm_namespace
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+
+  data = {
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        "artifactory.cloud.cms.gov" = {
+          "username" = var.registry_username
+          "password" = var.registry_password
+          "email"    = "batcave@internal.cms.gov"
+        }
+      }
+    })
+  }
+}
+
 ### Security group rules for cluster_primary_securiy_group_id
 resource "aws_security_group_rule" "allow_all_cluster_primary_2" {
   type                     = "ingress"
