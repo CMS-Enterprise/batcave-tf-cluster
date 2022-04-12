@@ -94,6 +94,6 @@ module "batcave-elb" {
 }
 
 resource "aws_autoscaling_attachment" "att-batcave-workers" {
-  elb                    = module.batcave-elb.this_elb_id
+  elb                    = module.batcave-elb.elb_id
   autoscaling_group_name = module.eks.self_managed_node_groups.general.autoscaling_group_name
 }
