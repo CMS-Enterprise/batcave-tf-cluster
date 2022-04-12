@@ -71,25 +71,25 @@ module "atlassian-elb" {
 
   listener = [
     {
-      instance_port     = "32180"
+      instance_port     = "30080"
       instance_protocol = "TCP"
       lb_port           = "80"
       lb_protocol       = "tcp"
     },
     {
-      instance_port     = "31243"
+      instance_port     = "30443"
       instance_protocol = "TCP"
       lb_port           = "443"
       lb_protocol       = "tcp"
     },
     {
-      instance_port     = "32120"
+      instance_port     = "31020"
       instance_protocol = "TCP"
       lb_port           = "15020"
       lb_protocol       = "tcp"
     },
     {
-      instance_port     = "32543"
+      instance_port     = "31443"
       instance_protocol = "TCP"
       lb_port           = "15443"
       lb_protocol       = "tcp"
@@ -98,7 +98,7 @@ module "atlassian-elb" {
   ]
 
   health_check = {
-    target              = "TCP:32120"
+    target              = "TCP:31020"
     interval            = 10
     healthy_threshold   = 2
     unhealthy_threshold = 6
