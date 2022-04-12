@@ -66,6 +66,10 @@ variable "transport_subnet_cidr_blocks" {
   type = map(string)
 }
 
+variable "transport_subnets" {
+  type = list(any)
+}
+
 variable "cluster_endpoint_private_access" {
   default = "true"
 }

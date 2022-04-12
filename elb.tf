@@ -44,7 +44,7 @@ module "batcave-elb" {
   source  = "terraform-aws-modules/elb/aws"
   name = local.formatted_batcave_lb_name
 
-  subnets         = var.private_subnets
+  subnets         = var.transport_subnets
   security_groups = [aws_security_group.batcave-elb-sg.id]
   internal        = true
   listener = [
