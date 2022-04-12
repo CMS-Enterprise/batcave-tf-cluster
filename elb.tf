@@ -1,6 +1,6 @@
 locals {
   batcave_lb_name           = "${var.cluster_name}-batcave-lb"
-  formatted_atlassian_lb_name = length(local.batcave_lb_name) > 32 ? "${substr(local.batcave_lb_name, 0, 16)}-${substr(local.batcave_lb_name, length(local.batcave_lb_name) - 15, 32)}" : local.batcave_lb_name
+  formatted_batcave_lb_name = length(local.batcave_lb_name) > 32 ? "${substr(local.batcave_lb_name, 0, 16)}-${substr(local.batcave_lb_name, length(local.batcave_lb_name) - 15, 32)}" : local.batcave_lb_name
 }
 resource "aws_security_group" "batcave-elb-sg" {
   name        = "${var.cluster_name}-batcave-elb-sg"
@@ -40,14 +40,13 @@ resource "aws_security_group_rule" "batcave-elb-https-in" {
   cidr_blocks       = ["10.0.0.0/8"]
 }
 
-module "atlassian-elb" {
+module "batcave-elb" {
   source  = "terraform-aws-modules/elb/aws"
   name = local.formatted_batcave_lb_name
 
   subnets         = var.private_subnet_ids
-  security_groups = [aws_security_group.atlassian-elb-sg.id]
+  security_groups = [aws_security_group.batcave-elb-sg.id]
   internal        = true
-
   listener = [
     {
       instance_port     = "30080"
@@ -94,8 +93,8 @@ module "atlassian-elb" {
   }
 }
 
-# resource "aws_autoscaling_attachment" "att-atlassian-workers" {
+# resource "aws_autoscaling_attachment" "att-batcave-workers" {
 #   count                  = length(var.worker_asg_names)
-#   elb                    = module.atlassian-elb.this_elb_id
+#   elb                    = module.batcave-elb.this_elb_id
 #   autoscaling_group_name = var.worker_asg_names[count.index]
 # }
