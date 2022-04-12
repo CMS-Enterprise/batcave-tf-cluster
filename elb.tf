@@ -125,24 +125,26 @@ resource "aws_lb_listener" "batcave-https" {
 resource "aws_lb_listener" "batcave-redirect" {
   load_balancer_arn = aws_lb.batcave-lb.arn
   port              = "80"
-  protocol          = "HTTP"
-
+  protocol          = "TCP"
   default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.batcave-https.arn
   }
+
 }
 
 # Create Target Group
 resource "aws_lb_target_group" "batcave-https" {
   name     = "batcave-lb-tg"
   port     = 443
-  protocol = "HTTPS"
+  protocol = "TCP"
+  vpc_id   = var.vpc_id
+}
+
+resource "aws_lb_target_group" "batcave-https" {
+  name     = "batcave-lb-tg"
+  port     = 80
+  protocol = "TCP"
   vpc_id   = var.vpc_id
 }
 
