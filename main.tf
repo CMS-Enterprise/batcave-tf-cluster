@@ -16,13 +16,14 @@ data "aws_ami" "eks_ami" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "18.0.5"
+  version = "18.20.2"
 
   cluster_name    = local.name
   cluster_version = local.cluster_version
 
-  iam_role_path                 = var.iam_role_path
-  iam_role_permissions_boundary = var.iam_role_permissions_boundary
+  iam_role_path                  = var.iam_role_path
+  iam_role_permissions_boundary  = var.iam_role_permissions_boundary
+  cluster_encryption_policy_path = var.iam_role_path
 
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets
