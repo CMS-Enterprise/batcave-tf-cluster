@@ -105,6 +105,7 @@ resource "aws_autoscaling_attachment" "runners-batcave-workers" {
 
 resource "aws_security_group_rule" "elb_node" {
   type                     = "ingress"
+  description              = "Ingress from ELB" 
   to_port                  = 0
   from_port                = 0
   protocol                 = "-1"
