@@ -103,7 +103,7 @@ resource "aws_lb" "batcave-lb" {
   enable_deletion_protection = true
 
   tags = {
-    Name = BatCave-ELB
+    Name = "BatCave-ELB"
     Environment = "Development"
   }
 }
