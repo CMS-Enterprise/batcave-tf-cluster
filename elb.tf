@@ -93,7 +93,12 @@ module "batcave-elb" {
   }
 }
 
-resource "aws_autoscaling_attachment" "att-batcave-workers" {
+resource "aws_autoscaling_attachment" "general-batcave-workers" {
   elb                    = module.batcave-elb.elb_id
   autoscaling_group_name = module.eks.self_managed_node_groups.general.autoscaling_group_name
+}
+
+resource "aws_autoscaling_attachment" "runners-batcave-workers" {
+  elb                    = module.batcave-elb.elb_id
+  autoscaling_group_name = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_name
 }
