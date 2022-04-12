@@ -102,3 +102,12 @@ resource "aws_autoscaling_attachment" "runners-batcave-workers" {
   elb                    = module.batcave-elb.elb_id
   autoscaling_group_name = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_name
 }
+
+resource "aws_security_group_rule" "elb_node" {
+  type                     = "ingress"
+  to_port                  = 0
+  from_port                = 0
+  protocol                 = "-1"
+  security_group_id        = aws_security_group.batcave-elb-sg.id
+  source_security_group_id = module.eks.node_security_group_id
+}
