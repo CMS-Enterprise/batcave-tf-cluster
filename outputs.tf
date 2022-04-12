@@ -236,10 +236,10 @@ output "self_managed_node_group_gitlab_runners" {
   value = module.eks.self_managed_node_groups.gitlab-runners.launch_template_id
 }
 
-output "general_nodepool_asg" {
-  value = module.eks.self_managed_node_groups.general.autoscaling_group_name
-}
+#output "general_nodepool_asg" {
+#  value = module.eks.self_managed_node_groups.general.autoscaling_group_name
+#}
 
-output "runner_nodepool_asg" {
-  values = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_name
-}
+#output "runner_nodepool_asg" {
+#  value = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_name
+#}
