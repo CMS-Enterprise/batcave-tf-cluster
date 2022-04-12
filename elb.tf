@@ -111,7 +111,7 @@ resource "aws_lb" "batcave-lb" {
 }
 
 # Listener HTTPS
-resource "aws_lb_listener" "batcave-https" {
+resource "aws_lb_listener" "batcave-ls-https" {
   load_balancer_arn = aws_lb.batcave-lb.arn
   port              = "443"
   protocol          = "TCP"
@@ -122,7 +122,7 @@ resource "aws_lb_listener" "batcave-https" {
 }
 
 # Redirect from HTTP to HTTPS
-resource "aws_lb_listener" "batcave-redirect" {
+resource "aws_lb_listener" "batcave-ls-http" {
   load_balancer_arn = aws_lb.batcave-lb.arn
   port              = "80"
   protocol          = "TCP"
@@ -134,7 +134,7 @@ resource "aws_lb_listener" "batcave-redirect" {
 }
 
 # Create Target Group
-resource "aws_lb_target_group" "batcave-https" {
+resource "aws_lb_target_group" "batcave-tg-https" {
   name     = "batcave-lb-tg"
   port     = 443
   protocol = "TCP"
