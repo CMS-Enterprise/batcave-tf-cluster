@@ -2,7 +2,7 @@ locals {
   batcave_lb_name           = "${var.cluster_name}-batcave-lb"
   formatted_atlassian_lb_name = length(local.batcave_lb_name) > 32 ? "${substr(local.batcave_lb_name, 0, 16)}-${substr(local.batcave_lb_name, length(local.batcave_lb_name) - 15, 32)}" : local.batcave_lb_name
 }
-resource "aws_security_group" "atlassian-elb-sg" {
+resource "aws_security_group" "batcave-elb-sg" {
   name        = "${var.cluster_name}-batcave-elb-sg"
   description = "${var.cluster_name} batcave elb sg"
   vpc_id      = var.vpc_id
@@ -20,23 +20,23 @@ resource "aws_security_group_rule" "batcave-elb-egress" {
 
 // Allow 80 so that istio can do the traffic promotion
 // NOTE: This doesn't mean we're allowing unencrypted traffic into the appgate in the cluster, just the load balancer
-resource "aws_security_group_rule" "atlassian-elb-http-in" {
+resource "aws_security_group_rule" "batcave-elb-http-in" {
   description       = "Allow HTTP traffic"
   type              = "ingress"
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  security_group_id = aws_security_group.atlassian-elb-sg.id
+  security_group_id = aws_security_group.batcave-elb-sg.id
   cidr_blocks       = ["10.0.0.0/8"]
 }
 
-resource "aws_security_group_rule" "atlassian-elb-https-in" {
+resource "aws_security_group_rule" "batcave-elb-https-in" {
   description       = "Allow HTTPS traffic"
   type              = "ingress"
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  security_group_id = aws_security_group.atlassian-elb-sg.id
+  security_group_id = aws_security_group.batcave-elb-sg.id
   cidr_blocks       = ["10.0.0.0/8"]
 }
 
