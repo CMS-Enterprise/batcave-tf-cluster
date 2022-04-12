@@ -40,27 +40,6 @@ resource "aws_security_group_rule" "batcave-elb-https-in" {
   cidr_blocks       = ["10.0.0.0/8"]
 }
 
-resource "aws_security_group_rule" "batcave-elb-https-in" {
-  description       = "Allow Health of cluster traffic"
-  type              = "ingress"
-  from_port         = 15021
-  to_port           = 15201
-  protocol          = "tcp"
-  security_group_id = aws_security_group.batcave-elb-sg.id
-  cidr_blocks       = ["10.0.0.0/8"]
-}
-
-
-resource "aws_security_group_rule" "atlassian-elb-inbound-workers-asg" {
-  type                     = "ingress"
-  description              = "allow traffic from private application lb"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  security_group_id        = module.eks.node_security_group_id
-  source_security_group_id = aws_security_group.atlassian-elb-sg.id
-}
-
 module "atlassian-elb" {
   source  = "terraform-aws-modules/elb/aws"
   name = local.formatted_batcave_lb_name
