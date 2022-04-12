@@ -40,72 +40,80 @@ resource "aws_security_group_rule" "batcave-elb-https-in" {
   cidr_blocks       = ["10.0.0.0/8"]
 }
 
-# resource "aws_security_group_rule" "atlassian-elb-inbound-workers-asg" {
-#   count                    = length(var.worker_sg_ids)
-#   type                     = "ingress"
-#   description              = "allow traffic from private application lb"
-#   from_port                = 0
-#   to_port                  = 0
-#   protocol                 = "-1"
-#   security_group_id        = var.worker_sg_ids[count.index]
-#   source_security_group_id = aws_security_group.atlassian-elb-sg.id
-# }
+resource "aws_security_group_rule" "batcave-elb-https-in" {
+  description       = "Allow Health of cluster traffic"
+  type              = "ingress"
+  from_port         = 15021
+  to_port           = 15201
+  protocol          = "tcp"
+  security_group_id = aws_security_group.batcave-elb-sg.id
+  cidr_blocks       = ["10.0.0.0/8"]
+}
 
-# module "atlassian-elb" {
-#   source  = "terraform-aws-modules/elb/aws"
-#   version = "2.5.0"
 
-#   name = local.formatted_atlassian_lb_name
+resource "aws_security_group_rule" "atlassian-elb-inbound-workers-asg" {
+  type                     = "ingress"
+  description              = "allow traffic from private application lb"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  security_group_id        = module.eks.node_security_group_id
+  source_security_group_id = aws_security_group.atlassian-elb-sg.id
+}
 
-#   subnets         = var.private_subnet_ids
-#   security_groups = [aws_security_group.atlassian-elb-sg.id]
-#   internal        = true
+module "atlassian-elb" {
+  source  = "terraform-aws-modules/elb/aws"
+  name = local.formatted_batcave_lb_name
 
-#   listener = [
-#     {
-#       instance_port     = "32180"
-#       instance_protocol = "TCP"
-#       lb_port           = "80"
-#       lb_protocol       = "tcp"
-#     },
-#     {
-#       instance_port     = "31243"
-#       instance_protocol = "TCP"
-#       lb_port           = "443"
-#       lb_protocol       = "tcp"
-#     },
-#     {
-#       instance_port     = "32120"
-#       instance_protocol = "TCP"
-#       lb_port           = "15020"
-#       lb_protocol       = "tcp"
-#     },
-#     {
-#       instance_port     = "32543"
-#       instance_protocol = "TCP"
-#       lb_port           = "15443"
-#       lb_protocol       = "tcp"
-#     },
+  subnets         = var.private_subnet_ids
+  security_groups = [aws_security_group.atlassian-elb-sg.id]
+  internal        = true
 
-#   ]
+  listener = [
+    {
+      instance_port     = "32180"
+      instance_protocol = "TCP"
+      lb_port           = "80"
+      lb_protocol       = "tcp"
+    },
+    {
+      instance_port     = "31243"
+      instance_protocol = "TCP"
+      lb_port           = "443"
+      lb_protocol       = "tcp"
+    },
+    {
+      instance_port     = "32120"
+      instance_protocol = "TCP"
+      lb_port           = "15020"
+      lb_protocol       = "tcp"
+    },
+    {
+      instance_port     = "32543"
+      instance_protocol = "TCP"
+      lb_port           = "15443"
+      lb_protocol       = "tcp"
+    },
 
-#   health_check = {
-#     target              = "TCP:32120"
-#     interval            = 10
-#     healthy_threshold   = 2
-#     unhealthy_threshold = 6
-#     timeout             = 5
-#   }
+  ]
 
-#   access_logs = {}
+  health_check = {
+    target              = "TCP:32120"
+    interval            = 10
+    healthy_threshold   = 2
+    unhealthy_threshold = 6
+    timeout             = 5
+  }
 
-#   idle_timeout = 500
+  access_logs = {}
 
-#   tags = {
-#     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-#     "Terraform_Managed"                         = "true"
-#   }
-# }
+  idle_timeout = 500
+
+  tags = {
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "Terraform_Managed"                         = "true"
+  }
+}
 
 # resource "aws_autoscaling_attachment" "att-atlassian-workers" {
 #   count                  = length(var.worker_asg_names)
