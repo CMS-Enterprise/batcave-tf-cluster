@@ -98,6 +98,8 @@ locals {
 resource "aws_lb" "batcave-lb" {
   name               = "batcave-lb"
   load_balancer_type = "network"
+  internal = true
+
 
   subnets = var.transport_subnets
   enable_deletion_protection = true
@@ -108,10 +110,37 @@ resource "aws_lb" "batcave-lb" {
   }
 }
 
+# Listener
+resource "aws_lb_listener" "batcave-https" {
+  load_balancer_arn = aws_lb.batcave-lb.arn
+  port              = "443"
+  protocol          = "TCP"
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.batcave-https.arn
+  }
+}
+
+resource "aws_lb_listener" "batcave-redirect" {
+  load_balancer_arn = aws_lb.batcave-lb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
 # Create Target Group
 resource "aws_lb_target_group" "batcave-https" {
-  name     = "tf-example-lb-tg"
-  port     = 8443
+  name     = "batcave-lb-tg"
+  port     = 443
   protocol = "HTTPS"
   vpc_id   = var.vpc_id
 }
