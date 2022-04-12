@@ -109,6 +109,6 @@ resource "aws_security_group_rule" "elb_node" {
   to_port                  = 0
   from_port                = 0
   protocol                 = "-1"
-  security_group_id        = module.eks.node_security_group_id
-  source_security_group_id = aws_security_group.batcave-elb-sg.id
+  security_group_id        = aws_security_group.batcave-elb-sg.id
+  source_security_group_id = module.eks.node_security_group_id
 }
