@@ -102,7 +102,7 @@ resource "aws_lb" "batcave-lb" {
 
 
   subnets = var.transport_subnets
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 
   tags = {
     Name = "BatCave-ELB"
@@ -110,7 +110,7 @@ resource "aws_lb" "batcave-lb" {
   }
 }
 
-# Listener
+# Listener HTTPS
 resource "aws_lb_listener" "batcave-https" {
   load_balancer_arn = aws_lb.batcave-lb.arn
   port              = "443"
@@ -121,6 +121,7 @@ resource "aws_lb_listener" "batcave-https" {
   }
 }
 
+# Redirect from HTTP to HTTPS
 resource "aws_lb_listener" "batcave-redirect" {
   load_balancer_arn = aws_lb.batcave-lb.arn
   port              = "80"
