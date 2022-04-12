@@ -93,8 +93,7 @@ module "batcave-elb" {
   }
 }
 
-# resource "aws_autoscaling_attachment" "att-batcave-workers" {
-#   count                  = length(var.worker_asg_names)
-#   elb                    = module.batcave-elb.this_elb_id
-#   autoscaling_group_name = var.worker_asg_names[count.index]
-# }
+resource "aws_autoscaling_attachment" "att-batcave-workers" {
+  elb                    = module.batcave-elb.this_elb_id
+  autoscaling_group_name = module.eks.self_managed_node_groups.general.autoscaling_group_name
+}
