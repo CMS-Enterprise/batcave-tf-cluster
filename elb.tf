@@ -150,13 +150,13 @@ resource "aws_lb_target_group" "batcave-tg-http" {
 
 # Attached General Node-Pool to Target Group
 resource "aws_autoscaling_attachment" "general-batcave-workers" {
-  lb_target_group_arn    = aws_lb_target_group.batcave-https.arn
+  lb_target_group_arn    = aws_lb_target_group.batcave-tg-https.arn
   autoscaling_group_name = module.eks.self_managed_node_groups.general.autoscaling_group_name
 }
 
 # Attached Runner Node-Pool to Target Group
 resource "aws_autoscaling_attachment" "runners-batcave-workers" {
-  lb_target_group_arn    = aws_lb_target_group.batcave-https.arn
+  lb_target_group_arn    = aws_lb_target_group.batcave-tg-https.arn
   autoscaling_group_name = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_name
 }
 
