@@ -94,71 +94,71 @@ locals {
 #   }
 # }
 
-# create NLB
-resource "aws_lb" "batcave-lb" {
-  name               = "batcave-lb"
-  load_balancer_type = "network"
-  internal = true
+# # create NLB
+# resource "aws_lb" "batcave-lb" {
+#   name               = "batcave-lb"
+#   load_balancer_type = "network"
+#   internal = true
 
 
-  subnets = var.transport_subnets
-  enable_deletion_protection = false
+#   subnets = var.transport_subnets
+#   enable_deletion_protection = false
 
-  tags = {
-    Name = "BatCave-ELB"
-    Environment = "Development"
-  }
-}
+#   tags = {
+#     Name = "BatCave-ELB"
+#     Environment = "Development"
+#   }
+# }
 
-# Listener HTTPS
-resource "aws_lb_listener" "batcave-ls-https" {
-  load_balancer_arn = aws_lb.batcave-lb.arn
-  port              = "443"
-  protocol          = "TCP"
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.batcave-tg-https.arn
-  }
-}
+# # Listener HTTPS
+# resource "aws_lb_listener" "batcave-ls-https" {
+#   load_balancer_arn = aws_lb.batcave-lb.arn
+#   port              = "443"
+#   protocol          = "TCP"
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.batcave-tg-https.arn
+#   }
+# }
 
-# Redirect from HTTP to HTTPS
-resource "aws_lb_listener" "batcave-ls-http" {
-  load_balancer_arn = aws_lb.batcave-lb.arn
-  port              = "80"
-  protocol          = "TCP"
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.batcave-tg-https.arn
-  }
+# # Redirect from HTTP to HTTPS
+# resource "aws_lb_listener" "batcave-ls-http" {
+#   load_balancer_arn = aws_lb.batcave-lb.arn
+#   port              = "80"
+#   protocol          = "TCP"
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.batcave-tg-https.arn
+#   }
 
-}
+# }
 
-# Create Target Group
-resource "aws_lb_target_group" "batcave-tg-https" {
-  name     = "batcave-tg-https"
-  port     = 443
-  protocol = "TCP"
-  vpc_id   = var.vpc_id
-}
+# # Create Target Group
+# resource "aws_lb_target_group" "batcave-tg-https" {
+#   name     = "batcave-tg-https"
+#   port     = 443
+#   protocol = "TCP"
+#   vpc_id   = var.vpc_id
+# }
 
-resource "aws_lb_target_group" "batcave-tg-http" {
-  name     = "batcave-tg-http"
-  port     = 80
-  protocol = "TCP"
-  vpc_id   = var.vpc_id
-}
+# resource "aws_lb_target_group" "batcave-tg-http" {
+#   name     = "batcave-tg-http"
+#   port     = 80
+#   protocol = "TCP"
+#   vpc_id   = var.vpc_id
+# }
 
-# Attached General Node-Pool to Target Group
-resource "aws_autoscaling_attachment" "general-batcave-workers" {
-  lb_target_group_arn    = aws_lb_target_group.batcave-tg-https.arn
-  autoscaling_group_name = module.eks.self_managed_node_groups.general.autoscaling_group_name
-}
+# # Attached General Node-Pool to Target Group
+# resource "aws_autoscaling_attachment" "general-batcave-workers" {
+#   lb_target_group_arn    = aws_lb_target_group.batcave-tg-https.arn
+#   autoscaling_group_name = module.eks.self_managed_node_groups.general.autoscaling_group_name
+# }
 
-# Attached Runner Node-Pool to Target Group
-resource "aws_autoscaling_attachment" "runners-batcave-workers" {
-  lb_target_group_arn    = aws_lb_target_group.batcave-tg-https.arn
-  autoscaling_group_name = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_name
-}
+# # Attached Runner Node-Pool to Target Group
+# resource "aws_autoscaling_attachment" "runners-batcave-workers" {
+#   lb_target_group_arn    = aws_lb_target_group.batcave-tg-https.arn
+#   autoscaling_group_name = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_name
+# }
 
 # resource "aws_security_group_rule" "elb_node" {
 #   type                     = "ingress"
