@@ -117,7 +117,7 @@ resource "aws_lb_listener" "batcave-ls-https" {
   protocol          = "TCP"
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.batcave-https.arn
+    target_group_arn = aws_lb_target_group.batcave-tg-https.arn
   }
 }
 
@@ -128,7 +128,7 @@ resource "aws_lb_listener" "batcave-ls-http" {
   protocol          = "TCP"
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.batcave-https.arn
+    target_group_arn = aws_lb_target_group.batcave-tg-https.arn
   }
 
 }
