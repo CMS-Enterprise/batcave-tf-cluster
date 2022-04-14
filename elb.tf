@@ -144,38 +144,38 @@ resource "aws_lb_listener" "batcave-ls-https" {
 }
 
 # Redirect from HTTP to HTTPS
-resource "aws_lb_listener" "batcave-ls-http" {
-  load_balancer_arn = aws_lb.batcave-lb.arn
-  port              = "80"
-  protocol          = "TCP"
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.batcave-tg-https.arn
-  }
+# resource "aws_lb_listener" "batcave-ls-http" {
+#   load_balancer_arn = aws_lb.batcave-lb.arn
+#   port              = "80"
+#   protocol          = "TCP"
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.batcave-tg-https.arn
+#   }
 
-}
+# }
 
-resource "aws_lb_listener" "batcave-ls-status" {
-  load_balancer_arn = aws_lb.batcave-lb.arn
-  port              = "15020"
-  protocol          = "TCP"
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.batcave-tg-https.arn
-  }
+# resource "aws_lb_listener" "batcave-ls-status" {
+#   load_balancer_arn = aws_lb.batcave-lb.arn
+#   port              = "15020"
+#   protocol          = "TCP"
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.batcave-tg-https.arn
+#   }
 
-}
+# }
 
-resource "aws_lb_listener" "batcave-ls-tls" {
-  load_balancer_arn = aws_lb.batcave-lb.arn
-  port              = "15443"
-  protocol          = "TCP"
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.batcave-tg-https.arn
-  }
+# resource "aws_lb_listener" "batcave-ls-tls" {
+#   load_balancer_arn = aws_lb.batcave-lb.arn
+#   port              = "15443"
+#   protocol          = "TCP"
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.batcave-tg-https.arn
+#   }
 
-}
+# }
 
 # Create Target Group
 resource "aws_lb_target_group" "batcave-tg-https" {
@@ -185,12 +185,12 @@ resource "aws_lb_target_group" "batcave-tg-https" {
   vpc_id   = var.vpc_id
 }
 
-resource "aws_lb_target_group" "batcave-tg-http" {
-  name     = "batcave-tg-http"
-  port     = 30080
-  protocol = "TCP"
-  vpc_id   = var.vpc_id
-}
+# resource "aws_lb_target_group" "batcave-tg-http" {
+#   name     = "batcave-tg-http"
+#   port     = 30080
+#   protocol = "TCP"
+#   vpc_id   = var.vpc_id
+# }
 
 # Attached General Node-Pool to Target Group
 resource "aws_autoscaling_attachment" "general-batcave-workers" {
