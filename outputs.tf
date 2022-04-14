@@ -53,9 +53,13 @@ output "cluster_certificate_authority_data" {
   value       = try(module.eks.certificate_authority[0].data, "")
 }
 
-output "cluster_id" {
+output "cluster_eks_id" {
   description = "The name/id of the EKS cluster. Will block on cluster creation until the cluster is really ready"
   value       = try(module.eks.id, "")
+}
+
+output "cluster_id" {
+  value       = try(module.eks.cluster_id, "")
 }
 
 output "cluster_oidc_issuer_url" {
