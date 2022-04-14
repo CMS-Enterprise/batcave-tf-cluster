@@ -6,7 +6,7 @@ data "aws_kms_alias" "sops" {
 
 data "aws_iam_policy_document" "node_policy" {
   statement {
-    sid = "K8s-nodes"
+    sid = "K8sNodes"
     actions = [
       "kms:*",
     ]
