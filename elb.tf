@@ -77,7 +77,7 @@ module "batcave-elb" {
   ]
 
   health_check = {
-    target              = "TCP:31020"
+    target              = "TCP:30020"
     interval            = 10
     healthy_threshold   = 2
     unhealthy_threshold = 6
