@@ -13,15 +13,15 @@ resource "aws_lb" "batcave-lb" {
 
   subnet_mapping {
     subnet_id = var.transport_subnets_by_zone["us-east-1a"]
-    private_ipv4_address = "10.202.92.0"
+    private_ipv4_address = "10.223.166.129"
   }
   subnet_mapping {
     subnet_id = var.transport_subnets_by_zone["us-east-1b"]
-    private_ipv4_address = "10.202.92.128"
+    private_ipv4_address = "10.223.166.145"
   }
   subnet_mapping {
     subnet_id = var.transport_subnets_by_zone["us-east-1c"]
-    private_ipv4_address = "10.202.93.0"
+    private_ipv4_address = "10.223.166.161"
   }
 
   enable_deletion_protection = false
