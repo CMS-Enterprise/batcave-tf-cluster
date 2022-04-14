@@ -66,6 +66,10 @@ variable "transport_subnet_cidr_blocks" {
   type = map(string)
 }
 
+variable "transport_subnets_by_zone" {
+  type = map(string)
+}
+
 variable "transport_subnets" {
   type = list(any)
 }
