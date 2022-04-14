@@ -183,13 +183,6 @@ resource "aws_lb_target_group" "batcave-tg-https" {
   port     = 30443
   protocol = "TCP"
   vpc_id   = var.vpc_id
-  health_check = {
-    target              = "TCP:30020"
-    interval            = 10
-    healthy_threshold   = 2
-    unhealthy_threshold = 6
-    timeout             = 5
-  }
 }
 
 resource "aws_lb_target_group" "batcave-tg-http" {
@@ -197,13 +190,6 @@ resource "aws_lb_target_group" "batcave-tg-http" {
   port     = 30080
   protocol = "TCP"
   vpc_id   = var.vpc_id
-  health_check = {
-    target              = "TCP:30020"
-    interval            = 10
-    healthy_threshold   = 2
-    unhealthy_threshold = 6
-    timeout             = 5
-  }
 }
 
 # Attached General Node-Pool to Target Group
