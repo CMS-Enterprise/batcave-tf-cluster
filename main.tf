@@ -420,3 +420,4 @@ resource "aws_security_group_rule" "https-tg-ingress" {
   protocol                 = "-1"
   security_group_id = module.eks.node_security_group_id
   cidr_blocks              = ["10.0.0.0/8"]
+}
