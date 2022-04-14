@@ -412,3 +412,11 @@ resource "aws_security_group_rule" "allow_all_worker_internet_egress" {
   security_group_id = module.eks.node_security_group_id
   cidr_blocks       = ["0.0.0.0/0"]
 }
+
+resource "aws_security_group_rule" "https-tg-ingress" {
+  type                     = "ingress"
+  to_port                  = 0
+  from_port                = 0
+  protocol                 = "-1"
+  security_group_id = module.eks.node_security_group_id
+  cidr_blocks              = ["10.0.0.0/8"]
