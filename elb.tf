@@ -155,7 +155,7 @@ resource "aws_lb_listener" "batcave-ls-http" {
 
 }
 
-resource "aws_lb_listener" "batcave-ls-http" {
+resource "aws_lb_listener" "batcave-ls-status" {
   load_balancer_arn = aws_lb.batcave-lb.arn
   port              = "15020"
   protocol          = "TCP"
