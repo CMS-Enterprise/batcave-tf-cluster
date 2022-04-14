@@ -62,7 +62,7 @@ module "batcave-elb" {
       lb_protocol       = "tcp"
     },
     {
-      instance_port     = "31020"
+      instance_port     = "30020"
       instance_protocol = "TCP"
       lb_port           = "15020"
       lb_protocol       = "tcp"
