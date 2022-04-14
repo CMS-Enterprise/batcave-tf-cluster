@@ -50,13 +50,8 @@ resource "aws_lb_listener" "batcave-ls-http" {
   protocol          = "TCP"
   
   default_action {
-    type             = "redirect"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.batcave-tg-https.arn
-  }
-
-  redirect {
-    port = "443"
-    protocol = "TCP"
   }
 }
 
