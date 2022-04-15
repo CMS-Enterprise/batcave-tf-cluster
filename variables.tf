@@ -231,3 +231,8 @@ variable "cluster_security_group_additional_rules" {
   description = "Map of security group rules to attach to the cluster security group, as you cannot change cluster security groups without replacing the instance"
   default     = {}
 }
+
+variable "nlb_deletion_protection" {
+  type = bool
+  default = false
+}

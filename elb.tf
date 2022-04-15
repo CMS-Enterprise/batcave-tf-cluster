@@ -6,7 +6,7 @@ locals {
 
 # create NLB
 resource "aws_lb" "batcave-lb" {
-  name               = "batcave-lb"
+  name               = "${var.clustername}-lb"
   load_balancer_type = "network"
   internal = true
   
@@ -18,24 +18,11 @@ resource "aws_lb" "batcave-lb" {
     }
   }
 
-  # subnet_mapping {
-  #   subnet_id = var.transport_subnets_by_zone["us-east-1a"]
-  #   private_ipv4_address = cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone["us-east-1a"]],5)
-  # }
-  # subnet_mapping {
-  #   subnet_id = var.transport_subnets_by_zone["us-east-1b"]
-  #   private_ipv4_address = var.env != "dev" ? cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone["us-east-1b"]],5) : null
-  # }
-  # subnet_mapping {
-  #   subnet_id = var.transport_subnets_by_zone["us-east-1c"]
-  #   private_ipv4_address = cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone["us-east-1c"]],5)
-  # }
-
-  enable_deletion_protection = false
+  enable_deletion_protection = var.nlb_deletion_protection
 
   tags = {
-    Name = "BatCave-ELB"
-    Environment = "Development"
+    Name = "${var.cluster_name}-ELB"
+    Environment = var.environment
   }
 }
 
