@@ -62,6 +62,7 @@ module "eks" {
       desired_size                  = var.desired_size
       max_size                      = var.max_size
       min_size                      = var.min_size
+      target_group_arn              = [aws_lb_target_group.batcave-tg-https.arn, aws_lb_target_group.batcave-tg-http.arn]
       create_security_group         = false
       block_device_mappings = [
         {
@@ -95,6 +96,7 @@ module "eks" {
       max_size                      = var.runners_max_size
       min_size                      = var.runners_min_size
       create_security_group         = false
+      target_group_arn              = [aws_lb_target_group.batcave-tg-https.arn,aws_lb_target_group.batcave-tg-http.arn]
       block_device_mappings = [
         {
           device_name = "/dev/xvda"
