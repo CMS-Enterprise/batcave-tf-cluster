@@ -245,5 +245,5 @@ output "runner_nodepool_asg" {
 }
 
 output "z-test" {
-  value = var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone["us-east-1a"]]
+  value = cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone["us-east-1a"]],5)
 }
