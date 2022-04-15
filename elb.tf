@@ -6,7 +6,7 @@ locals {
 
 # create NLB
 resource "aws_lb" "batcave-lb" {
-  name               = "${var.clustername}-lb"
+  name               = "${var.cluster_name}-lb"
   load_balancer_type = "network"
   internal = true
   
