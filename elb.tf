@@ -9,20 +9,27 @@ resource "aws_lb" "batcave-lb" {
   name               = "batcave-lb"
   load_balancer_type = "network"
   internal = true
+  
+  dynamic "subnet_mapping" {
+    for_each = var.transport_subnets_by_zone
+    content {
+      subnet_id = subnet_mapping.value
+      private_ipv4_address = var.create_nlb_static_ip ? cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone[subnet_mapping.key]],5) : null
+    }
+  }
 
-
-  subnet_mapping {
-    subnet_id = var.transport_subnets_by_zone["us-east-1a"]
-    private_ipv4_address = cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone["us-east-1a"]],5)
-  }
-  subnet_mapping {
-    subnet_id = var.transport_subnets_by_zone["us-east-1b"]
-    private_ipv4_address = cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone["us-east-1b"]],5)
-  }
-  subnet_mapping {
-    subnet_id = var.transport_subnets_by_zone["us-east-1c"]
-    private_ipv4_address = cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone["us-east-1c"]],5)
-  }
+  # subnet_mapping {
+  #   subnet_id = var.transport_subnets_by_zone["us-east-1a"]
+  #   private_ipv4_address = cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone["us-east-1a"]],5)
+  # }
+  # subnet_mapping {
+  #   subnet_id = var.transport_subnets_by_zone["us-east-1b"]
+  #   private_ipv4_address = var.env != "dev" ? cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone["us-east-1b"]],5) : null
+  # }
+  # subnet_mapping {
+  #   subnet_id = var.transport_subnets_by_zone["us-east-1c"]
+  #   private_ipv4_address = cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone["us-east-1c"]],5)
+  # }
 
   enable_deletion_protection = false
 
