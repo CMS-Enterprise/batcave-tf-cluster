@@ -240,3 +240,6 @@ output "general_nodepool_asg" {
   value = module.eks.self_managed_node_groups.general.autoscaling_group_id
 }
 
+output "runner_nodepool_asg" {
+  value = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_id
+}
