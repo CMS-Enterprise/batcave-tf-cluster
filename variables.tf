@@ -217,6 +217,11 @@ variable "create_transport_nlb" {
   description = "Optionally create a network load balancer in the transport subnet.  Requires VPC to be configured to fetch transport subnet data"
 }
 
+variable "create_nlb_static_ip" {
+  type = bool
+  default = true
+}
+
 variable "cluster_additional_sg_prefix_lists" {
   type = list(string)
 }
