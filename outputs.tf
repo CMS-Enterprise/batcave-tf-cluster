@@ -240,10 +240,3 @@ output "general_nodepool_asg" {
   value = module.eks.self_managed_node_groups.general.autoscaling_group_id
 }
 
-output "runner_nodepool_asg" {
-  value = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_id
-}
-
-output "z-test" {
-  value = cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone["us-east-1a"]],5)
-}
