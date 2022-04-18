@@ -110,7 +110,7 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
   role       = each.value.iam_role_name
 }
 # SSM policy
-resource "aws_iam_policy" "ssm_managed_instance_policy" {
+resource "aws_iam_policy" "ssm_managed_instance" {
   name = "ssm-policy-${var.cluster_name}"
   path = var.iam_role_path
   policy = jsonencode({
