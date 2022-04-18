@@ -1,12 +1,12 @@
 locals {
-  batcave_lb_name           = "${var.cluster_name}-batcave-lb"
+  batcave_lb_name           = "${var.cluster_name}"-batcave-lb
   formatted_batcave_lb_name = length(local.batcave_lb_name) > 32 ? "${substr(local.batcave_lb_name, 0, 16)}-${substr(local.batcave_lb_name, length(local.batcave_lb_name) - 15, 32)}" : local.batcave_lb_name
 }
 
 
 # create NLB
 resource "aws_lb" "batcave-lb" {
-  name               = "${var.cluster_=name}-lb"
+  name               = "${var.cluster_name}"-lb
   load_balancer_type = "network"
   internal = true
   
