@@ -4,9 +4,9 @@ data "aws_kms_alias" "sops" {
   name = "alias/batcave-landing-sops"
 }
 
-data "aws_iam_policy_document" "kms_policy" {
+data "aws_iam_policy_document" "node_policy" {
   statement {
-    sid = "kmsuse"
+    sid = "K8sNodes"
     actions = [
       "kms:*",
     ]
@@ -20,23 +20,30 @@ data "aws_iam_policy_document" "kms_policy" {
     actions = [
       "kms:List*",
       "kms:Describe*",
+      "s3:*",
+      "ec2:DescribeVolumes",
+      "ec2:DescribeSnapshots",
+      "ec2:CreateTags",
+      "ec2:CreateVolume",
+      "ec2:CreateSnapshot",
+      "ec2:DeleteSnapshot"
     ]
     resources = ["*"]
   }
 }
 
 # KMS policy to allow sops key only
-resource "aws_iam_policy" "kms_policy" {
-  name        = "${local.name}-kms_policy"
+resource "aws_iam_policy" "node_policy" {
+  name        = "${local.name}-node_policy"
   path        = var.iam_role_path
-  description = "IAM policy to access KMS key"
-  policy      = data.aws_iam_policy_document.kms_policy.json
+  description = "IAM policy to nodes"
+  policy      = data.aws_iam_policy_document.node_policy.json
 }
 
 # Attach KMS policy to node IAM role
 resource "aws_iam_role_policy_attachment" "additional" {
   for_each   = module.eks.self_managed_node_groups
-  policy_arn = aws_iam_policy.kms_policy.arn
+  policy_arn = aws_iam_policy.node_policy.arn
   role       = each.value.iam_role_name
 }
 
@@ -68,63 +75,6 @@ resource "aws_iam_policy" "secretsmanager_policy" {
 resource "aws_iam_role_policy_attachment" "secretsmanager" {
   for_each   = module.eks.self_managed_node_groups
   policy_arn = aws_iam_policy.secretsmanager_policy.arn
-  role       = each.value.iam_role_name
-}
-
-### S3 access policy for nodes
-resource "aws_iam_policy" "s3_policy" {
-  name        = "${local.name}-s3_policy"
-  path        = var.iam_role_path
-  description = "S3 access policy for nodes"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "s3fullaccess",
-        "Action" : "s3:*",
-        "Effect" : "Allow",
-        "Resource" : "*"
-      }
-    ]
-  })
-}
-
-# Attach S3 policy to node IAM role
-resource "aws_iam_role_policy_attachment" "additional_policy_s3" {
-  for_each   = module.eks.self_managed_node_groups
-  policy_arn = aws_iam_policy.s3_policy.arn
-  role       = each.value.iam_role_name
-}
-
-### S3 access policy for nodes
-resource "aws_iam_policy" "velero_policy" {
-  name        = "${local.name}-velero_policy"
-  path        = var.iam_role_path
-  description = "Velero backup policy for nodes"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "veleroaccess",
-        "Action" : [
-          "ec2:DescribeVolumes",
-          "ec2:DescribeSnapshots",
-          "ec2:CreateTags",
-          "ec2:CreateVolume",
-          "ec2:CreateSnapshot",
-          "ec2:DeleteSnapshot"
-        ],
-        "Effect" : "Allow",
-        "Resource" : "*"
-      }
-    ]
-  })
-}
-
-# Attach S3 policy to node IAM role
-resource "aws_iam_role_policy_attachment" "additional_policy_velero" {
-  for_each   = module.eks.self_managed_node_groups
-  policy_arn = aws_iam_policy.velero_policy.arn
   role       = each.value.iam_role_name
 }
 
@@ -160,7 +110,7 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
   role       = each.value.iam_role_name
 }
 # SSM policy
-resource "aws_iam_policy" "ssm_managed_instance" {
+resource "aws_iam_policy" "ssm_managed_instance_policy" {
   name = "ssm-policy-${var.cluster_name}"
   path = var.iam_role_path
   policy = jsonencode({
@@ -219,4 +169,3 @@ resource "aws_iam_role_policy_attachment" "ssm_managed_instance" {
   role       = each.value.iam_role_name
   policy_arn = aws_iam_policy.ssm_managed_instance.arn
 }
-

@@ -66,6 +66,14 @@ variable "transport_subnet_cidr_blocks" {
   type = map(string)
 }
 
+variable "transport_subnets_by_zone" {
+  type = map(string)
+}
+
+variable "transport_subnets" {
+  type = list(any)
+}
+
 variable "cluster_endpoint_private_access" {
   default = "true"
 }
@@ -209,6 +217,11 @@ variable "create_transport_nlb" {
   description = "Optionally create a network load balancer in the transport subnet.  Requires VPC to be configured to fetch transport subnet data"
 }
 
+variable "create_nlb_static_ip" {
+  type = bool
+  default = true
+}
+
 variable "cluster_additional_sg_prefix_lists" {
   type = list(string)
 }
@@ -217,4 +230,9 @@ variable "cluster_security_group_additional_rules" {
   type        = map(any)
   description = "Map of security group rules to attach to the cluster security group, as you cannot change cluster security groups without replacing the instance"
   default     = {}
+}
+
+variable "nlb_deletion_protection" {
+  type = bool
+  default = false
 }
