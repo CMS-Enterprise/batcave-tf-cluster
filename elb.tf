@@ -58,7 +58,7 @@ resource "aws_lb_target_group" "batcave-tg-https" {
   vpc_id   = var.vpc_id
 }
 
-resource "aws_lb_target_group" "batcave-tg-https" {
+resource "aws_lb_target_group" "batcave-tg-http" {
   name     = "batcave-tg-http"
   port     = 30080
   protocol = "TCP"
