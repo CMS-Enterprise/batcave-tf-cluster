@@ -176,7 +176,7 @@ resource "aws_iam_role_policy_attachment" "ssm_managed_instance" {
 
 resource "aws_iam_policy" "ssm_managed_instance" {
   name = "batcave-ssm-policy-${var.cluster_name}"
-  path = var.iam_path
+  path = var.iam_role_path
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
