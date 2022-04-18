@@ -228,6 +228,7 @@ resource "aws_iam_policy" "ssm_managed_instance" {
 }
 
 resource "aws_iam_role_policy_attachment" "batcave_ssm_policy" {
-  role       = var.worker_iam_role_name
+  for_each   = module.eks.self_managed_node_groups
+  role       = each.value.iam_role_name
   policy_arn = aws_iam_policy.ssm_managed_instance.arn
 }
