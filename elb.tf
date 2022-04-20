@@ -35,6 +35,10 @@ resource "aws_lb_listener" "batcave-ls-https" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.batcave-tg-https.arn
   }
+  tags = {
+    Name = "${var.cluster_name}-https-tg"
+    Environment = var.environment
+  }
 }
 
 # Redirect from HTTP to HTTPS
@@ -47,8 +51,11 @@ resource "aws_lb_listener" "batcave-ls-http" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.batcave-tg-http.arn
   }
+  tags = {
+    Name = "${var.cluster_name}-http-tg"
+    Environment = var.environment
+  }
 }
-
 
 # Create Target Group
 resource "aws_lb_target_group" "batcave-tg-https" {
