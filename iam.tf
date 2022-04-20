@@ -20,7 +20,12 @@ data "aws_iam_policy_document" "node_policy" {
     actions = [
       "kms:List*",
       "kms:Describe*",
-      "s3:*",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid = "ec2snapshot"
+    actions = [
       "ec2:DescribeVolumes",
       "ec2:DescribeSnapshots",
       "ec2:CreateTags",
@@ -29,6 +34,26 @@ data "aws_iam_policy_document" "node_policy" {
       "ec2:DeleteSnapshot"
     ]
     resources = ["*"]
+  }
+  statement {
+    actions = [
+      "s3:ListBucket"
+    ]
+    resources = [
+      "arn:aws:s3:::*velero-*"
+    ]
+  }
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:PutObject",
+      "s3:AbortMultipartUpload",
+      "s3:List*"
+    ]
+    resources = [
+      "arn:aws:s3:::*velero-*/*"
+    ]
   }
 }
 
