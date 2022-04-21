@@ -59,14 +59,14 @@ resource "aws_lb_listener" "batcave-ls-http" {
 
 # Create Target Group
 resource "aws_lb_target_group" "batcave-tg-https" {
-  name     = "batcave-tg-https"
+  name     = "${var.cluster_name}-batcave-tg-https"
   port     = 30443
   protocol = "TCP"
   vpc_id   = var.vpc_id
 }
 
 resource "aws_lb_target_group" "batcave-tg-http" {
-  name     = "batcave-tg-http"
+  name     = "${var.cluster_name}-batcave-tg-http"
   port     = 30080
   protocol = "TCP"
   vpc_id   = var.vpc_id
