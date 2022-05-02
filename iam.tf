@@ -167,5 +167,5 @@ resource "aws_iam_policy" "ssm_managed_instance_policy" {
 resource "aws_iam_role_policy_attachment" "ssm_managed_instance" {
   for_each   = module.eks.self_managed_node_groups
   role       = each.value.iam_role_name
-  policy_arn = aws_iam_policy.ssm_managed_instance.arn
+  policy_arn = aws_iam_policy.ssm_managed_instance_policy.arn
 }
