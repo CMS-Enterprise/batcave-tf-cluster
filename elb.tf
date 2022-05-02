@@ -35,6 +35,10 @@ resource "aws_lb_listener" "batcave-ls-https" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.batcave-tg-https.arn
   }
+  tags = {
+    Name = "${var.cluster_name}-https-tg"
+    Environment = var.environment
+  }
 }
 
 # Redirect from HTTP to HTTPS
@@ -45,27 +49,49 @@ resource "aws_lb_listener" "batcave-ls-http" {
   
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.batcave-tg-https.arn
+    target_group_arn = aws_lb_target_group.batcave-tg-http.arn
+  }
+  tags = {
+    Name = "${var.cluster_name}-http-tg"
+    Environment = var.environment
   }
 }
 
-
 # Create Target Group
 resource "aws_lb_target_group" "batcave-tg-https" {
-  name     = "batcave-tg-https"
+  name     = "${var.cluster_name}-batcave-tg-https"
   port     = 30443
   protocol = "TCP"
   vpc_id   = var.vpc_id
 }
 
+resource "aws_lb_target_group" "batcave-tg-http" {
+  name     = "${var.cluster_name}-batcave-tg-http"
+  port     = 30080
+  protocol = "TCP"
+  vpc_id   = var.vpc_id
+}
+
 # Attached General Node-Pool to Target Group
-resource "aws_autoscaling_attachment" "general-batcave-workers" {
+resource "aws_autoscaling_attachment" "general-batcave-workers-https" {
   lb_target_group_arn    = aws_lb_target_group.batcave-tg-https.arn
   autoscaling_group_name = module.eks.self_managed_node_groups.general.autoscaling_group_name
 }
 
 # Attached Runner Node-Pool to Target Group
-resource "aws_autoscaling_attachment" "runners-batcave-workers" {
+resource "aws_autoscaling_attachment" "runners-batcave-workers-https" {
   lb_target_group_arn    = aws_lb_target_group.batcave-tg-https.arn
+  autoscaling_group_name = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_name
+}
+
+# Attached General Node-Pool to Target Group
+resource "aws_autoscaling_attachment" "general-batcave-workers-http" {
+  lb_target_group_arn    = aws_lb_target_group.batcave-tg-http.arn
+  autoscaling_group_name = module.eks.self_managed_node_groups.general.autoscaling_group_name
+}
+
+# Attached Runner Node-Pool to Target Group
+resource "aws_autoscaling_attachment" "runners-batcave-workers-http" {
+  lb_target_group_arn    = aws_lb_target_group.batcave-tg-http.arn
   autoscaling_group_name = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_name
 }

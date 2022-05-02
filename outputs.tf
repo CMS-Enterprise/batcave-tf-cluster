@@ -202,32 +202,6 @@ output "aws_auth_configmap_yaml" {
 ################################################################################
 # AWS Load Balancer
 ################################################################################
-
-output "aws_lb_id" {
-  description = "The ID of the load balancer"
-  value       = aws_lb.transport.*.id
-}
-
-output "aws_lb_arn" {
-  description = "The ARN of the load balancer"
-  value       = aws_lb.transport.*.arn
-}
-
-output "aws_lb_arn_suffix" {
-  description = "The ARN suffix for use with CloudWatch Metrics"
-  value       = aws_lb.transport.*.arn_suffix
-}
-
-output "aws_lb_dns_name" {
-  description = "The DNS name fo the load balancer"
-  value       = aws_lb.transport.*.zone_id
-}
-
-output "aws_lb_zone_id" {
-  description = "The canonical hosted zone ID of the load balancer"
-  value       = aws_lb.transport.*.zone_id
-}
-
 output "self_managed_node_group_general" {
   value = module.eks.self_managed_node_groups.general.launch_template_id
 }
