@@ -40,7 +40,8 @@ data "aws_iam_policy_document" "node_policy" {
       "s3:ListBucket"
     ]
     resources = [
-      "arn:aws:s3:::*velero-*"
+      "arn:aws:s3:::*velero-*",
+      "arn:aws:s3:::*runner-cache"
     ]
   }
   statement {
@@ -52,7 +53,8 @@ data "aws_iam_policy_document" "node_policy" {
       "s3:List*"
     ]
     resources = [
-      "arn:aws:s3:::*velero-*/*"
+      "arn:aws:s3:::*velero-*/*",
+      "arn:aws:s3:::*runner-cache/*"
     ]
   }
 }
