@@ -40,9 +40,9 @@ data "aws_iam_policy_document" "node_policy" {
       "s3:ListBucket"
     ]
     resources = [
-      "arn:aws:s3:::*velero-*",
+      "arn:aws:s3:::${var.cluster_name}*velero-storage",
       "arn:aws:s3:::batcave*runner-cache",
-      "arn:aws:s3:::batcave*gitlab*/*"
+      "arn:aws:s3:::batcave*gitlab*"
     ]
   }
   statement {
@@ -54,7 +54,7 @@ data "aws_iam_policy_document" "node_policy" {
       "s3:List*"
     ]
     resources = [
-      "arn:aws:s3:::*velero-*/*",
+      "arn:aws:s3:::${var.cluster_name}*velero-storage/*",
       "arn:aws:s3:::batcave*runner-cache/*",
       "arn:aws:s3:::batcave*gitlab*/*"
     ]
