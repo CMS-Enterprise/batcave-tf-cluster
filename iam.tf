@@ -41,7 +41,8 @@ data "aws_iam_policy_document" "node_policy" {
     ]
     resources = [
       "arn:aws:s3:::*velero-*",
-      "arn:aws:s3:::*runner-cache"
+      "arn:aws:s3:::batcave*runner-cache",
+      "arn:aws:s3:::batcave*gitlab*/*"
     ]
   }
   statement {
@@ -54,7 +55,8 @@ data "aws_iam_policy_document" "node_policy" {
     ]
     resources = [
       "arn:aws:s3:::*velero-*/*",
-      "arn:aws:s3:::*runner-cache/*"
+      "arn:aws:s3:::batcave*runner-cache/*",
+      "arn:aws:s3:::batcave*gitlab*/*"
     ]
   }
 }
