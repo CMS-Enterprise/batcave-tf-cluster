@@ -21,8 +21,8 @@ module "eks" {
   cluster_name    = local.name
   cluster_version = local.cluster_version
 
-  iam_role_path                 = var.iam_role_path
-  iam_role_permissions_boundary = var.iam_role_permissions_boundary
+  iam_role_path                  = var.iam_role_path
+  iam_role_permissions_boundary  = var.iam_role_permissions_boundary
   cluster_encryption_policy_path = var.iam_role_path
 
 
@@ -62,8 +62,11 @@ module "eks" {
       desired_size                  = var.desired_size
       max_size                      = var.max_size
       min_size                      = var.min_size
-      target_group_arn              = [aws_lb_target_group.batcave-tg-https.arn, aws_lb_target_group.batcave-tg-http.arn]
-      create_security_group         = false
+      target_group_arns = [
+        aws_lb_target_group.batcave_nlb_http.arn,
+        aws_lb_target_group.batcave_nlb_https.arn,
+      ]
+      create_security_group = false
       block_device_mappings = [
         {
           device_name = "/dev/xvda"
@@ -96,7 +99,6 @@ module "eks" {
       max_size                      = var.runners_max_size
       min_size                      = var.runners_min_size
       create_security_group         = false
-      target_group_arn              = [aws_lb_target_group.batcave-tg-https.arn, aws_lb_target_group.batcave-tg-http.arn]
       block_device_mappings = [
         {
           device_name = "/dev/xvda"
@@ -416,10 +418,10 @@ resource "aws_security_group_rule" "allow_all_worker_internet_egress" {
 }
 
 resource "aws_security_group_rule" "https-tg-ingress" {
-  type                     = "ingress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
+  type              = "ingress"
+  to_port           = 0
+  from_port         = 0
+  protocol          = "-1"
   security_group_id = module.eks.node_security_group_id
-  cidr_blocks              = ["10.0.0.0/8"]
+  cidr_blocks       = ["10.0.0.0/8"]
 }
