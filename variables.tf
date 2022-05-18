@@ -74,6 +74,10 @@ variable "transport_subnets" {
   type = list(any)
 }
 
+variable "nlb_subnets_by_zone" {
+  type = map(string)
+}
+
 variable "cluster_endpoint_private_access" {
   default = "true"
 }
@@ -211,14 +215,9 @@ variable "lt_CustomTag" {
 # ## KMS Key ARN from KMS module
 # variable "kms_key_arn" {}
 
-variable "create_transport_nlb" {
-  type        = bool
-  default     = false
-  description = "Optionally create a network load balancer in the transport subnet.  Requires VPC to be configured to fetch transport subnet data"
-}
 
-variable "create_nlb_static_ip" {
-  type = bool
+variable "transport_proxy_static_ip" {
+  type    = bool
   default = true
 }
 
@@ -233,6 +232,12 @@ variable "cluster_security_group_additional_rules" {
 }
 
 variable "nlb_deletion_protection" {
-  type = bool
+  type    = bool
   default = false
+}
+
+variable "create_transport_proxy_lb" {
+  type        = bool
+  default     = false
+  description = "Optionally create a network load balancer in the transport subnet.  Requires VPC to be configured to fetch transport subnet data"
 }

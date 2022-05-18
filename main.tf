@@ -21,8 +21,8 @@ module "eks" {
   cluster_name    = local.name
   cluster_version = local.cluster_version
 
-  iam_role_path                 = var.iam_role_path
-  iam_role_permissions_boundary = var.iam_role_permissions_boundary
+  iam_role_path                  = var.iam_role_path
+  iam_role_permissions_boundary  = var.iam_role_permissions_boundary
   cluster_encryption_policy_path = var.iam_role_path
 
 
@@ -62,8 +62,11 @@ module "eks" {
       desired_size                  = var.desired_size
       max_size                      = var.max_size
       min_size                      = var.min_size
-      target_group_arn              = [aws_lb_target_group.batcave-tg-https.arn, aws_lb_target_group.batcave-tg-http.arn]
-      create_security_group         = false
+      target_group_arns = [
+        aws_lb_target_group.batcave_nlb_http.arn,
+        aws_lb_target_group.batcave_nlb_https.arn,
+      ]
+      create_security_group = false
       block_device_mappings = [
         {
           device_name = "/dev/xvda"
@@ -96,7 +99,6 @@ module "eks" {
       max_size                      = var.runners_max_size
       min_size                      = var.runners_min_size
       create_security_group         = false
-      target_group_arn              = [aws_lb_target_group.batcave-tg-https.arn, aws_lb_target_group.batcave-tg-http.arn]
       block_device_mappings = [
         {
           device_name = "/dev/xvda"
@@ -222,204 +224,64 @@ resource "kubernetes_config_map" "aws_auth" {
   depends_on = [module.eks]
 }
 
-### Security group rules for cluster_primary_securiy_group_id
-resource "aws_security_group_rule" "allow_all_cluster_primary_2" {
-  type                     = "ingress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = module.eks.cluster_primary_security_group_id
-  source_security_group_id = module.eks.cluster_security_group_id
+locals {
+  cluster_security_groups_created = toset([
+    module.eks.node_security_group_id,
+    module.eks.cluster_security_group_id,
+  ])
+
+  cluster_security_groups_all = toset([
+    module.eks.node_security_group_id,
+    module.eks.cluster_security_group_id,
+    module.eks.cluster_primary_security_group_id,
+  ])
+
+  node_security_group_setproduct = setproduct(local.cluster_security_groups_created, local.cluster_security_groups_all)
+  node_security_group_src_dst = {for set in local.node_security_group_setproduct : "${set[0]}_allow_${set[1]}" => { sg = set[0], source_sg = set[1] }} # if set[0] != set[1]}
 }
 
-resource "aws_security_group_rule" "allow_all_cluster_primary_3" {
-  type                     = "ingress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = module.eks.cluster_primary_security_group_id
-  source_security_group_id = module.eks.node_security_group_id
-}
-
-# Security group rules for cluster_security_group_id
-resource "aws_security_group_rule" "allow_all_cluster_1" {
-  type              = "ingress"
-  to_port           = 0
-  from_port         = 0
-  protocol          = "-1"
-  security_group_id = module.eks.cluster_security_group_id
-  self              = true
-}
-resource "aws_security_group_rule" "allow_all_cluster_2" {
-  type                     = "ingress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = module.eks.cluster_security_group_id
-  source_security_group_id = module.eks.node_security_group_id
-}
-resource "aws_security_group_rule" "allow_all_cluster_3" {
-  type                     = "ingress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = module.eks.cluster_security_group_id
-  source_security_group_id = module.eks.cluster_primary_security_group_id
-}
-
-# Security group rules for cluster_security_group_id
-resource "aws_security_group_rule" "allow_all_worker_1" {
-  type              = "ingress"
-  to_port           = 0
-  from_port         = 0
-  protocol          = "-1"
-  security_group_id = module.eks.node_security_group_id
-  self              = true
-}
-resource "aws_security_group_rule" "allow_all_worker_2" {
-  type                     = "ingress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = module.eks.node_security_group_id
-  source_security_group_id = module.eks.cluster_security_group_id
-}
-resource "aws_security_group_rule" "allow_all_worker_3" {
-  type                     = "ingress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = module.eks.node_security_group_id
-  source_security_group_id = module.eks.cluster_primary_security_group_id
-}
-
-### Security group rules for cluster_primary_securiy_group_id
-
-resource "aws_security_group_rule" "allow_all_cluster_primary_2_egress" {
-  type                     = "egress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = module.eks.cluster_primary_security_group_id
-  source_security_group_id = module.eks.cluster_security_group_id
-}
-
-resource "aws_security_group_rule" "allow_all_cluster_primary_3_egress" {
-  type                     = "egress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = module.eks.cluster_primary_security_group_id
-  source_security_group_id = module.eks.node_security_group_id
-}
-
+# Ingress for provided prefix lists
 resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists" {
+  for_each          = local.cluster_security_groups_all
   type              = "ingress"
+  description       = "allow_ingress_additional_prefix_lists"
   to_port           = 0
   from_port         = 0
   protocol          = "-1"
   prefix_list_ids   = var.cluster_additional_sg_prefix_lists
-  security_group_id = module.eks.cluster_primary_security_group_id
+  security_group_id = each.key
 }
 
-resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists_worker" {
-  type              = "ingress"
-  to_port           = 0
-  from_port         = 0
-  protocol          = "-1"
-  prefix_list_ids   = var.cluster_additional_sg_prefix_lists
-  security_group_id = module.eks.node_security_group_id
-}
-
-resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists_secondary" {
-  type              = "ingress"
-  to_port           = 0
-  from_port         = 0
-  protocol          = "-1"
-  prefix_list_ids   = var.cluster_additional_sg_prefix_lists
-  security_group_id = module.eks.cluster_security_group_id
-}
-
-# ### Security group rules for cluster_security_group_id
-resource "aws_security_group_rule" "allow_all_cluster_1_egress" {
-  type              = "egress"
-  to_port           = 0
-  from_port         = 0
-  protocol          = "-1"
-  security_group_id = module.eks.cluster_security_group_id
-  self              = true
-}
-resource "aws_security_group_rule" "allow_all_cluster_2_egress" {
-  type                     = "egress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = module.eks.cluster_security_group_id
-  source_security_group_id = module.eks.node_security_group_id
-}
-resource "aws_security_group_rule" "allow_all_cluster_3_egress" {
-  type                     = "egress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = module.eks.cluster_security_group_id
-  source_security_group_id = module.eks.cluster_primary_security_group_id
-}
-
-### Security group rules for cluster_security_group_id
-
-resource "aws_security_group_rule" "allow_all_worker_1_egress" {
-  type              = "egress"
-  to_port           = 0
-  from_port         = 0
-  protocol          = "-1"
-  security_group_id = module.eks.node_security_group_id
-  self              = true
-}
-resource "aws_security_group_rule" "allow_all_worker_2_egress" {
-  type                     = "egress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = module.eks.node_security_group_id
-  source_security_group_id = module.eks.cluster_security_group_id
-}
-resource "aws_security_group_rule" "allow_all_worker_3_egress" {
-  type                     = "egress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = module.eks.node_security_group_id
-  source_security_group_id = module.eks.cluster_primary_security_group_id
-}
 
 # egress for the worker nodes
-# resource "aws_security_group_rule" "allow_all_worker_egress" {
-#   description              = "outbound bastion traffic"
-#   type                     = "egress"
-#   to_port                  = 0
-#   from_port                = 0
-#   protocol                 = "-1"
-#   security_group_id        = module.eks.node_security_group_id
-#   source_security_group_id = module.eks.cluster_security_group_id
-# }
-
-# egress for the worker nodes
-resource "aws_security_group_rule" "allow_all_worker_internet_egress" {
-  description       = "outbound nodes traffic"
+resource "aws_security_group_rule" "allow_all_node_internet_egress" {
+  for_each          = local.cluster_security_groups_created
+  description       = "allow_all_node_internet_egress"
   type              = "egress"
   to_port           = 0
   from_port         = 0
   protocol          = "-1"
-  security_group_id = module.eks.node_security_group_id
+  security_group_id = each.key
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+# ingress between the cluster security groups
+resource "aws_security_group_rule" "allow_all_nodes_to_other_nodes" {
+  for_each          = local.node_security_group_src_dst
+  description       = "allow all cluster nodes to other nodes"
+  type              = "ingress"
+  to_port           = 0
+  from_port         = 0
+  protocol          = "-1"
+  security_group_id = each.value.sg
+  source_security_group_id = each.value.source_sg
+}
+
 resource "aws_security_group_rule" "https-tg-ingress" {
-  type                     = "ingress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
+  type              = "ingress"
+  to_port           = 0
+  from_port         = 0
+  protocol          = "-1"
   security_group_id = module.eks.node_security_group_id
-  cidr_blocks              = ["10.0.0.0/8"]
+  cidr_blocks       = ["10.0.0.0/8"]
 }
