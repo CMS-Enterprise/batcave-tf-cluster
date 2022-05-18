@@ -7,10 +7,11 @@ locals {
   formatted_batcave_lb_name = length(local.batcave_lb_name) > 32 ? "${substr(local.batcave_lb_name, 0, 16)}-${substr(local.batcave_lb_name, length(local.batcave_lb_name) - 15, 32)}" : local.batcave_lb_name
 }
 
-
 # create NLB
-resource "aws_lb" "batcave-lb" {
-  name               = "${var.cluster_name}-lb"
+resource "aws_lb" "batcave_transport" {
+  count = var.create_transport_proxy_lb ? 1 : 0
+
+  name               = "${var.cluster_name}-transport"
   load_balancer_type = "network"
   internal           = true
 
@@ -31,38 +32,44 @@ resource "aws_lb" "batcave-lb" {
 }
 
 # Listener HTTPS
-resource "aws_lb_listener" "batcave-ls-https" {
-  load_balancer_arn = aws_lb.batcave-lb.arn
+resource "aws_lb_listener" "batcave_transport_https" {
+  count = var.create_transport_proxy_lb ? 1 : 0
+
+  load_balancer_arn = aws_lb.batcave_transport[0].arn
   port              = "443"
   protocol          = "TCP"
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.batcave-tg-https.arn
+    target_group_arn = aws_lb_target_group.batcave_transport_https[0].arn
   }
   tags = {
-    Name        = "${var.cluster_name}-https-tg"
+    Name        = "${var.cluster_name}_transport_https"
     Environment = var.environment
   }
 }
 
 # Redirect from HTTP to HTTPS
-resource "aws_lb_listener" "batcave-ls-http" {
-  load_balancer_arn = aws_lb.batcave-lb.arn
+resource "aws_lb_listener" "batcave_transport_http" {
+  count = var.create_transport_proxy_lb ? 1 : 0
+
+  load_balancer_arn = aws_lb.batcave_transport[0].arn
   port              = "80"
   protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.batcave-tg-http.arn
+    target_group_arn = aws_lb_target_group.batcave_transport_http[0].arn
   }
   tags = {
-    Name        = "${var.cluster_name}-http-tg"
+    Name        = "${var.cluster_name}_transport_http"
     Environment = var.environment
   }
 }
 
 # Create Target Group
-resource "aws_lb_target_group" "batcave-tg-https" {
+resource "aws_lb_target_group" "batcave_transport_https" {
+  count = var.create_transport_proxy_lb ? 1 : 0
+
   name_prefix          = substr(var.cluster_name, 0, 6)
   port                 = 443
   protocol             = "TCP"
@@ -72,7 +79,9 @@ resource "aws_lb_target_group" "batcave-tg-https" {
   preserve_client_ip   = false
 }
 
-resource "aws_lb_target_group" "batcave-tg-http" {
+resource "aws_lb_target_group" "batcave_transport_http" {
+  count = var.create_transport_proxy_lb ? 1 : 0
+
   name_prefix          = substr(var.cluster_name, 0, 6)
   port                 = 80
   protocol             = "TCP"
@@ -82,16 +91,16 @@ resource "aws_lb_target_group" "batcave-tg-http" {
   preserve_client_ip   = false
 }
 
-resource "aws_lb_target_group_attachment" "batcave-tg-https" {
-  for_each         = data.aws_network_interface.batcave_nlb
-  target_group_arn = aws_lb_target_group.batcave-tg-https.arn
+resource "aws_lb_target_group_attachment" "batcave_transport_https" {
+  for_each         = var.create_transport_proxy_lb ? data.aws_network_interface.batcave_nlb : {}
+  target_group_arn = aws_lb_target_group.batcave_transport_https[0].arn
   target_id        = each.value.private_ip
   port             = 443
 }
 
-resource "aws_lb_target_group_attachment" "batcave-tg-http" {
-  for_each         = data.aws_network_interface.batcave_nlb
-  target_group_arn = aws_lb_target_group.batcave-tg-http.arn
+resource "aws_lb_target_group_attachment" "batcave_transport_http" {
+  for_each         = var.create_transport_proxy_lb ? data.aws_network_interface.batcave_nlb : {}
+  target_group_arn = aws_lb_target_group.batcave_transport_http[0].arn
   target_id        = each.value.private_ip
   port             = 80
 }
