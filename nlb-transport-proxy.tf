@@ -19,7 +19,7 @@ resource "aws_lb" "batcave_transport" {
     for_each = var.transport_subnets_by_zone
     content {
       subnet_id            = subnet_mapping.value
-      private_ipv4_address = var.create_nlb_static_ip ? cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone[subnet_mapping.key]], 5) : null
+      private_ipv4_address = var.transport_proxy_static_ip ? cidrhost(var.transport_subnet_cidr_blocks[var.transport_subnets_by_zone[subnet_mapping.key]], 5) : null
     }
   }
 

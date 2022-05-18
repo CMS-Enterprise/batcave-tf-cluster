@@ -216,7 +216,7 @@ variable "lt_CustomTag" {
 # variable "kms_key_arn" {}
 
 
-variable "create_nlb_static_ip" {
+variable "transport_proxy_static_ip" {
   type    = bool
   default = true
 }
