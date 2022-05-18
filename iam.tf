@@ -8,7 +8,7 @@ data "aws_iam_policy_document" "node_policy" {
   statement {
     sid = "K8sNodes"
     actions = [
-      "kms:*",
+      "kms:Decrypt",
     ]
     resources = [
       data.aws_kms_alias.sops.arn,
