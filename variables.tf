@@ -63,15 +63,18 @@ variable "private_subnets" {
 }
 
 variable "transport_subnet_cidr_blocks" {
-  type = map(string)
+  type    = map(string)
+  default = {}
 }
 
 variable "transport_subnets_by_zone" {
-  type = map(string)
+  type    = map(string)
+  default = {}
 }
 
 variable "transport_subnets" {
-  type = list(any)
+  type    = list(any)
+  default = []
 }
 
 variable "nlb_subnets_by_zone" {
