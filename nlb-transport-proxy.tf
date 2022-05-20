@@ -13,7 +13,7 @@ resource "aws_lb" "batcave_transport" {
 
   name               = "${var.cluster_name}-transport"
   load_balancer_type = "network"
-  internal           = true
+  internal           = var.transport_proxy_is_internal
 
   dynamic "subnet_mapping" {
     for_each = var.transport_subnets_by_zone

@@ -218,10 +218,15 @@ variable "lt_CustomTag" {
 # ## KMS Key ARN from KMS module
 # variable "kms_key_arn" {}
 
-
 variable "transport_proxy_static_ip" {
   type    = bool
   default = true
+}
+
+variable "transport_proxy_is_internal" {
+  type        = bool
+  default     = true
+  description = "Boolean to trigger a public transport proxy ip"
 }
 
 variable "cluster_additional_sg_prefix_lists" {
