@@ -225,19 +225,27 @@ resource "kubernetes_config_map" "aws_auth" {
 }
 
 locals {
-  cluster_security_groups_created = toset([
-    module.eks.node_security_group_id,
-    module.eks.cluster_security_group_id,
-  ])
+  cluster_security_groups_created = {
+    "node" : module.eks.node_security_group_id,
+    "cluster" : module.eks.cluster_security_group_id,
+  }
 
-  cluster_security_groups_all = toset([
-    module.eks.node_security_group_id,
-    module.eks.cluster_security_group_id,
-    module.eks.cluster_primary_security_group_id,
-  ])
+  cluster_security_groups_all = {
+    "node" : module.eks.node_security_group_id,
+    "cluster" : module.eks.cluster_security_group_id,
+    "cluster_primary" : module.eks.cluster_primary_security_group_id,
+  }
 
-  node_security_group_setproduct = setproduct(local.cluster_security_groups_created, local.cluster_security_groups_all)
-  node_security_group_src_dst = {for set in local.node_security_group_setproduct : "${set[0]}_allow_${set[1]}" => { sg = set[0], source_sg = set[1] }} # if set[0] != set[1]}
+  # List of all combinations of security_groups_created and security_groups_all
+  node_security_group_setproduct = setproduct(
+    [for k, v in local.cluster_security_groups_created : { "${k}" : v }],
+    [for k, v in local.cluster_security_groups_all : { "${k}" : v }],
+  )
+  # Map of type: {"node_allow_cluster": {sg: "sg-1234", source_sg: "sg-2345"}, ...}
+  node_security_group_src_dst = { for sg_pair in local.node_security_group_setproduct :
+    "${keys(sg_pair[0])[0]}_allow_${keys(sg_pair[1])[0]}" =>
+    { sg = one(values(sg_pair[0])), source_sg = one(values(sg_pair[1])) }
+  }
 }
 
 # Ingress for provided prefix lists
@@ -249,7 +257,7 @@ resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists" {
   from_port         = 0
   protocol          = "-1"
   prefix_list_ids   = var.cluster_additional_sg_prefix_lists
-  security_group_id = each.key
+  security_group_id = each.value
 }
 
 
@@ -261,19 +269,19 @@ resource "aws_security_group_rule" "allow_all_node_internet_egress" {
   to_port           = 0
   from_port         = 0
   protocol          = "-1"
-  security_group_id = each.key
+  security_group_id = each.value
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-# ingress between the cluster security groups
+## ingress between the cluster security groups
 resource "aws_security_group_rule" "allow_all_nodes_to_other_nodes" {
-  for_each          = local.node_security_group_src_dst
-  description       = "allow all cluster nodes to other nodes"
-  type              = "ingress"
-  to_port           = 0
-  from_port         = 0
-  protocol          = "-1"
-  security_group_id = each.value.sg
+  for_each                 = local.node_security_group_src_dst
+  description              = "allow all cluster nodes to other nodes"
+  type                     = "ingress"
+  to_port                  = 0
+  from_port                = 0
+  protocol                 = "-1"
+  security_group_id        = each.value.sg
   source_security_group_id = each.value.source_sg
 }
 
