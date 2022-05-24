@@ -60,7 +60,7 @@ output "cluster_id" {
 
 output "cluster_oidc_issuer_url" {
   description = "The URL on the EKS cluster for the OpenID Connect identity provider"
-  value       = try(module.eks.identity[0].oidc[0].issuer, "")
+  value       = flatten(concat(aws_eks_cluster.this[*].identity[*].oidc.0.issuer, [""]))[0]
 }
 
 output "cluster_platform_version" {
