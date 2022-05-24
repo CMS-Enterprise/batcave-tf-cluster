@@ -31,9 +31,7 @@ output "general_node_pool_launch_template" {
 # output "cpu_node_pool_launch_template" {
 #   value = module.eks.self_managed_node_groups.cpu.launch_template_id
 # }
-output "provider_url" {
-  value = module.eks.cluster_oidc_issuer_url
-}
+
 
 output "worker_security_group_id" {
   value = module.eks.node_security_group_id
@@ -56,11 +54,6 @@ output "cluster_certificate_authority_data" {
 output "cluster_id" {
   description = "The name/id of the EKS cluster. Will block on cluster creation until the cluster is really ready"
   value       = module.eks.cluster_id
-}
-
-output "cluster_oidc_issuer_url" {
-  description = "The URL on the EKS cluster for the OpenID Connect identity provider"
-  value       = flatten(concat(aws_eks_cluster.this[*].identity[*].oidc.0.issuer, [""]))[0]
 }
 
 output "cluster_platform_version" {
@@ -105,9 +98,18 @@ output "node_security_group_id" {
 # IRSA
 ################################################################################
 
-output "oidc_provider_arn" {
-  description = "The ARN of the OIDC Provider if `enable_irsa = true`"
-  value       = var.enable_irsa ? concat(aws_iam_openid_connect_provider.oidc_provider[*].arn, [""])[0] : null
+# output "oidc_provider_arn" {
+#   description = "The ARN of the OIDC Provider if `enable_irsa = true`"
+#   value       = module.eks.
+# }
+
+# output "cluster_oidc_issuer_url" {
+#   description = "The URL on the EKS cluster for the OpenID Connect identity provider"
+#   value       = flatten(concat(aws_eks_cluster.this[*].identity[*].oidc.0.issuer, [""]))[0]
+# }
+
+output "provider_url" {
+  value = module.eks.cluster_oidc_issuer_url
 }
 
 ################################################################################
