@@ -98,18 +98,14 @@ output "node_security_group_id" {
 # IRSA
 ################################################################################
 
-# output "oidc_provider_arn" {
-#   description = "The ARN of the OIDC Provider if `enable_irsa = true`"
-#   value       = module.eks.
-# }
+output "oidc_provider_arn" {
+  description = "The ARN of the OIDC Provider if `enable_irsa = true`"
+  value       = module.eks.oidc_provider_arn
+}
 
-# output "cluster_oidc_issuer_url" {
-#   description = "The URL on the EKS cluster for the OpenID Connect identity provider"
-#   value       = flatten(concat(aws_eks_cluster.this[*].identity[*].oidc.0.issuer, [""]))[0]
-# }
-
-output "provider_url" {
-  value = module.eks.cluster_oidc_issuer_url
+output "cluster_oidc_issuer_url" {
+  description = "The URL on the EKS cluster for the OpenID Connect identity provider"
+  value       = module.eks.cluster_oidc_issuer_url
 }
 
 ################################################################################
