@@ -249,3 +249,43 @@ variable "create_transport_proxy_lb" {
   default     = false
   description = "Optionally create a network load balancer in the transport subnet.  Requires VPC to be configured to fetch transport subnet data"
 }
+
+variable "node_https_ingress_cidr_blocks" {
+  description = "List of CIDR blocks to allow into the node over the HTTPs port"
+  default     = ["10.0.0.0/8"]
+  type        = list(string)
+}
+
+variable "create_alb_proxy" {
+  type        = bool
+  description = "Create an Application Load Balancer proxy to live in front of the NLB and act as a proxy from the public Internet"
+  default     = false
+}
+variable "alb_proxy_is_internal" {
+  type        = bool
+  description = "If the ALB Proxy should be using internal ips.  Defaults to false, because the reason for ALB proxy existing is typically to make it accessible over the Internet"
+  default     = false
+}
+
+variable "alb_proxy_subnets" {
+  description = "List of subnet ids for the ALB Proxy to be deployed into"
+  default     = []
+  type        = list(string)
+}
+
+variable "acm_cert_base_domain" {
+  description = "Base domain of the certificate used for the ALB Proxy"
+  default     = ""
+  type        = string
+}
+
+variable "alb_proxy_ingress_cidrs" {
+  description = "List of CIDR blocks allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs"
+  default     = []
+  type        = list(string)
+}
+variable "alb_proxy_ingress_prefix_lists" {
+  description = "List of Prefix List IDs allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs"
+  default     = []
+  type        = list(string)
+}
