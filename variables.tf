@@ -77,7 +77,7 @@ variable "transport_subnets" {
   default = []
 }
 
-variable "nlb_subnets_by_zone" {
+variable "alb_subnets_by_zone" {
   type = map(string)
 }
 
@@ -239,17 +239,6 @@ variable "cluster_security_group_additional_rules" {
   default     = {}
 }
 
-variable "nlb_deletion_protection" {
-  type    = bool
-  default = false
-}
-
-variable "create_transport_proxy_lb" {
-  type        = bool
-  default     = false
-  description = "Optionally create a network load balancer in the transport subnet.  Requires VPC to be configured to fetch transport subnet data"
-}
-
 variable "node_https_ingress_cidr_blocks" {
   description = "List of CIDR blocks to allow into the node over the HTTPs port"
   default     = ["10.0.0.0/8"]
@@ -258,7 +247,7 @@ variable "node_https_ingress_cidr_blocks" {
 
 variable "create_alb_proxy" {
   type        = bool
-  description = "Create an Application Load Balancer proxy to live in front of the NLB and act as a proxy from the public Internet"
+  description = "Create an Application Load Balancer proxy to live in front of the K8s ALB and act as a proxy from the public Internet"
   default     = false
 }
 variable "alb_proxy_is_internal" {
@@ -288,4 +277,9 @@ variable "alb_proxy_ingress_prefix_lists" {
   description = "List of Prefix List IDs allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs"
   default     = []
   type        = list(string)
+}
+variable "alb_deletion_protection" {
+  description = "Enable/Disable ALB deletion protection for both ALBs"
+  default = false
+  type = bool
 }

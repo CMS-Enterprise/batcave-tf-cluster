@@ -63,8 +63,8 @@ module "eks" {
       max_size                      = var.max_size
       min_size                      = var.min_size
       target_group_arns = [
-        aws_lb_target_group.batcave_nlb_http.arn,
-        aws_lb_target_group.batcave_nlb_https.arn,
+        aws_lb_target_group.batcave_alb_http.arn,
+        aws_lb_target_group.batcave_alb_https.arn,
       ]
       create_security_group = false
       block_device_mappings = [
