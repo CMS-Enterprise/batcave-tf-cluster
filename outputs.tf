@@ -220,12 +220,7 @@ output "runner_nodepool_asg" {
 
 output "batcave_lb_dns" {
   description = "DNS value of NLB created for routing traffic to apps"
-  value       = aws_lb.batcave_nlb.dns_name
-}
-
-output "batcave_transport_proxy_lb_dns" {
-  description = "DNS value of NLB created for proxying requests through the transport subnet"
-  value       = var.create_transport_proxy_lb ? aws_lb.batcave_transport[0].dns_name : ""
+  value       = aws_lb.batcave_alb.dns_name
 }
 
 output "batcave_alb_proxy_dns" {
