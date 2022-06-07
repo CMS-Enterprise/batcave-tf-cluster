@@ -280,6 +280,6 @@ variable "alb_proxy_ingress_prefix_lists" {
 }
 variable "alb_deletion_protection" {
   description = "Enable/Disable ALB deletion protection for both ALBs"
-  default = false
-  type = bool
+  default     = false
+  type        = bool
 }
