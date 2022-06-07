@@ -76,7 +76,7 @@ resource "aws_lb_target_group" "batcave_alb_proxy_https" {
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    matcher = "200"
+    matcher             = "200"
     interval            = 30
     path                = "/healthz/ready"
     protocol            = "HTTP" # istio's status-port uses http by default
@@ -143,10 +143,4 @@ resource "aws_security_group_rule" "batcave_alb_proxy_egress" {
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.batcave_alb_proxy[0].id
-}
-
-# Attach target group to Autoscaler
-resource "aws_autoscaling_attachment" "asg_attachment_alb_proxy" {
-  autoscaling_group_name = module.eks.self_managed_node_groups.general.autoscaling_group_id
-  lb_target_group_arn    = try(aws_lb_target_group.batcave_alb_proxy_https[0].arn, "")
 }

@@ -62,10 +62,10 @@ module "eks" {
       desired_size                  = var.desired_size
       max_size                      = var.max_size
       min_size                      = var.min_size
-      target_group_arns = [
-        aws_lb_target_group.batcave_alb_http.arn,
-        aws_lb_target_group.batcave_alb_https.arn,
-      ]
+      target_group_arns = concat(
+        [aws_lb_target_group.batcave_alb_https.arn],
+        var.create_alb_proxy ? [aws_lb_target_group.batcave_alb_proxy_https[0].arn] : [],
+      )
       create_security_group = false
       block_device_mappings = [
         {
@@ -286,14 +286,14 @@ resource "aws_security_group_rule" "allow_all_nodes_to_other_nodes" {
 }
 
 resource "aws_security_group_rule" "eks_node_ingress_alb_proxy" {
-  for_each = var.create_alb_proxy ? toset(["80","443"]) : toset([])
-  type              = "ingress"
-  to_port           = each.key
-  from_port         = each.key
-  protocol          = "tcp"
-  security_group_id = module.eks.node_security_group_id
+  for_each                 = var.create_alb_proxy ? toset(["80", "443"]) : toset([])
+  type                     = "ingress"
+  to_port                  = each.key
+  from_port                = each.key
+  protocol                 = "tcp"
+  security_group_id        = module.eks.node_security_group_id
   source_security_group_id = aws_security_group.batcave_alb_proxy[0].id
-  description = "Allow access form alb_proxy over port ${each.key}"
+  description              = "Allow access form alb_proxy over port ${each.key}"
 }
 
 resource "aws_security_group_rule" "https-tg-ingress" {

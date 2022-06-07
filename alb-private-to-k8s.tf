@@ -1,9 +1,9 @@
 # create Batcave ALB that forwards traffic to K8s
 resource "aws_lb" "batcave_alb" {
-  name               = "${var.cluster_name}-alb"
-  load_balancer_type = "application"
-  internal           = true
-  security_groups = [aws_security_group.batcave_alb.id]
+  name                       = "${var.cluster_name}-alb"
+  load_balancer_type         = "application"
+  internal                   = true
+  security_groups            = [aws_security_group.batcave_alb.id]
   enable_deletion_protection = var.alb_deletion_protection
 
   dynamic "subnet_mapping" {
@@ -67,7 +67,7 @@ resource "aws_lb_target_group" "batcave_alb_https" {
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    matcher = "200"
+    matcher             = "200"
     interval            = 30
     path                = "/healthz/ready"
     protocol            = "HTTP" # istio's status-port uses http by default
@@ -84,7 +84,7 @@ resource "aws_lb_target_group" "batcave_alb_http" {
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    matcher = "200"
+    matcher             = "200"
     interval            = 30
     path                = "/healthz/ready"
     protocol            = "HTTP"
@@ -126,10 +126,4 @@ resource "aws_security_group_rule" "batcave_alb_ingress_pl_https" {
   from_port         = 443
   description       = "Allow inbound Prefix Lists https"
   prefix_list_ids   = var.cluster_additional_sg_prefix_lists
-}
-
-# Attach target group to Autoscaler
-resource "aws_autoscaling_attachment" "asg_attachment_alb" {
-  autoscaling_group_name = module.eks.self_managed_node_groups.general.autoscaling_group_id
-  lb_target_group_arn    = aws_lb_target_group.batcave_alb_https.arn
 }
