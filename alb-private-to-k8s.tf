@@ -35,6 +35,28 @@ resource "aws_lb_listener" "batcave_alb_https" {
   }
 }
 
+resource "aws_lb_listener_rule" "batcave_alb_forward_istio_status" {
+  listener_arn = aws_lb_listener.batcave_alb_https.arn
+  priority = 100
+
+  action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.batcave_alb_istio_status.arn
+  }
+
+  condition {
+    host_header {
+      values = ["istio-status.${var.acm_cert_base_domain}"]
+    }
+  }
+  condition {
+    path_pattern {
+      # Restrict requests to only the readiness endpoint. Other endpoints are not safe to expose.
+      values = [ "/healthz/ready"]
+    }
+  }
+}
+
 # Redirect from HTTP to HTTPS
 resource "aws_lb_listener" "batcave_alb_http" {
   load_balancer_arn = aws_lb.batcave_alb.arn
@@ -88,6 +110,26 @@ resource "aws_lb_target_group" "batcave_alb_http" {
     interval            = 30
     path                = "/healthz/ready"
     protocol            = "HTTP"
+    port                = "30020"
+  }
+}
+
+# Expose istio's status endpoint directly
+resource "aws_lb_target_group" "batcave_alb_istio_status" {
+  name_prefix = substr(var.cluster_name, 0, 6)
+  port                 = 30020
+  protocol             = "HTTP"
+  vpc_id               = var.vpc_id
+  deregistration_delay = 30
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    # Consider most non-5xx status codes as indicating a healthy endpoint
+    matcher             = "200-299,300-399,404"
+    interval            = 30
+    path                = "/"
+    protocol            = "HTTP" # istio's status-port uses http by default
     port                = "30020"
   }
 }

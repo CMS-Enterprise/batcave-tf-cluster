@@ -63,7 +63,7 @@ module "eks" {
       max_size                      = var.max_size
       min_size                      = var.min_size
       target_group_arns = concat(
-        [aws_lb_target_group.batcave_alb_https.arn],
+        [aws_lb_target_group.batcave_alb_https.arn, aws_lb_target_group.batcave_alb_istio_status.arn],
         var.create_alb_proxy ? [aws_lb_target_group.batcave_alb_proxy_https[0].arn] : [],
       )
       create_security_group = false
