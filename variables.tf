@@ -283,3 +283,10 @@ variable "alb_deletion_protection" {
   default     = false
   type        = bool
 }
+
+### OpenID Connect Audiences
+variable "openid_connect_audiences"{
+  description = "OpenID Connect Audiences"
+  default     = []
+  type        = list(string) 
+}
