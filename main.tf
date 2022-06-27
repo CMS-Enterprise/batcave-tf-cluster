@@ -119,6 +119,70 @@ module "eks" {
         }
       ]
     }
+    batcave-website = {
+      name                          = "${var.cluster_name}-batcave-website"
+      subnet_ids                    = var.private_subnets
+      instance_type                 = var.batcave_website_instance_type
+      iam_role_path                 = var.iam_role_path
+      iam_role_permissions_boundary = var.iam_role_permissions_boundary
+      bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=batcave-website=true:NoSchedule'"
+      ami_id                        = data.aws_ami.eks_ami.id
+      desired_size                  = var.batcave_website_desired_size
+      max_size                      = var.batcave_website_max_size
+      min_size                      = var.batcave_website_min_size
+      create_security_group         = false
+      block_device_mappings = [
+        {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = "300"
+            volume_type           = "gp3"
+            delete_on_termination = true
+            encrypted             = true
+          }
+        }
+      ]
+
+      propagate_tags = [
+        {
+          key                 = "ProjectName"
+          value               = "batCAVE-Website"
+          propagate_at_launch = var.wg_tag_propagate_at_launch
+        }
+      ]
+    }
+    batcave-nightlight = {
+      name                          = "${var.cluster_name}-batcave-nightlight"
+      subnet_ids                    = var.private_subnets
+      instance_type                 = var.batcave_nightlight_instance_type
+      iam_role_path                 = var.iam_role_path
+      iam_role_permissions_boundary = var.iam_role_permissions_boundary
+      bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=batcave-website=true:NoSchedule'"
+      ami_id                        = data.aws_ami.eks_ami.id
+      desired_size                  = var.batcave_nightlight_desired_size
+      max_size                      = var.batcave_nightlight_max_size
+      min_size                      = var.batcave_nightlight_min_size
+      create_security_group         = false
+      block_device_mappings = [
+        {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = "300"
+            volume_type           = "gp3"
+            delete_on_termination = true
+            encrypted             = true
+          }
+        }
+      ]
+
+      propagate_tags = [
+        {
+          key                 = "ProjectName"
+          value               = "batCAVE-NightLight"
+          propagate_at_launch = var.wg_tag_propagate_at_launch
+        }
+      ]
+    }
   }
   tags = {
     Environment = var.environment
