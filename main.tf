@@ -78,7 +78,10 @@ module "eks" {
           }
         }
       ]
-
+      tags = {
+        ProjectName = "batcave-shared"
+        Environment = "dev"
+      }
       propagate_tags = [
         {
           key                 = "Node_type"
@@ -110,7 +113,10 @@ module "eks" {
           }
         }
       ]
-
+      tags = {
+        ProjectName = "batcave-shared"
+        Environment = "dev"
+      }
       propagate_tags = [
         {
           key                 = "Node_type"
@@ -142,7 +148,10 @@ module "eks" {
           }
         }
       ]
-
+      tags = {
+        ProjectName = "batcave-website"
+        Environment = "dev"
+      }
       propagate_tags = [
         {
           key                 = "ProjectName"
@@ -157,7 +166,7 @@ module "eks" {
       instance_type                 = var.batcave_nightlight_instance_type
       iam_role_path                 = var.iam_role_path
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
-      bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=batcave-website=true:NoSchedule'"
+      bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=batcave-nightlight=true:NoSchedule'"
       ami_id                        = data.aws_ami.eks_ami.id
       desired_size                  = var.batcave_nightlight_desired_size
       max_size                      = var.batcave_nightlight_max_size
@@ -174,6 +183,11 @@ module "eks" {
           }
         }
       ]
+
+      tags = {
+        ProjectName = "batcave-nightlight"
+        Environment = "dev"
+      }
 
       propagate_tags = [
         {
