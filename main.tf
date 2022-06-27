@@ -253,7 +253,7 @@ locals {
           "system:nodes",
         ],
       ))
-    }
+    },
     {
       rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.batcave-website.iam_role_name}"
       username = "system:node:{{EC2PrivateDNSName}}"
@@ -263,7 +263,7 @@ locals {
           "system:nodes",
         ],
       ))
-    }
+    },
     {
       rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.batcave-nightlight.iam_role_name}"
       username = "system:node:{{EC2PrivateDNSName}}"
