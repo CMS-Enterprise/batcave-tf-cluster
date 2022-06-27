@@ -53,17 +53,17 @@ variable "batcave_website_instance_type" {
 
 variable "batcave_website_desired_size" {
   default = 0
-  type = number 
+  type    = number
 }
 
 variable "batcave_website_max_size" {
   default = 1
-  type = number
+  type    = number
 }
 
 variable "batcave_website_min_size" {
   default = 1
-  type = number
+  type    = number
 }
 
 ### batCAVE night-light node-pool
@@ -73,17 +73,17 @@ variable "batcave_nightlight_instance_type" {
 
 variable "batcave_nightlight_desired_size" {
   default = 0
-  type = number 
+  type    = number
 }
 
 variable "batcave_nightlight_max_size" {
   default = 1
-  type = number
+  type    = number
 }
 
 variable "batcave_nightlight_min_size" {
   default = 1
-  type = number
+  type    = number
 }
 
 variable "cluster_name" {}
