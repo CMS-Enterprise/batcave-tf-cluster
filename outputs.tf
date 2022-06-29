@@ -216,6 +216,14 @@ output "runner_nodepool_asg" {
   value = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_id
 }
 
+output "batcave_website_nodepool_asg" {
+  value = module.eks.self_managed_node_groups.batcave-website.autoscaling_group_id
+}
+
+output "batcave_nodepool_asg" {
+  value = module.eks.self_managed_node_groups.batcave-nightlight.autoscaling_group_id
+}
+
 output "batcave_lb_dns" {
   description = "DNS value of NLB created for routing traffic to apps"
   value       = aws_lb.batcave_alb.dns_name
