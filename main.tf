@@ -57,7 +57,7 @@ module "eks" {
       instance_type                 = var.instance_type
       iam_role_path                 = var.iam_role_path
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
-      bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=general=true'"
+      bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=general=true --register-with-taints=shared=true:NoSchedule'"
       ami_id                        = data.aws_ami.eks_ami.id
       desired_size                  = var.desired_size
       max_size                      = var.max_size
