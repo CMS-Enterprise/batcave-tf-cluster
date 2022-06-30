@@ -297,7 +297,7 @@ resource "aws_security_group_rule" "https-tg-ingress" {
 
 ## Setup for cosign keyless signatures 
 locals {
-  oidc_provider = "${module.eks.oidc_provider.id}"
+  oidc_provider = "${module.eks.oidc_provider}"
 }
 
 resource "kubernetes_service_account" "cosign" {
