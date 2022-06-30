@@ -331,7 +331,7 @@ resource "kubernetes_namespace" "gitlab" {
 resource "kubernetes_service_account" "cosign" {
   metadata {
     name = "cosign"
-    namespace = "${kubernetes_namespace.gitlab.metadata[2]}"
+    namespace = "${kubernetes_namespace.gitlab.metadata[0].name}"
     annotations = {
       "eks.amazonaws.com/audience" = "sigstore",
       "eks.amazonaws.com/role-arn" = aws_iam_role.cosign.arn
