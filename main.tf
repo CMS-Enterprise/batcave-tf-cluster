@@ -312,10 +312,26 @@ locals {
   oidc_provider = "${module.eks.oidc_provider}"
 }
 
+resource "kubernetes_namespace" "gitlab" {
+  metadata {
+    annotations = {
+      "meta.helm.sh/release-name" = "batcave",
+      "meta.helm.sh/release-namespace" = "batcave"
+    }
+
+    labels = {
+      name = "gitlab",
+      managed-by = "Helm"
+    }
+
+    name = "gitlab"
+  }
+}
+
 resource "kubernetes_service_account" "cosign" {
   metadata {
     name = "cosign"
-    namespace = "gitlab"
+    namespace = "${kubernetes_namespace.gitlab.metadata[2]}"
     annotations = {
       "eks.amazonaws.com/audience" = "sigstore",
       "eks.amazonaws.com/role-arn" = aws_iam_role.cosign.arn
