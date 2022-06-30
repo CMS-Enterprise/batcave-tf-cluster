@@ -25,8 +25,11 @@ variable "instance_type" {
   default = "c5.2xlarge"
 }
 
-### Runners node group vars
+variable "general_nodepool_extra_args" {
+  default = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=runners=true:NoSchedule'"
+}
 
+### Runners node group vars
 variable "runners_desired_size" {
   type    = number
   default = 1
@@ -40,6 +43,10 @@ variable "runners_max_size" {
 variable "runners_min_size" {
   type    = number
   default = 1
+}
+
+variable "gitlab_runner_extra_args" {
+  default = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=runners=true:NoSchedule'"
 }
 
 variable "runners_instance_type" {
@@ -66,6 +73,10 @@ variable "batcave_website_min_size" {
   type    = number
 }
 
+variable "batcave_website_extra_args" {
+  default = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=batcave-website=true:NoSchedule'"
+}
+
 ### batCAVE night-light node-pool
 variable "batcave_nightlight_instance_type" {
   default = "t2.medium"
@@ -84,6 +95,10 @@ variable "batcave_nightlight_max_size" {
 variable "batcave_nightlight_min_size" {
   default = 1
   type    = number
+}
+
+variable "batcave_nightlight_extra_args" {
+  default = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=batcave-nightlight=true:NoSchedule'"
 }
 
 variable "cluster_name" {}

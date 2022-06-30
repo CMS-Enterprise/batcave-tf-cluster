@@ -57,7 +57,7 @@ module "eks" {
       instance_type                 = var.instance_type
       iam_role_path                 = var.iam_role_path
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
-      bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=general=true --register-with-taints=CriticalAddonsOnly=true:NoSchedule'"
+      bootstrap_extra_args          = var.general_nodepool_extra_args
       ami_id                        = data.aws_ami.eks_ami.id
       desired_size                  = var.desired_size
       max_size                      = var.max_size
@@ -96,7 +96,7 @@ module "eks" {
       instance_type                 = var.runners_instance_type
       iam_role_path                 = var.iam_role_path
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
-      bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=runners=true:NoSchedule'"
+      bootstrap_extra_args          = var.gitlab_runner_extra_args
       ami_id                        = data.aws_ami.eks_ami.id
       desired_size                  = var.runners_desired_size
       max_size                      = var.runners_max_size
@@ -131,7 +131,7 @@ module "eks" {
       instance_type                 = var.batcave_website_instance_type
       iam_role_path                 = var.iam_role_path
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
-      bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=batcave-website=true:NoSchedule'"
+      bootstrap_extra_args          = var.batcave_website_extra_args
       ami_id                        = data.aws_ami.eks_ami.id
       desired_size                  = var.batcave_website_desired_size
       max_size                      = var.batcave_website_max_size
@@ -166,7 +166,7 @@ module "eks" {
       instance_type                 = var.batcave_nightlight_instance_type
       iam_role_path                 = var.iam_role_path
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
-      bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=batcave-nightlight=true:NoSchedule'"
+      bootstrap_extra_args          = var.batcave_nightlight_extra_args
       ami_id                        = data.aws_ami.eks_ami.id
       desired_size                  = var.batcave_nightlight_desired_size
       max_size                      = var.batcave_nightlight_max_size
