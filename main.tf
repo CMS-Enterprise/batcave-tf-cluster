@@ -308,8 +308,7 @@ resource "kubernetes_namespace" "gitlab" {
     }
 
     labels = {
-      name = "gitlab",
-      managed-by = "Helm"
+      "app.kubernetes.io/managed-by" = "Helm"
     }
 
     name = "gitlab"
