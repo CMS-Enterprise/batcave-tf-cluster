@@ -36,13 +36,26 @@ data "aws_iam_policy_document" "node_policy" {
     resources = ["*"]
   }
   statement {
+    sid = "stsassumerole"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    # self-referential ARN used by Rapidfort to allow the pod to assume a role
+    resources = [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/delegatedadmin/developer/*general-node-group*"
+    ]
+
+  }
+  statement {
     actions = [
       "s3:ListBucket"
     ]
     resources = [
       "arn:aws:s3:::${var.cluster_name}*velero-storage",
       "arn:aws:s3:::batcave*runner-cache",
-      "arn:aws:s3:::batcave*gitlab*"
+      "arn:aws:s3:::batcave*gitlab*",
+      "arn:aws:s3:::rapidfort*storage"
     ]
   }
   statement {
@@ -56,7 +69,8 @@ data "aws_iam_policy_document" "node_policy" {
     resources = [
       "arn:aws:s3:::${var.cluster_name}*velero-storage/*",
       "arn:aws:s3:::batcave*runner-cache/*",
-      "arn:aws:s3:::batcave*gitlab*/*"
+      "arn:aws:s3:::batcave*gitlab*/*",
+      "arn:aws:s3:::rapidfort*storage/*"
     ]
   }
 }
