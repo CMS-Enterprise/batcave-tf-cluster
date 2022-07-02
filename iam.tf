@@ -51,12 +51,17 @@ data "aws_iam_policy_document" "node_policy" {
     actions = [
       "s3:ListBucket"
     ]
-    resources = [
-      "arn:aws:s3:::${var.cluster_name}*velero-storage",
-      "arn:aws:s3:::batcave*runner-cache",
-      "arn:aws:s3:::batcave*gitlab*",
-      "arn:aws:s3:::rapidfort*storage"
-    ]
+    resources = (var.s3_bucket_access_grants == null ?
+      # Use legacy default
+      [
+        "arn:aws:s3:::${var.cluster_name}*velero-storage",
+        "arn:aws:s3:::batcave*runner-cache",
+        "arn:aws:s3:::batcave*gitlab*",
+        "arn:aws:s3:::rapidfort*storage"
+      ] :
+      [
+        for bucket in var.s3_bucket_access_grants : "arn:aws:s3:::${bucket}"
+      ])
   }
   statement {
     actions = [
@@ -66,12 +71,17 @@ data "aws_iam_policy_document" "node_policy" {
       "s3:AbortMultipartUpload",
       "s3:List*"
     ]
-    resources = [
-      "arn:aws:s3:::${var.cluster_name}*velero-storage/*",
-      "arn:aws:s3:::batcave*runner-cache/*",
-      "arn:aws:s3:::batcave*gitlab*/*",
-      "arn:aws:s3:::rapidfort*storage/*"
-    ]
+    resources = (var.s3_bucket_access_grants == null ?
+      # Use legacy default
+      [
+        "arn:aws:s3:::${var.cluster_name}*velero-storage/*",
+        "arn:aws:s3:::batcave*runner-cache/*",
+        "arn:aws:s3:::batcave*gitlab*/*",
+        "arn:aws:s3:::rapidfort*storage/*"
+      ] :
+      [
+        for bucket in var.s3_bucket_access_grants : "arn:aws:s3:::${bucket}/*"
+      ])
   }
 }
 
