@@ -126,7 +126,7 @@ module "eks" {
       ]
     }
     batcave-website = {
-      name                          = "${var.cluster_name}-batcave-website"
+      name                          = "${var.cluster_name}-website"
       subnet_ids                    = var.private_subnets
       instance_type                 = var.batcave_website_instance_type
       iam_role_path                 = var.iam_role_path
@@ -161,7 +161,7 @@ module "eks" {
       ]
     }
     batcave-nightlight = {
-      name                          = "${var.cluster_name}-batcave-nightlight"
+      name                          = "${var.cluster_name}-nightlight"
       subnet_ids                    = var.private_subnets
       instance_type                 = var.batcave_nightlight_instance_type
       iam_role_path                 = var.iam_role_path
