@@ -26,7 +26,7 @@ variable "instance_type" {
 }
 
 variable "general_nodepool_extra_args" {
-  default = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=CrticalAddonsOnly=true:NoSchedule'"
+  default = "--kubelet-extra-args '--node-labels=general=true --register-with-taints=CrticalAddonsOnly=true:NoSchedule'"
 }
 
 ### Runners node group vars
@@ -74,7 +74,7 @@ variable "batcave_website_min_size" {
 }
 
 variable "batcave_website_extra_args" {
-  default = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=batcave-website=true:NoSchedule'"
+  default = "--kubelet-extra-args '--node-labels=batcave-website=true --register-with-taints=batcave-website=true:NoSchedule'"
 }
 
 ### batCAVE night-light node-pool
@@ -98,7 +98,7 @@ variable "batcave_nightlight_min_size" {
 }
 
 variable "batcave_nightlight_extra_args" {
-  default = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=batcave-nightlight=true:NoSchedule'"
+  default = "--kubelet-extra-args '--node-labels=batcave-nightlight=true --register-with-taints=batcave-nightlight=true:NoSchedule'"
 }
 
 variable "cluster_name" {}
