@@ -16,7 +16,7 @@ data "aws_ami" "eks_ami" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "18.20.1"
+  version = "18.21.0"
 
   cluster_name    = local.name
   cluster_version = local.cluster_version
@@ -33,7 +33,7 @@ module "eks" {
   cluster_endpoint_public_access          = var.cluster_endpoint_public_access
   cluster_enabled_log_types               = var.cluster_enabled_log_types
   cluster_security_group_additional_rules = var.cluster_security_group_additional_rules
-  enable_irsa                             = var.enable_irsa
+  enable_irsa                             = true
 
   ## VERY IMPORTANT WARNING: Changing security group ids associated with a cluster will
   ## ***DELETE AND RECREATE*** existing clusters.  Do not modify this for already existing clusters
@@ -57,7 +57,7 @@ module "eks" {
       instance_type                 = var.instance_type
       iam_role_path                 = var.iam_role_path
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
-      bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=general=true'"
+      bootstrap_extra_args          = var.general_nodepool_extra_args
       ami_id                        = data.aws_ami.eks_ami.id
       desired_size                  = var.desired_size
       max_size                      = var.max_size
@@ -78,7 +78,10 @@ module "eks" {
           }
         }
       ]
-
+      tags = {
+        ProjectName = "batcave-shared"
+        Environment = "dev"
+      }
       propagate_tags = [
         {
           key                 = "Node_type"
@@ -93,7 +96,7 @@ module "eks" {
       instance_type                 = var.runners_instance_type
       iam_role_path                 = var.iam_role_path
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
-      bootstrap_extra_args          = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=runners=true:NoSchedule'"
+      bootstrap_extra_args          = var.gitlab_runner_extra_args
       ami_id                        = data.aws_ami.eks_ami.id
       desired_size                  = var.runners_desired_size
       max_size                      = var.runners_max_size
@@ -110,11 +113,86 @@ module "eks" {
           }
         }
       ]
-
+      tags = {
+        ProjectName = "batcave-shared"
+        Environment = "dev"
+      }
       propagate_tags = [
         {
           key                 = "Node_type"
           value               = "runners"
+          propagate_at_launch = var.wg_tag_propagate_at_launch
+        }
+      ]
+    }
+    batcave-website = {
+      name                          = "${var.cluster_name}-batcave-website"
+      subnet_ids                    = var.private_subnets
+      instance_type                 = var.batcave_website_instance_type
+      iam_role_path                 = var.iam_role_path
+      iam_role_permissions_boundary = var.iam_role_permissions_boundary
+      bootstrap_extra_args          = var.batcave_website_extra_args
+      ami_id                        = data.aws_ami.eks_ami.id
+      desired_size                  = var.batcave_website_desired_size
+      max_size                      = var.batcave_website_max_size
+      min_size                      = var.batcave_website_min_size
+      create_security_group         = false
+      block_device_mappings = [
+        {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = "300"
+            volume_type           = "gp3"
+            delete_on_termination = true
+            encrypted             = true
+          }
+        }
+      ]
+      tags = {
+        ProjectName = "batcave-website"
+        Environment = "dev"
+      }
+      propagate_tags = [
+        {
+          key                 = "ProjectName"
+          value               = "batCAVE-Website"
+          propagate_at_launch = var.wg_tag_propagate_at_launch
+        }
+      ]
+    }
+    batcave-nightlight = {
+      name                          = "${var.cluster_name}-batcave-nightlight"
+      subnet_ids                    = var.private_subnets
+      instance_type                 = var.batcave_nightlight_instance_type
+      iam_role_path                 = var.iam_role_path
+      iam_role_permissions_boundary = var.iam_role_permissions_boundary
+      bootstrap_extra_args          = var.batcave_nightlight_extra_args
+      ami_id                        = data.aws_ami.eks_ami.id
+      desired_size                  = var.batcave_nightlight_desired_size
+      max_size                      = var.batcave_nightlight_max_size
+      min_size                      = var.batcave_nightlight_min_size
+      create_security_group         = false
+      block_device_mappings = [
+        {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = "300"
+            volume_type           = "gp3"
+            delete_on_termination = true
+            encrypted             = true
+          }
+        }
+      ]
+
+      tags = {
+        ProjectName = "batcave-nightlight"
+        Environment = "dev"
+      }
+
+      propagate_tags = [
+        {
+          key                 = "ProjectName"
+          value               = "batCAVE-NightLight"
           propagate_at_launch = var.wg_tag_propagate_at_launch
         }
       ]
@@ -182,6 +260,26 @@ locals {
     },
     {
       rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.gitlab-runners.iam_role_name}"
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups = tolist(concat(
+        [
+          "system:bootstrappers",
+          "system:nodes",
+        ],
+      ))
+    },
+    {
+      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.batcave-website.iam_role_name}"
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups = tolist(concat(
+        [
+          "system:bootstrappers",
+          "system:nodes",
+        ],
+      ))
+    },
+    {
+      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${module.eks.self_managed_node_groups.batcave-nightlight.iam_role_name}"
       username = "system:node:{{EC2PrivateDNSName}}"
       groups = tolist(concat(
         [

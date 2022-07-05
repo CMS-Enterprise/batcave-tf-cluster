@@ -25,8 +25,11 @@ variable "instance_type" {
   default = "c5.2xlarge"
 }
 
-### Runners node group vars
+variable "general_nodepool_extra_args" {
+  default = "--kubelet-extra-args '--node-labels=general=true --register-with-taints=CrticalAddonsOnly=true:NoSchedule'"
+}
 
+### Runners node group vars
 variable "runners_desired_size" {
   type    = number
   default = 1
@@ -42,8 +45,60 @@ variable "runners_min_size" {
   default = 1
 }
 
+variable "gitlab_runner_extra_args" {
+  default = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=runners=true:NoSchedule'"
+}
+
 variable "runners_instance_type" {
   default = "c4.xlarge"
+}
+
+### batCAVE website node-pool
+variable "batcave_website_instance_type" {
+  default = "t2.medium"
+}
+
+variable "batcave_website_desired_size" {
+  default = 0
+  type    = number
+}
+
+variable "batcave_website_max_size" {
+  default = 1
+  type    = number
+}
+
+variable "batcave_website_min_size" {
+  default = 1
+  type    = number
+}
+
+variable "batcave_website_extra_args" {
+  default = "--kubelet-extra-args '--node-labels=batcave-website=true --register-with-taints=batcave-website=true:NoSchedule'"
+}
+
+### batCAVE night-light node-pool
+variable "batcave_nightlight_instance_type" {
+  default = "t2.medium"
+}
+
+variable "batcave_nightlight_desired_size" {
+  default = 0
+  type    = number
+}
+
+variable "batcave_nightlight_max_size" {
+  default = 1
+  type    = number
+}
+
+variable "batcave_nightlight_min_size" {
+  default = 1
+  type    = number
+}
+
+variable "batcave_nightlight_extra_args" {
+  default = "--kubelet-extra-args '--node-labels=batcave-nightlight=true --register-with-taints=batcave-nightlight=true:NoSchedule'"
 }
 
 variable "cluster_name" {}
