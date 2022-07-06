@@ -338,3 +338,8 @@ variable "alb_deletion_protection" {
   default     = false
   type        = bool
 }
+variable "s3_bucket_access_grants" {
+  description = "A list of s3 bucket names to grant the cluster roles R/W access to"
+  default     = null
+  type        = list(string)
+}
