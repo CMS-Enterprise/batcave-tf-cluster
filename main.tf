@@ -88,7 +88,7 @@ module "eks" {
     subnet_ids = var.private_subnets
   }
   # Worker groups (using Launch Configurations)
-  self_managed_node_groups = merge(local.custom_node_pools, {
+  self_managed_node_groups = merge({
     general = {
       name                          = "${var.cluster_name}-general"
       subnet_ids                    = var.private_subnets
@@ -124,7 +124,7 @@ module "eks" {
         }
       ]
     }
-  })
+  }, local.custom_node_pools)
 }
 
 resource "null_resource" "instance_cleanup" {
