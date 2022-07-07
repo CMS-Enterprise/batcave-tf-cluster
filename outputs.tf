@@ -20,19 +20,6 @@ output "general_node_pool_launch_template" {
   value = module.eks.self_managed_node_groups.general.launch_template_id
 }
 
-# output "bootstrap_node_pool_launch_template" {
-#   value = module.eks.self_managed_node_groups.bootstrap.launch_template_id
-# }
-
-# output "memory_node_pool_launch_template" {
-#   value = module.eks.self_managed_node_groups.memory.launch_template_id
-# }
-
-# output "cpu_node_pool_launch_template" {
-#   value = module.eks.self_managed_node_groups.cpu.launch_template_id
-# }
-
-
 output "worker_security_group_id" {
   value = module.eks.node_security_group_id
 }
@@ -200,28 +187,20 @@ output "aws_auth_configmap_yaml" {
 ################################################################################
 # AWS Load Balancer
 ################################################################################
+output "nodepool_launch_templates" {
+  value = { for k,v in module.eks.self_managed_node_groups: k => v.launch_template_ids }
+}
+
 output "self_managed_node_group_general" {
   value = module.eks.self_managed_node_groups.general.launch_template_id
 }
 
-output "self_managed_node_group_gitlab_runners" {
-  value = module.eks.self_managed_node_groups.gitlab-runners.launch_template_id
+output "nodepool_asgs" {
+  value = { for k,v in module.eks.self_managed_node_groups: k => v.autoscaling_group_id }
 }
 
 output "general_nodepool_asg" {
   value = module.eks.self_managed_node_groups.general.autoscaling_group_id
-}
-
-output "runner_nodepool_asg" {
-  value = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_id
-}
-
-output "batcave_website_nodepool_asg" {
-  value = module.eks.self_managed_node_groups.batcave-website.autoscaling_group_id
-}
-
-output "batcave_nodepool_asg" {
-  value = module.eks.self_managed_node_groups.batcave-nightlight.autoscaling_group_id
 }
 
 output "batcave_lb_dns" {

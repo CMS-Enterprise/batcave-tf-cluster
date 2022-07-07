@@ -53,52 +53,30 @@ variable "runners_instance_type" {
   default = "c4.xlarge"
 }
 
-### batCAVE website node-pool
-variable "batcave_website_instance_type" {
-  default = "t2.medium"
-}
-
-variable "batcave_website_desired_size" {
-  default = 0
-  type    = number
-}
-
-variable "batcave_website_max_size" {
-  default = 1
-  type    = number
-}
-
-variable "batcave_website_min_size" {
-  default = 1
-  type    = number
-}
-
-variable "batcave_website_extra_args" {
-  default = "--kubelet-extra-args '--node-labels=batcave-website=true --register-with-taints=batcave-website=true:NoSchedule'"
-}
-
-### batCAVE night-light node-pool
-variable "batcave_nightlight_instance_type" {
-  default = "t2.medium"
-}
-
-variable "batcave_nightlight_desired_size" {
-  default = 0
-  type    = number
-}
-
-variable "batcave_nightlight_max_size" {
-  default = 1
-  type    = number
-}
-
-variable "batcave_nightlight_min_size" {
-  default = 1
-  type    = number
-}
-
-variable "batcave_nightlight_extra_args" {
-  default = "--kubelet-extra-args '--node-labels=batcave-nightlight=true --register-with-taints=batcave-nightlight=true:NoSchedule'"
+variable "custom_node_pools" {
+  default = {}
+  #  runners = {
+  #    instance_type = "c4.xlarge"
+  #    desired_size = 1
+  #    max_size = 1
+  #    min_size = 1
+  #    extra_args = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=runners=true:NoSchedule'"
+  #  }
+  #  batcave_website = {
+  #    instance_type = "t2.medium"
+  #    desired_size = 0
+  #    max_size = 0
+  #    min_size = 0
+  #    extra_args = "--kubelet-extra-args '--node-labels=batcave-website=true --register-with-taints=batcave-website=true:NoSchedule'"
+  #  }
+  #  batcave_knightlight = {
+  #    instance_type = "t2.medium"
+  #    desired_size = 0
+  #    max_size = 0
+  #    min_size = 0
+  #    extra_args = "--kubelet-extra-args '--node-labels=batcave_knightlight=true --register-with-taints=batcave_knightlight=true:NoSchedule'"
+  #  }
+  #}
 }
 
 variable "cluster_name" {}
