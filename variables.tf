@@ -54,7 +54,7 @@ variable "runners_instance_type" {
 }
 
 variable "custom_node_pools" {
-  type    = map(any)
+  type    = any
   default = {}
   #  runners = {
   #    instance_type = "c4.xlarge"
