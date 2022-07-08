@@ -69,6 +69,9 @@ variable "custom_node_pools" {
   #    max_size = 0
   #    min_size = 0
   #    extra_args = "--kubelet-extra-args '--node-labels=batcave-website=true --register-with-taints=batcave-website=true:NoSchedule'"
+  #    tags = {
+  #      "project-name" = "batcave"
+  #    }  
   #  }
   #  batcave_knightlight = {
   #    instance_type = "t2.medium"

@@ -38,9 +38,7 @@ locals {
           }
         }
       ]
-      tags = {
-        ProjectName = k
-      }
+      tags = v.tags
       propagate_tags = [
         {
           key                 = "ProjectName"
