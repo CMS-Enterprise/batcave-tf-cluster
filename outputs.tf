@@ -8,31 +8,6 @@ output "cluster_security_group_id" {
   value       = module.eks.cluster_security_group_id
 }
 
-output "worker_iam_role_arn" {
-  value = module.eks.self_managed_node_groups.general.iam_role_arn
-}
-
-output "worker_iam_role_name" {
-  value = module.eks.self_managed_node_groups.general.iam_role_name
-}
-
-output "general_node_pool_launch_template" {
-  value = module.eks.self_managed_node_groups.general.launch_template_id
-}
-
-# output "bootstrap_node_pool_launch_template" {
-#   value = module.eks.self_managed_node_groups.bootstrap.launch_template_id
-# }
-
-# output "memory_node_pool_launch_template" {
-#   value = module.eks.self_managed_node_groups.memory.launch_template_id
-# }
-
-# output "cpu_node_pool_launch_template" {
-#   value = module.eks.self_managed_node_groups.cpu.launch_template_id
-# }
-
-
 output "worker_security_group_id" {
   value = module.eks.node_security_group_id
 }
@@ -169,27 +144,6 @@ output "self_managed_node_groups" {
 }
 
 ################################################################################
-# Launch template
-################################################################################
-
-output "launch_template_id" {
-  description = "The ID of the launch template"
-  value       = module.eks.self_managed_node_groups.general.launch_template_id
-}
-
-output "launch_template_arn" {
-  description = "The ARN of the launch template"
-  value       = module.eks.self_managed_node_groups.general.launch_template_arn
-  #  value       = try(aws_launch_template.this[0].arn, "")
-}
-
-output "launch_template_latest_version" {
-  description = "The latest version of the launch template"
-  value       = module.eks.self_managed_node_groups.general.launch_template_latest_version
-  #  value       = try(aws_launch_template.this[0].latest_version, "")
-}
-
-################################################################################
 # Additional
 ################################################################################
 
@@ -200,29 +154,6 @@ output "aws_auth_configmap_yaml" {
 ################################################################################
 # AWS Load Balancer
 ################################################################################
-output "self_managed_node_group_general" {
-  value = module.eks.self_managed_node_groups.general.launch_template_id
-}
-
-output "self_managed_node_group_gitlab_runners" {
-  value = module.eks.self_managed_node_groups.gitlab-runners.launch_template_id
-}
-
-output "general_nodepool_asg" {
-  value = module.eks.self_managed_node_groups.general.autoscaling_group_id
-}
-
-output "runner_nodepool_asg" {
-  value = module.eks.self_managed_node_groups.gitlab-runners.autoscaling_group_id
-}
-
-output "batcave_website_nodepool_asg" {
-  value = module.eks.self_managed_node_groups.batcave-website.autoscaling_group_id
-}
-
-output "batcave_nodepool_asg" {
-  value = module.eks.self_managed_node_groups.batcave-nightlight.autoscaling_group_id
-}
 
 output "batcave_lb_dns" {
   description = "DNS value of NLB created for routing traffic to apps"
