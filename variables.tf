@@ -243,7 +243,10 @@ variable "network_interface_tag" {
   default = "Network Interface custom tag"
 }
 
-
+variable "general_nodepool_tags" {
+  default = {
+  }
+}
 ### Launch template tags
 
 variable "lt_CustomTag" {
