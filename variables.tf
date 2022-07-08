@@ -77,7 +77,6 @@ variable "custom_node_pools" {
   #    min_size = 0
   #    extra_args = "--kubelet-extra-args '--node-labels=batcave_knightlight=true --register-with-taints=batcave_knightlight=true:NoSchedule'"
   #  }
-  #}
 }
 
 variable "cluster_name" {}
