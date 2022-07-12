@@ -38,9 +38,7 @@ locals {
           }
         }
       ]
-      tags = {
-        ProjectName = k
-      }
+      tags = v.tags
       propagate_tags = [
         {
           key                 = "ProjectName"
@@ -116,6 +114,7 @@ module "eks" {
           }
         }
       ]
+      tags = var.general_nodepool_tags
       propagate_tags = [
         {
           key                 = "node_type"

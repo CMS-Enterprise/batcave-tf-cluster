@@ -54,7 +54,7 @@ variable "runners_instance_type" {
 }
 
 variable "custom_node_pools" {
-  type    = map(any)
+  type    = any
   default = {}
   #  runners = {
   #    instance_type = "c4.xlarge"
@@ -69,6 +69,9 @@ variable "custom_node_pools" {
   #    max_size = 0
   #    min_size = 0
   #    extra_args = "--kubelet-extra-args '--node-labels=batcave-website=true --register-with-taints=batcave-website=true:NoSchedule'"
+  #    tags = {
+  #      "project-name" = "batcave"
+  #    }  
   #  }
   #  batcave_knightlight = {
   #    instance_type = "t2.medium"
@@ -240,7 +243,10 @@ variable "network_interface_tag" {
   default = "Network Interface custom tag"
 }
 
-
+variable "general_nodepool_tags" {
+  default = {
+  }
+}
 ### Launch template tags
 
 variable "lt_CustomTag" {
