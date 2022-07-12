@@ -114,10 +114,7 @@ module "eks" {
           }
         }
       ]
-<<<<<<< HEAD
       tags = var.general_nodepool_tags
-=======
->>>>>>> 2ea41cc6dd90e89f6e3b25be1f4d76abbd7bc17d
       propagate_tags = [
         {
           key                 = "node_type"
