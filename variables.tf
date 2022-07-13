@@ -26,7 +26,7 @@ variable "instance_type" {
 }
 
 variable "general_nodepool_extra_args" {
-  default = "--kubelet-extra-args '--node-labels=general=true --register-with-taints=CrticalAddonsOnly=true:NoSchedule'"
+  default = "--kubelet-extra-args '--node-labels=general=true --register-with-taints=CriticalAddonsOnly=true:NoSchedule'"
 }
 
 ### Runners node group vars
