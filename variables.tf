@@ -244,6 +244,7 @@ variable "network_interface_tag" {
 }
 
 variable "general_nodepool_tags" {
+  type = any
   default = {
   }
 }
