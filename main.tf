@@ -204,6 +204,12 @@ resource "kubernetes_config_map" "aws_auth" {
   depends_on = [module.eks]
 }
 
+resource "kubernetes_namespace" "batcave" {
+  metadata {
+    name = "batcave"
+  }
+}
+
 locals {
   cluster_security_groups_created = {
     "node" : module.eks.node_security_group_id,
