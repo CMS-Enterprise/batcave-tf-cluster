@@ -38,7 +38,7 @@ locals {
           }
         }
       ]
-      tags = v.tags
+      tags = try(v.tags, null)
       propagate_tags = [
         {
           key                 = "ProjectName"
