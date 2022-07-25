@@ -204,6 +204,19 @@ resource "kubernetes_config_map" "aws_auth" {
   depends_on = [module.eks]
 }
 
+resource "kubernetes_namespace" "batcave" {
+  metadata {
+    name = "batcave"
+  }
+  lifecycle {
+    ignore_changes = [
+      # Kustomize adds labels after the fact, ignore these changes
+      metadata[0].labels,
+      metadata[0].annotations,
+    ]
+  }
+}
+
 locals {
   cluster_security_groups_created = {
     "node" : module.eks.node_security_group_id,
