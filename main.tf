@@ -208,6 +208,13 @@ resource "kubernetes_namespace" "batcave" {
   metadata {
     name = "batcave"
   }
+  lifecycle {
+    ignore_changes = [
+      # Kustomize adds labels after the fact, ignore these changes
+      metadata[0].labels,
+      metadata[0].annotations,
+    ]
+  }
 }
 
 locals {
