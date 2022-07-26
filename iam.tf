@@ -57,7 +57,8 @@ data "aws_iam_policy_document" "node_policy" {
         "arn:aws:s3:::${var.cluster_name}*velero-storage",
         "arn:aws:s3:::batcave*runner-cache",
         "arn:aws:s3:::batcave*gitlab*",
-        "arn:aws:s3:::rapidfort*storage"
+        "arn:aws:s3:::rapidfort*storage",
+        "arn:aws:s3:::batcave-dev-us-east-1-tf-state"
       ] :
       [
         for bucket in var.s3_bucket_access_grants : "arn:aws:s3:::${bucket}"
@@ -77,7 +78,8 @@ data "aws_iam_policy_document" "node_policy" {
         "arn:aws:s3:::${var.cluster_name}*velero-storage/*",
         "arn:aws:s3:::batcave*runner-cache/*",
         "arn:aws:s3:::batcave*gitlab*/*",
-        "arn:aws:s3:::rapidfort*storage/*"
+        "arn:aws:s3:::rapidfort*storage/*",
+        "arn:aws:s3:::batcave-dev-us-east-1-tf-state/lzzw"
       ] :
       [
         for bucket in var.s3_bucket_access_grants : "arn:aws:s3:::${bucket}/*"
