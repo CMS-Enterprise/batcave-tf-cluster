@@ -323,11 +323,6 @@ variable "alb_deletion_protection" {
   default     = false
   type        = bool
 }
-variable "s3_bucket_access_grants" {
-  description = "A list of s3 bucket names to grant the cluster roles R/W access to"
-  default     = null
-  type        = list(string)
-}
 
 variable "logging_bucket" {
   description = "Name of the S3 bucket to send load balancer access logs."
@@ -339,5 +334,11 @@ variable "logging_bucket" {
 variable "openid_connect_audiences"{
   description = "OpenID Connect Audiences"
   default     = []
+  type        = list(string)
+}
+
+variable "s3_bucket_access_grants" {
+  description = "A list of s3 bucket names to grant the cluster roles R/W access to"
+  default     = null
   type        = list(string)
 }

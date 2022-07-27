@@ -151,6 +151,10 @@ output "aws_auth_configmap_yaml" {
   value = module.eks.aws_auth_configmap_yaml
 }
 
+output "cosign_iam_role_arn" {
+  value = aws_iam_role.cosign.arn
+}
+
 ################################################################################
 # AWS Load Balancer
 ################################################################################
