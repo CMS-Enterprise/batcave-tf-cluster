@@ -151,8 +151,8 @@ data "aws_eks_cluster_auth" "cluster" {
 
 provider "kubernetes" {
   host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  token                  = data.aws_eks_cluster_auth.cluster.token
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.example.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.example.token
 }
 
 resource "aws_kms_key" "eks" {
