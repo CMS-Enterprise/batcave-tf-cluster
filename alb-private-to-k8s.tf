@@ -13,6 +13,11 @@ resource "aws_lb" "batcave_alb" {
     }
   }
 
+  access_logs {
+    bucket  = "cms-cloud-${data.aws_caller_identity.current.account_id}-${var.region}"
+    enabled = true
+  }
+
   tags = {
     Name        = "${var.cluster_name}-Shared-ALB"
     Environment = var.environment
