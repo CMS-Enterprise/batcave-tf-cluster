@@ -17,6 +17,11 @@ resource "aws_lb" "batcave_alb_proxy" {
 
   enable_deletion_protection = var.alb_deletion_protection
 
+  access_logs {
+    bucket  = var.logging_bucket
+    enabled = true
+  }
+
   tags = {
     Name        = "${var.cluster_name} Application Load Balancer Proxy"
     Environment = var.environment

@@ -13,6 +13,11 @@ resource "aws_lb" "batcave_alb" {
     }
   }
 
+  access_logs {
+    bucket  = var.logging_bucket
+    enabled = true
+  }
+
   tags = {
     Name        = "${var.cluster_name}-Shared-ALB"
     Environment = var.environment

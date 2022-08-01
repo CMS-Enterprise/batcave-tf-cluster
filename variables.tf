@@ -328,3 +328,9 @@ variable "s3_bucket_access_grants" {
   default     = null
   type        = list(string)
 }
+
+variable "logging_bucket" {
+  description = "Name of the S3 bucket to send load balancer access logs."
+  default     = null
+  type        = string
+}
