@@ -301,6 +301,8 @@ locals {
 }
 
 resource "aws_iam_role" "cosign" {
+  count = var.create_cosign_iam_role ? 1 : 0
+
   name = "${var.cluster_name}-cosign"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
