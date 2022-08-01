@@ -118,12 +118,12 @@ resource "aws_security_group_rule" "batcave_alb_ingress_pl_http" {
   prefix_list_ids   = var.cluster_additional_sg_prefix_lists
 }
 
-resource "aws_security_group_rule" "batcave_alb_ingress_pl_https" {
-  security_group_id = aws_security_group.batcave_alb.id
-  type              = "ingress"
-  protocol          = "tcp"
-  to_port           = 443
-  from_port         = 443
-  description       = "Allow inbound Prefix Lists https"
-  prefix_list_ids   = var.cluster_additional_sg_prefix_lists
-}
+# resource "aws_security_group_rule" "batcave_alb_ingress_pl_https" {
+#   security_group_id = aws_security_group.batcave_alb.id
+#   type              = "ingress"
+#   protocol          = "tcp"
+#   to_port           = 443
+#   from_port         = 443
+#   description       = "Allow inbound Prefix Lists https"
+#   prefix_list_ids   = var.cluster_additional_sg_prefix_lists
+# }
