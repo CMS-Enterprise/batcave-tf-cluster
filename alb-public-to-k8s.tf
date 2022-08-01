@@ -124,15 +124,15 @@ resource "aws_security_group_rule" "batcave_alb_proxy_ingress_pl_http" {
   prefix_list_ids   = var.alb_proxy_ingress_prefix_lists
 }
 
-resource "aws_security_group_rule" "batcave_alb_proxy_ingress_pl_https" {
-  count             = var.create_alb_proxy && length(var.alb_proxy_ingress_prefix_lists) > 0 ? 1 : 0
-  security_group_id = aws_security_group.batcave_alb_proxy[0].id
-  type              = "ingress"
-  protocol          = "tcp"
-  to_port           = 443
-  from_port         = 443
-  description       = "Allow inbound Prefix Lists https"
-  prefix_list_ids   = var.alb_proxy_ingress_prefix_lists
+# resource "aws_security_group_rule" "batcave_alb_proxy_ingress_pl_https" {
+#   count             = var.create_alb_proxy && length(var.alb_proxy_ingress_prefix_lists) > 0 ? 1 : 0
+#   security_group_id = aws_security_group.batcave_alb_proxy[0].id
+#   type              = "ingress"
+#   protocol          = "tcp"
+#   to_port           = 443
+#   from_port         = 443
+#   description       = "Allow inbound Prefix Lists https"
+#   prefix_list_ids   = var.alb_proxy_ingress_prefix_lists
 }
 
 resource "aws_security_group_rule" "batcave_alb_proxy_egress" {
