@@ -301,7 +301,7 @@ locals {
 }
 
 resource "aws_iam_role" "cosign" {
-  name = "cosign"
+  name = "${var.cluster_name}-cosign"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
