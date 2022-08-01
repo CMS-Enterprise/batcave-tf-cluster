@@ -320,11 +320,6 @@ resource "aws_iam_role" "cosign" {
       },
     ]
   })
-  path = "/delegatedadmin/developer/"
-  permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/cms-cloud-admin/developer-boundary-policy"
-}
-
-resource "aws_iam_role_policy_attachment" "cosign-attach" {
-  role       = aws_iam_role.cosign.name
-  policy_arn = aws_iam_role.cosign.permissions_boundary
+  path = var.iam_role_path
+  permissions_boundary = var.iam_role_permissions_boundary
 }
