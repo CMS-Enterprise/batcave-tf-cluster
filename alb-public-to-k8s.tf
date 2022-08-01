@@ -18,7 +18,7 @@ resource "aws_lb" "batcave_alb_proxy" {
   enable_deletion_protection = var.alb_deletion_protection
 
   access_logs {
-    bucket  = "cms-cloud-${data.aws_caller_identity.current.account_id}-${var.region}"
+    bucket  = var.logging_bucket
     enabled = true
   }
 

@@ -14,7 +14,7 @@ resource "aws_lb" "batcave_alb" {
   }
 
   access_logs {
-    bucket  = "cms-cloud-${data.aws_caller_identity.current.account_id}-${var.region}"
+    bucket  = var.logging_bucket
     enabled = true
   }
 
