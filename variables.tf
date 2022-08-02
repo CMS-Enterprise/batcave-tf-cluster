@@ -71,7 +71,7 @@ variable "custom_node_pools" {
   #    extra_args = "--kubelet-extra-args '--node-labels=batcave-website=true --register-with-taints=batcave-website=true:NoSchedule'"
   #    tags = {
   #      "project-name" = "batcave"
-  #    }  
+  #    }
   #  }
   #  batcave_knightlight = {
   #    instance_type = "t2.medium"
@@ -333,4 +333,15 @@ variable "logging_bucket" {
   description = "Name of the S3 bucket to send load balancer access logs."
   default     = null
   type        = string
+}
+
+### Cosign OpenID Connect Audiences
+variable "openid_connect_audiences"{
+  description = "OpenID Connect Audiences"
+  default     = []
+  type        = list(string)
+}
+variable "create_cosign_iam_role" {
+  description = "Flag to create Cosign IAM role"
+  default = false
 }

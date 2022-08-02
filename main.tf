@@ -71,6 +71,8 @@ module "eks" {
   cluster_security_group_additional_rules = var.cluster_security_group_additional_rules
   enable_irsa                             = true
 
+  openid_connect_audiences                = var.openid_connect_audiences
+
   ## VERY IMPORTANT WARNING: Changing security group ids associated with a cluster will
   ## ***DELETE AND RECREATE*** existing clusters.  Do not modify this for already existing clusters
   cluster_additional_security_group_ids = []
@@ -291,4 +293,35 @@ resource "aws_security_group_rule" "https-tg-ingress" {
   protocol          = "-1"
   security_group_id = module.eks.node_security_group_id
   cidr_blocks       = ["10.0.0.0/8"]
+}
+
+## Setup for cosign keyless signatures 
+locals {
+  oidc_provider = "${module.eks.oidc_provider}"
+}
+
+resource "aws_iam_role" "cosign" {
+  count = var.create_cosign_iam_role ? 1 : 0
+
+  name = "${var.cluster_name}-cosign"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${local.oidc_provider}"
+        }
+        Condition = {
+          StringEquals = {
+            "${local.oidc_provider}:aud": "sigstore",
+            "${local.oidc_provider}:sub": "system:serviceaccount:gitlab:cosign"
+          } 
+        }
+      },
+    ]
+  })
+  path = var.iam_role_path
+  permissions_boundary = var.iam_role_permissions_boundary
 }
