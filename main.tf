@@ -151,12 +151,6 @@ data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_id
 }
 
-provider "kubernetes" {
-  host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  token                  = data.aws_eks_cluster_auth.cluster.token
-}
-
 resource "aws_kms_key" "eks" {
   description             = "EKS Secret Encryption Key"
   deletion_window_in_days = 7
@@ -165,54 +159,6 @@ resource "aws_kms_key" "eks" {
 
 data "aws_partition" "current" {}
 data "aws_caller_identity" "current" {}
-
-locals {
-  configmap_roles = [ for k,v in module.eks.self_managed_node_groups : {
-      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${v.iam_role_name}"
-      username = "system:node:{{EC2PrivateDNSName}}"
-      groups = tolist(concat(
-        [
-          "system:bootstrappers",
-          "system:nodes",
-        ],
-      ))
-    }
-  ]
-}
-
-resource "kubernetes_config_map" "aws_auth" {
-  metadata {
-    name      = "aws-auth"
-    namespace = "kube-system"
-    labels = merge(
-      {
-        "app.kubernetes.io/managed-by" = "Terraform"
-      }
-    )
-  }
-  data = {
-    mapRoles = yamlencode(
-      distinct(concat(
-        local.configmap_roles
-      ))
-    )
-
-  }
-  depends_on = [module.eks]
-}
-
-resource "kubernetes_namespace" "batcave" {
-  metadata {
-    name = "batcave"
-  }
-  lifecycle {
-    ignore_changes = [
-      # Kustomize adds labels after the fact, ignore these changes
-      metadata[0].labels,
-      metadata[0].annotations,
-    ]
-  }
-}
 
 locals {
   cluster_security_groups_created = {
