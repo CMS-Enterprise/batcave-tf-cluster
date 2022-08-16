@@ -25,7 +25,7 @@ locals {
     desired_size          = v.desired_size
     max_size              = v.max_size
     min_size              = v.min_size
-    bootstrap_extra_args  = try(v.extra_args, "--kubelet-extra-args '--node-labels=${k}=true --register-with-taints=${k}=true:NoSchedule'")
+    bootstrap_extra_args  = try(v.extra_args, "--kubelet-extra-args '--node-labels=${k}=true ${join(" ", [for taint_key, taint_value in try(v.taints, {}) : "--register-with-taints=${taint_key}=${taint_value}"])}'")
     create_security_group = false
     block_device_mappings = [
       {
@@ -38,8 +38,13 @@ locals {
         }
       }
     ]
-    tags                   = try(v.tags, null)
-    autoscaling_group_tags = var.autoscaling_group_tags
+    tags = try(v.tags, null)
+    autoscaling_group_tags = merge(
+      # The default asg tags, typically used for Cluster Autoscaler self-discovery
+      var.autoscaling_group_tags,
+      # Taint tags for Cluster Autoscaler hints
+      try({ for taint_key, taint_value in v.taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint_key}" => taint_value }, {})
+    )
     propagate_tags = [
       {
         key                 = "ProjectName"
@@ -96,7 +101,7 @@ module "eks" {
       instance_type                 = var.instance_type
       iam_role_path                 = var.iam_role_path
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
-      bootstrap_extra_args          = var.general_nodepool_extra_args
+      bootstrap_extra_args          = try(var.general_nodepool_extra_args, "--kubelet-extra-args '--node-labels=general=true ${join(" ", [for taint_key, taint_value in try(var.general_nodepool_taints, {}) : "--register-with-taints=${taint_key}=${taint_value}"])}'")
       ami_id                        = data.aws_ami.eks_ami.id
       desired_size                  = var.desired_size
       max_size                      = var.max_size
@@ -117,8 +122,13 @@ module "eks" {
           }
         }
       ]
-      tags                   = var.general_nodepool_tags
-      autoscaling_group_tags = var.autoscaling_group_tags
+      tags = var.general_nodepool_tags
+      autoscaling_group_tags = merge(
+        # The default asg tags, typically used for Cluster Autoscaler self-discovery
+        var.autoscaling_group_tags,
+        # Taint tags for Cluster Autoscaler hints
+        try({ for taint_key, taint_value in var.general_nodepool_taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint_key}" => taint_value }, {})
+      )
       propagate_tags = [
         {
           key                 = "node_type"

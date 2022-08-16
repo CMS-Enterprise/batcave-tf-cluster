@@ -26,7 +26,15 @@ variable "instance_type" {
 }
 
 variable "general_nodepool_extra_args" {
-  default = "--kubelet-extra-args '--node-labels=general=true --register-with-taints=CrticalAddonsOnly=true:NoSchedule'"
+  description = "extra args for kubelet in form of: `--kubelet-extra-args '<...>'`.  Incompatible with var.general_nodepool_taints"
+  default     = null
+  type        = string
+}
+
+variable "general_nodepool_taints" {
+  description = "Map of taint flags for kubelets.  If var.general_nodepool_extra_args is provided, this var will not be used.  Ex: `{MyTaint = \"true:NoSchedule\"}`"
+  type        = map(any)
+  default     = {}
 }
 
 ### Runners node group vars
