@@ -10,53 +10,24 @@ variable "cluster_version" {
   default = "1.21"
 }
 
-### Default node group vars
+## Default node group
+variable "general_node_pool" {
+  type        = any
+  description = "General node pool, required for hosting core services"
+  default = {
+    instance_type = "c5.2xlarge"
+    desired_size  = 3
+    max_size      = 5
+    min_size      = 2
+    # Map of label flags for kubelets.  If extra_args is provided, this var will be overridden.
+    labels = { general = "true" }
+    # Map of taint flags for kubelets.  If extra_args is provided, this var will be overridden.
+    # Ex: `{MyTaint = "true:NoSchedule"}`
+    taints = {}
 
-variable "desired_size" {
-  default = 3
-}
-variable "max_size" {
-  default = 3
-}
-variable "min_size" {
-  default = 3
-}
-variable "instance_type" {
-  default = "c5.2xlarge"
-}
-
-variable "general_nodepool_extra_args" {
-  description = "extra args for kubelet in form of: `--kubelet-extra-args '<...>'`.  Incompatible with var.general_nodepool_taints"
-  default     = null
-  type        = string
-}
-
-variable "general_nodepool_taints" {
-  description = "Map of taint flags for kubelets.  If var.general_nodepool_extra_args is provided, this var will not be used.  Ex: `{MyTaint = \"true:NoSchedule\"}`"
-  type        = map(any)
-  default     = {}
-}
-
-variable "general_nodepool_labels" {
-  description = "Map of label flags for kubelets.  If var.general_nodepool_extra_args is provided, this var will not be used.  Ex: `{MyLabel = \"true\"}`"
-  type        = map(any)
-  default     = { general = "true" }
-}
-
-### Runners node group vars
-variable "runners_desired_size" {
-  type    = number
-  default = 1
-}
-
-variable "runners_max_size" {
-  type    = number
-  default = 1
-}
-
-variable "runners_min_size" {
-  type    = number
-  default = 1
+    # Extra args for kubelet in form of: `--kubelet-extra-args '<...>'`.  Will override any taints or labels
+    #extra_args = "--kubelete-extra-args '--node-labels=general=true'
+  }
 }
 
 variable "custom_node_pools" {
@@ -67,24 +38,8 @@ variable "custom_node_pools" {
   #    desired_size = 1
   #    max_size = 1
   #    min_size = 1
-  #    extra_args = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=runners=true:NoSchedule'"
-  #  }
-  #  batcave_website = {
-  #    instance_type = "t2.medium"
-  #    desired_size = 0
-  #    max_size = 0
-  #    min_size = 0
-  #    extra_args = "--kubelet-extra-args '--node-labels=batcave-website=true --register-with-taints=batcave-website=true:NoSchedule'"
-  #    tags = {
-  #      "project-name" = "batcave"
-  #    }
-  #  }
-  #  batcave_knightlight = {
-  #    instance_type = "t2.medium"
-  #    desired_size = 0
-  #    max_size = 0
-  #    min_size = 0
-  #    extra_args = "--kubelet-extra-args '--node-labels=batcave_knightlight=true --register-with-taints=batcave_knightlight=true:NoSchedule'"
+  #    labels = { gitlab-runners-go-here = "true" }
+  #    taints = { better-watch-out-for-gitlab-runners = "true:NoSchedule" }
   #  }
 }
 

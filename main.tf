@@ -14,7 +14,7 @@ data "aws_ami" "eks_ami" {
 # EKS Module
 ################################################################################
 locals {
-  custom_node_pools = { for k, v in var.custom_node_pools : k => {
+  custom_node_pools = { for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
     name                          = "${var.cluster_name}-${k}"
     subnet_ids                    = var.private_subnets
     ami_id                        = data.aws_ami.eks_ami.id
@@ -45,13 +45,16 @@ locals {
     ]
     tags = try(v.tags, null)
     autoscaling_group_tags = merge(
-      # The default asg tags, typically used for Cluster Autoscaler self-discovery
-      var.autoscaling_group_tags,
+      {
+        "k8s.io/cluster-autoscaler/enabled"             = "true",
+        "k8s.io/cluster-autoscaler/${var.cluster_name}" = "${var.cluster_name}"
+      },
       # Taint tags for Cluster Autoscaler hints
       try({ for taint_key, taint_value in v.taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint_key}" => taint_value }, {}),
       # Label tags for Cluster Autoscaler hints
       { "k8s.io/cluster-autoscaler/node-template/label/${k}" = "true" },
       try({ for label_key, label_value in v.labels : "k8s.io/cluster-autoscaler/node-template/label/${label_key}" => label_value }, {}),
+      var.autoscaling_group_tags,
     )
     propagate_tags = [
       {
@@ -102,57 +105,7 @@ module "eks" {
     subnet_ids = var.private_subnets
   }
   # Worker groups (using Launch Configurations)
-  self_managed_node_groups = merge({
-    general = {
-      name                          = "${var.cluster_name}-general"
-      subnet_ids                    = var.private_subnets
-      instance_type                 = var.instance_type
-      iam_role_path                 = var.iam_role_path
-      iam_role_permissions_boundary = var.iam_role_permissions_boundary
-      bootstrap_extra_args = var.general_nodepool_extra_args != null ? var.general_nodepool_extra_args : join(" ",
-        ["--kubelet-extra-args '--node-labels=general=true"],
-        [for label_key, label_value in try(var.general_nodepool_labels, {}) : "--node-labels=${label_key}=${label_value}"],
-        [for taint_key, taint_value in try(var.general_nodepool_taints, {}) : "--register-with-taints=${taint_key}=${taint_value}"],
-      ["'"])
-      ami_id       = data.aws_ami.eks_ami.id
-      desired_size = var.desired_size
-      max_size     = var.max_size
-      min_size     = var.min_size
-      target_group_arns = concat(
-        [aws_lb_target_group.batcave_alb_https.arn],
-        var.create_alb_proxy ? [aws_lb_target_group.batcave_alb_proxy_https[0].arn] : [],
-      )
-      create_security_group = false
-      block_device_mappings = [
-        {
-          device_name = "/dev/xvda"
-          ebs = {
-            volume_size           = "300"
-            volume_type           = "gp3"
-            delete_on_termination = true
-            encrypted             = true
-          }
-        }
-      ]
-      tags = var.general_nodepool_tags
-      autoscaling_group_tags = merge(
-        # The default asg tags, typically used for Cluster Autoscaler self-discovery
-        var.autoscaling_group_tags,
-        # Taint tags for Cluster Autoscaler hints
-        try({ for taint_key, taint_value in var.general_nodepool_taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint_key}" => taint_value }, {}),
-        # Label tags for Cluster Autoscaler hints
-        { "k8s.io/cluster-autoscaler/node-template/label/general" = "true" },
-        try({ for label_key, label_value in var.general_nodepool_labels : "k8s.io/cluster-autoscaler/node-template/label/${label_key}" => label_value }, {})
-      )
-      propagate_tags = [
-        {
-          key                 = "node_type"
-          value               = "general"
-          propagate_at_launch = var.wg_tag_propagate_at_launch
-        }
-      ]
-    }
-  }, local.custom_node_pools)
+  self_managed_node_groups = local.custom_node_pools
 }
 
 resource "null_resource" "instance_cleanup" {
