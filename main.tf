@@ -21,11 +21,16 @@ locals {
     iam_role_path                 = var.iam_role_path
     iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
-    instance_type         = v.instance_type
-    desired_size          = v.desired_size
-    max_size              = v.max_size
-    min_size              = v.min_size
-    bootstrap_extra_args  = try(v.extra_args, "--kubelet-extra-args '--node-labels=${k}=true ${join(" ", [for taint_key, taint_value in try(v.taints, {}) : "--register-with-taints=${taint_key}=${taint_value}"])}'")
+    instance_type = v.instance_type
+    desired_size  = v.desired_size
+    max_size      = v.max_size
+    min_size      = v.min_size
+    bootstrap_extra_args = try(v.extra_args, join(" ",
+      ["--kubelet-extra-args '--node-labels=${k}=true"],
+      [for label_key, label_value in try(v.labels, {}) : "--node-labels=${label_key}=${label_value}"],
+      [for taint_key, taint_value in try(v.taints, {}) : "--register-with-taints=${taint_key}=${taint_value}"],
+      ["'"])
+    )
     create_security_group = false
     block_device_mappings = [
       {
@@ -43,7 +48,10 @@ locals {
       # The default asg tags, typically used for Cluster Autoscaler self-discovery
       var.autoscaling_group_tags,
       # Taint tags for Cluster Autoscaler hints
-      try({ for taint_key, taint_value in v.taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint_key}" => taint_value }, {})
+      try({ for taint_key, taint_value in v.taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint_key}" => taint_value }, {}),
+      # Label tags for Cluster Autoscaler hints
+      { "k8s.io/cluster-autoscaler/node-template/label/${k}" = "true" },
+      try({ for label_key, label_value in v.labels : "k8s.io/cluster-autoscaler/node-template/label/${label_key}" => label_value }, {}),
     )
     propagate_tags = [
       {
@@ -101,11 +109,15 @@ module "eks" {
       instance_type                 = var.instance_type
       iam_role_path                 = var.iam_role_path
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
-      bootstrap_extra_args          = try(var.general_nodepool_extra_args, "--kubelet-extra-args '--node-labels=general=true ${join(" ", [for taint_key, taint_value in try(var.general_nodepool_taints, {}) : "--register-with-taints=${taint_key}=${taint_value}"])}'")
-      ami_id                        = data.aws_ami.eks_ami.id
-      desired_size                  = var.desired_size
-      max_size                      = var.max_size
-      min_size                      = var.min_size
+      bootstrap_extra_args = var.general_nodepool_extra_args != null ? var.general_nodepool_extra_args : join(" ",
+        ["--kubelet-extra-args '--node-labels=general=true"],
+        [for label_key, label_value in try(var.general_nodepool_labels, {}) : "--node-labels=${label_key}=${label_value}"],
+        [for taint_key, taint_value in try(var.general_nodepool_taints, {}) : "--register-with-taints=${taint_key}=${taint_value}"],
+      ["'"])
+      ami_id       = data.aws_ami.eks_ami.id
+      desired_size = var.desired_size
+      max_size     = var.max_size
+      min_size     = var.min_size
       target_group_arns = concat(
         [aws_lb_target_group.batcave_alb_https.arn],
         var.create_alb_proxy ? [aws_lb_target_group.batcave_alb_proxy_https[0].arn] : [],
@@ -127,7 +139,10 @@ module "eks" {
         # The default asg tags, typically used for Cluster Autoscaler self-discovery
         var.autoscaling_group_tags,
         # Taint tags for Cluster Autoscaler hints
-        try({ for taint_key, taint_value in var.general_nodepool_taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint_key}" => taint_value }, {})
+        try({ for taint_key, taint_value in var.general_nodepool_taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint_key}" => taint_value }, {}),
+        # Label tags for Cluster Autoscaler hints
+        { "k8s.io/cluster-autoscaler/node-template/label/general" = "true" },
+        try({ for label_key, label_value in var.general_nodepool_labels : "k8s.io/cluster-autoscaler/node-template/label/${label_key}" => label_value }, {})
       )
       propagate_tags = [
         {

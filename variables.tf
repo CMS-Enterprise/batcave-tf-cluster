@@ -37,6 +37,12 @@ variable "general_nodepool_taints" {
   default     = {}
 }
 
+variable "general_nodepool_labels" {
+  description = "Map of label flags for kubelets.  If var.general_nodepool_extra_args is provided, this var will not be used.  Ex: `{MyLabel = \"true\"}`"
+  type        = map(any)
+  default     = { general = "true" }
+}
+
 ### Runners node group vars
 variable "runners_desired_size" {
   type    = number
@@ -51,14 +57,6 @@ variable "runners_max_size" {
 variable "runners_min_size" {
   type    = number
   default = 1
-}
-
-variable "gitlab_runner_extra_args" {
-  default = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=runners=true:NoSchedule'"
-}
-
-variable "runners_instance_type" {
-  default = "c4.xlarge"
 }
 
 variable "custom_node_pools" {
