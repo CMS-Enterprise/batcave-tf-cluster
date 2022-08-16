@@ -19,14 +19,21 @@ variable "general_node_pool" {
     desired_size  = 3
     max_size      = 5
     min_size      = 2
-    # Map of label flags for kubelets.  If extra_args is provided, this var will be overridden.
+    # Map of label flags for kubelets.
     labels = { general = "true" }
-    # Map of taint flags for kubelets.  If extra_args is provided, this var will be overridden.
+    # Map of taint flags for kubelets.
     # Ex: `{MyTaint = "true:NoSchedule"}`
     taints = {}
+    #tags = {}
 
-    # Extra args for kubelet in form of: `--kubelet-extra-args '<...>'`.  Will override any taints or labels
-    #extra_args = "--kubelete-extra-args '--node-labels=general=true'
+    # Extra args for kubelet in form of: "--node-labels=general=true <...>'.  Will be in _addition_ to any 
+    # other args added by the labels and taints values
+    #extra_args = "--node-labels=general=true"
+
+
+    #volume_size                  = "300"
+    #volume_type                  = "gp3"
+    #volume_delete_on_termination = true
   }
 }
 
@@ -94,52 +101,6 @@ variable "cluster_enabled_log_types" {
 variable "enable_irsa" {
   default = "true"
 }
-
-
-### Worker Group variables
-
-variable "wg_instance_type" {
-  default = "t3.xlarge"
-}
-variable "wg_kubelet_extra_args" {
-  default = "--node-labels=bootstrap --register-with-taints=CriticalAddonsOnly=true:NoSchedule"
-}
-variable "wg_ami_id" {
-  default = "ami-0d111bb0f1e4a9787"
-}
-variable "wg_general_asg_desired_size" {
-  type    = number
-  default = 1
-}
-variable "wg_general_asg_max_size" {
-  type    = number
-  default = 5
-}
-variable "wg_general_asg_min_size" {
-  type    = number
-  default = 1
-}
-variable "wg_instance_refresh_enabled" {
-  type    = bool
-  default = true
-}
-variable "wg_instance_refresh_strategy" {
-  default = "Rolling"
-}
-variable "wg_instance_refresh_instance_warmup" {
-  type    = number
-  default = 90
-}
-variable "wg_tag_key" {
-  default = "restart_filter"
-}
-variable "wg_tag_value" {
-  default = "bootstrap"
-}
-variable "wg_tag_propagate_at_launch" {
-  default = "true"
-}
-
 
 ### AWS Launch Template variables
 

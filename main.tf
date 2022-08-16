@@ -25,11 +25,11 @@ locals {
     desired_size  = v.desired_size
     max_size      = v.max_size
     min_size      = v.min_size
-    bootstrap_extra_args = try(v.extra_args, join(" ",
-      ["--kubelet-extra-args '--node-labels=${k}=true"],
+    bootstrap_extra_args = join(" ",
+      ["--kubelet-extra-args '--node-labels=${k}=true", v.extra_args],
       [for label_key, label_value in try(v.labels, {}) : "--node-labels=${label_key}=${label_value}"],
       [for taint_key, taint_value in try(v.taints, {}) : "--register-with-taints=${taint_key}=${taint_value}"],
-      ["'"])
+      ["'"]
     )
     create_security_group = false
     block_device_mappings = [
@@ -60,7 +60,7 @@ locals {
       {
         key                 = "ProjectName"
         value               = k
-        propagate_at_launch = var.wg_tag_propagate_at_launch
+        propagate_at_launch = "true"
       }
     ]
     }
