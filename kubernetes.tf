@@ -5,15 +5,15 @@ provider "kubernetes" {
 }
 
 locals {
-  configmap_roles = [ for k,v in module.eks.self_managed_node_groups : {
-      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${v.iam_role_name}"
-      username = "system:node:{{EC2PrivateDNSName}}"
-      groups = tolist(concat(
-        [
-          "system:bootstrappers",
-          "system:nodes",
-        ],
-      ))
+  configmap_roles = [for k, v in module.eks.self_managed_node_groups : {
+    rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${v.iam_role_name}"
+    username = "system:node:{{EC2PrivateDNSName}}"
+    groups = tolist(concat(
+      [
+        "system:bootstrappers",
+        "system:nodes",
+      ],
+    ))
     }
   ]
 }
@@ -60,5 +60,5 @@ kind: Namespace
 metadata:
   name: batcave
 YAML
-  depends_on = [module.eks]
+  depends_on    = [module.eks]
 }

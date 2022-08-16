@@ -336,12 +336,18 @@ variable "logging_bucket" {
 }
 
 ### Cosign OpenID Connect Audiences
-variable "openid_connect_audiences"{
+variable "openid_connect_audiences" {
   description = "OpenID Connect Audiences"
   default     = []
   type        = list(string)
 }
 variable "create_cosign_iam_role" {
   description = "Flag to create Cosign IAM role"
-  default = false
+  default     = false
+}
+
+variable "autoscaling_group_tags" {
+  description = "Tags to apply to all autoscaling groups created"
+  default     = {}
+  type        = map(any)
 }

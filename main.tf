@@ -14,45 +14,46 @@ data "aws_ami" "eks_ami" {
 # EKS Module
 ################################################################################
 locals {
-  custom_node_pools = { for k,v in var.custom_node_pools : k => {
-      name                          = "${var.cluster_name}-${k}"
-      subnet_ids                    = var.private_subnets
-      ami_id                        = data.aws_ami.eks_ami.id
-      iam_role_path                 = var.iam_role_path
-      iam_role_permissions_boundary = var.iam_role_permissions_boundary
+  custom_node_pools = { for k, v in var.custom_node_pools : k => {
+    name                          = "${var.cluster_name}-${k}"
+    subnet_ids                    = var.private_subnets
+    ami_id                        = data.aws_ami.eks_ami.id
+    iam_role_path                 = var.iam_role_path
+    iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
-      instance_type                 = v.instance_type
-      desired_size                  = v.desired_size
-      max_size                      = v.max_size
-      min_size                      = v.min_size
-      bootstrap_extra_args          = try(v.extra_args, "--kubelet-extra-args '--node-labels=${k}=true --register-with-taints=${k}=true:NoSchedule'")
-      create_security_group         = false
-      block_device_mappings = [
-        {
-          device_name = "/dev/xvda"
-          ebs = {
-            volume_size           = try(v.volume_size, "300")
-            volume_type           = try(v.volume_type, "gp3")
-            delete_on_termination = try(v.volume_delete_on_termination, true)
-            encrypted             = true
-          }
+    instance_type         = v.instance_type
+    desired_size          = v.desired_size
+    max_size              = v.max_size
+    min_size              = v.min_size
+    bootstrap_extra_args  = try(v.extra_args, "--kubelet-extra-args '--node-labels=${k}=true --register-with-taints=${k}=true:NoSchedule'")
+    create_security_group = false
+    block_device_mappings = [
+      {
+        device_name = "/dev/xvda"
+        ebs = {
+          volume_size           = try(v.volume_size, "300")
+          volume_type           = try(v.volume_type, "gp3")
+          delete_on_termination = try(v.volume_delete_on_termination, true)
+          encrypted             = true
         }
-      ]
-      tags = try(v.tags, null)
-      propagate_tags = [
-        {
-          key                 = "ProjectName"
-          value               = k
-          propagate_at_launch = var.wg_tag_propagate_at_launch
-        }
-      ]
+      }
+    ]
+    tags                   = try(v.tags, null)
+    autoscaling_group_tags = var.autoscaling_group_tags
+    propagate_tags = [
+      {
+        key                 = "ProjectName"
+        value               = k
+        propagate_at_launch = var.wg_tag_propagate_at_launch
+      }
+    ]
     }
   }
 }
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "18.21.0"
+  version = "18.27.1"
 
   cluster_name    = local.name
   cluster_version = local.cluster_version
@@ -71,7 +72,7 @@ module "eks" {
   cluster_security_group_additional_rules = var.cluster_security_group_additional_rules
   enable_irsa                             = true
 
-  openid_connect_audiences                = var.openid_connect_audiences
+  openid_connect_audiences = var.openid_connect_audiences
 
   ## VERY IMPORTANT WARNING: Changing security group ids associated with a cluster will
   ## ***DELETE AND RECREATE*** existing clusters.  Do not modify this for already existing clusters
@@ -116,7 +117,8 @@ module "eks" {
           }
         }
       ]
-      tags = var.general_nodepool_tags
+      tags                   = var.general_nodepool_tags
+      autoscaling_group_tags = var.autoscaling_group_tags
       propagate_tags = [
         {
           key                 = "node_type"
@@ -243,7 +245,7 @@ resource "aws_security_group_rule" "https-tg-ingress" {
 
 ## Setup for cosign keyless signatures 
 locals {
-  oidc_provider = "${module.eks.oidc_provider}"
+  oidc_provider = module.eks.oidc_provider
 }
 
 resource "aws_iam_role" "cosign" {
@@ -261,13 +263,13 @@ resource "aws_iam_role" "cosign" {
         }
         Condition = {
           StringEquals = {
-            "${local.oidc_provider}:aud": "sigstore",
-            "${local.oidc_provider}:sub": "system:serviceaccount:gitlab:cosign"
-          } 
+            "${local.oidc_provider}:aud" : "sigstore",
+            "${local.oidc_provider}:sub" : "system:serviceaccount:gitlab:cosign"
+          }
         }
       },
     ]
   })
-  path = var.iam_role_path
+  path                 = var.iam_role_path
   permissions_boundary = var.iam_role_permissions_boundary
 }
