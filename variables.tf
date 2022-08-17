@@ -10,47 +10,31 @@ variable "cluster_version" {
   default = "1.21"
 }
 
-### Default node group vars
+## Default node group
+variable "general_node_pool" {
+  type        = any
+  description = "General node pool, required for hosting core services"
+  default = {
+    instance_type = "c5.2xlarge"
+    desired_size  = 3
+    max_size      = 5
+    min_size      = 2
+    # Map of label flags for kubelets.
+    labels = { general = "true" }
+    # Map of taint flags for kubelets.
+    # Ex: `{MyTaint = "true:NoSchedule"}`
+    taints = {}
+    #tags = {}
 
-variable "desired_size" {
-  default = 3
-}
-variable "max_size" {
-  default = 3
-}
-variable "min_size" {
-  default = 3
-}
-variable "instance_type" {
-  default = "c5.2xlarge"
-}
+    # Extra args for kubelet in form of: "--node-labels=general=true <...>'.  Will be in _addition_ to any 
+    # other args added by the labels and taints values
+    #extra_args = "--node-labels=general=true"
 
-variable "general_nodepool_extra_args" {
-  default = "--kubelet-extra-args '--node-labels=general=true --register-with-taints=CrticalAddonsOnly=true:NoSchedule'"
-}
 
-### Runners node group vars
-variable "runners_desired_size" {
-  type    = number
-  default = 1
-}
-
-variable "runners_max_size" {
-  type    = number
-  default = 1
-}
-
-variable "runners_min_size" {
-  type    = number
-  default = 1
-}
-
-variable "gitlab_runner_extra_args" {
-  default = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=runners=true:NoSchedule'"
-}
-
-variable "runners_instance_type" {
-  default = "c4.xlarge"
+    #volume_size                  = "300"
+    #volume_type                  = "gp3"
+    #volume_delete_on_termination = true
+  }
 }
 
 variable "custom_node_pools" {
@@ -61,24 +45,8 @@ variable "custom_node_pools" {
   #    desired_size = 1
   #    max_size = 1
   #    min_size = 1
-  #    extra_args = "--kubelet-extra-args '--node-labels=runners=true --register-with-taints=runners=true:NoSchedule'"
-  #  }
-  #  batcave_website = {
-  #    instance_type = "t2.medium"
-  #    desired_size = 0
-  #    max_size = 0
-  #    min_size = 0
-  #    extra_args = "--kubelet-extra-args '--node-labels=batcave-website=true --register-with-taints=batcave-website=true:NoSchedule'"
-  #    tags = {
-  #      "project-name" = "batcave"
-  #    }
-  #  }
-  #  batcave_knightlight = {
-  #    instance_type = "t2.medium"
-  #    desired_size = 0
-  #    max_size = 0
-  #    min_size = 0
-  #    extra_args = "--kubelet-extra-args '--node-labels=batcave_knightlight=true --register-with-taints=batcave_knightlight=true:NoSchedule'"
+  #    labels = { gitlab-runners-go-here = "true" }
+  #    taints = { better-watch-out-for-gitlab-runners = "true:NoSchedule" }
   #  }
 }
 
@@ -133,52 +101,6 @@ variable "cluster_enabled_log_types" {
 variable "enable_irsa" {
   default = "true"
 }
-
-
-### Worker Group variables
-
-variable "wg_instance_type" {
-  default = "t3.xlarge"
-}
-variable "wg_kubelet_extra_args" {
-  default = "--node-labels=bootstrap --register-with-taints=CriticalAddonsOnly=true:NoSchedule"
-}
-variable "wg_ami_id" {
-  default = "ami-0d111bb0f1e4a9787"
-}
-variable "wg_general_asg_desired_size" {
-  type    = number
-  default = 1
-}
-variable "wg_general_asg_max_size" {
-  type    = number
-  default = 5
-}
-variable "wg_general_asg_min_size" {
-  type    = number
-  default = 1
-}
-variable "wg_instance_refresh_enabled" {
-  type    = bool
-  default = true
-}
-variable "wg_instance_refresh_strategy" {
-  default = "Rolling"
-}
-variable "wg_instance_refresh_instance_warmup" {
-  type    = number
-  default = 90
-}
-variable "wg_tag_key" {
-  default = "restart_filter"
-}
-variable "wg_tag_value" {
-  default = "bootstrap"
-}
-variable "wg_tag_propagate_at_launch" {
-  default = "true"
-}
-
 
 ### AWS Launch Template variables
 
@@ -336,12 +258,18 @@ variable "logging_bucket" {
 }
 
 ### Cosign OpenID Connect Audiences
-variable "openid_connect_audiences"{
+variable "openid_connect_audiences" {
   description = "OpenID Connect Audiences"
   default     = []
   type        = list(string)
 }
 variable "create_cosign_iam_role" {
   description = "Flag to create Cosign IAM role"
-  default = false
+  default     = false
+}
+
+variable "autoscaling_group_tags" {
+  description = "Tags to apply to all autoscaling groups created"
+  default     = {}
+  type        = map(any)
 }

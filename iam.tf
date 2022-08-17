@@ -36,7 +36,7 @@ data "aws_iam_policy_document" "node_policy" {
     resources = ["*"]
   }
   statement {
-    sid = "stsassumerole"
+    sid    = "stsassumerole"
     effect = "Allow"
     actions = [
       "sts:AssumeRole"
@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "node_policy" {
       ] :
       [
         for bucket in var.s3_bucket_access_grants : "arn:aws:s3:::${bucket}"
-      ])
+    ])
   }
   statement {
     actions = [
@@ -81,7 +81,7 @@ data "aws_iam_policy_document" "node_policy" {
       ] :
       [
         for bucket in var.s3_bucket_access_grants : "arn:aws:s3:::${bucket}/*"
-      ])
+    ])
   }
 }
 
