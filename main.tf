@@ -26,7 +26,7 @@ locals {
     max_size      = v.max_size
     min_size      = v.min_size
     bootstrap_extra_args = join(" ",
-      ["--kubelet-extra-args '--node-labels=${k}=true", v.extra_args],
+      ["--kubelet-extra-args '--node-labels=${k}=true", try(v.extra_args, "")],
       [for label_key, label_value in try(v.labels, {}) : "--node-labels=${label_key}=${label_value}"],
       [for taint_key, taint_value in try(v.taints, {}) : "--register-with-taints=${taint_key}=${taint_value}"],
       ["'"]
