@@ -63,8 +63,30 @@ locals {
         propagate_at_launch = "true"
       }
     ]
-    }
-  }
+    enabled_metrics           = [
+        "GroupAndWarmPoolDesiredCapacity",
+        "GroupAndWarmPoolTotalCapacity",
+        "GroupDesiredCapacity",
+        "GroupInServiceCapacity",
+        "GroupInServiceInstances",
+        "GroupMaxSize",
+        "GroupMinSize",
+        "GroupPendingCapacity",
+        "GroupPendingInstances",
+        "GroupStandbyCapacity",
+        "GroupStandbyInstances",
+        "GroupTerminatingCapacity",
+        "GroupTerminatingInstances",
+        "GroupTotalCapacity",
+        "GroupTotalInstances",
+        "WarmPoolDesiredCapacity",
+        "WarmPoolMinSize",
+        "WarmPoolPendingCapacity",
+        "WarmPoolTerminatingCapacity",
+        "WarmPoolTotalCapacity",
+        "WarmPoolWarmedCapacity",
+    ]
+  }}
 }
 
 module "eks" {
