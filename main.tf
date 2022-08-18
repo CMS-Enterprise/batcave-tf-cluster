@@ -43,6 +43,13 @@ locals {
         }
       }
     ]
+
+    # On the general node group or any node group labeled "general", attach target groups
+    target_group_arns = (k == "general" || contains(keys(try(v.labels,{})),"general")) ? concat(
+      [aws_lb_target_group.batcave_alb_https.arn],
+      var.create_alb_proxy ? [aws_lb_target_group.batcave_alb_proxy_https[0].arn] : []
+    ) : null
+
     tags = try(v.tags, null)
     autoscaling_group_tags = merge(
       {
