@@ -45,7 +45,7 @@ locals {
     ]
 
     # On the general node group or any node group labeled "general", attach target groups
-    target_group_arns = (k == "general" || contains(keys(try(v.labels,{})),"general")) ? concat(
+    target_group_arns = (k == "general" || contains(keys(try(v.labels, {})), "general")) ? concat(
       [aws_lb_target_group.batcave_alb_https.arn],
       var.create_alb_proxy ? [aws_lb_target_group.batcave_alb_proxy_https[0].arn] : []
     ) : null
@@ -70,30 +70,30 @@ locals {
         propagate_at_launch = "true"
       }
     ]
-    enabled_metrics           = [
-        "GroupAndWarmPoolDesiredCapacity",
-        "GroupAndWarmPoolTotalCapacity",
-        "GroupDesiredCapacity",
-        "GroupInServiceCapacity",
-        "GroupInServiceInstances",
-        "GroupMaxSize",
-        "GroupMinSize",
-        "GroupPendingCapacity",
-        "GroupPendingInstances",
-        "GroupStandbyCapacity",
-        "GroupStandbyInstances",
-        "GroupTerminatingCapacity",
-        "GroupTerminatingInstances",
-        "GroupTotalCapacity",
-        "GroupTotalInstances",
-        "WarmPoolDesiredCapacity",
-        "WarmPoolMinSize",
-        "WarmPoolPendingCapacity",
-        "WarmPoolTerminatingCapacity",
-        "WarmPoolTotalCapacity",
-        "WarmPoolWarmedCapacity",
+    enabled_metrics = [
+      "GroupAndWarmPoolDesiredCapacity",
+      "GroupAndWarmPoolTotalCapacity",
+      "GroupDesiredCapacity",
+      "GroupInServiceCapacity",
+      "GroupInServiceInstances",
+      "GroupMaxSize",
+      "GroupMinSize",
+      "GroupPendingCapacity",
+      "GroupPendingInstances",
+      "GroupStandbyCapacity",
+      "GroupStandbyInstances",
+      "GroupTerminatingCapacity",
+      "GroupTerminatingInstances",
+      "GroupTotalCapacity",
+      "GroupTotalInstances",
+      "WarmPoolDesiredCapacity",
+      "WarmPoolMinSize",
+      "WarmPoolPendingCapacity",
+      "WarmPoolTerminatingCapacity",
+      "WarmPoolTotalCapacity",
+      "WarmPoolWarmedCapacity",
     ]
-  }}
+  } }
 }
 
 module "eks" {
