@@ -201,6 +201,12 @@ variable "cluster_security_group_additional_rules" {
   default     = {}
 }
 
+variable "grant_delete_ebs_volumes_lambda_access" {
+  type = bool
+  default = false
+  description = "When set to true, a cluster role and permissions will be created to grant the delete-ebs-volumes Lambda access to the PersistentVolumes API."
+}
+
 variable "node_https_ingress_cidr_blocks" {
   description = "List of CIDR blocks to allow into the node over the HTTPs port"
   default     = ["10.0.0.0/8"]

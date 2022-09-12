@@ -10,6 +10,13 @@ data "aws_ami" "eks_ami" {
   owners      = ["743302140042"]
 }
 
+data "aws_security_groups" "delete_ebs_volumes_lambda_security_group" {
+  filter {
+    name   = "group-name"
+    values = ["delete_ebs_volumes-lambda"]
+  }
+}
+
 ################################################################################
 # EKS Module
 ################################################################################
@@ -94,6 +101,20 @@ locals {
       "WarmPoolWarmedCapacity",
     ]
   } }
+  # Allow ingress to the control plane from the delete_ebs_volumes lambda (if it exists)
+  delete_ebs_volumes_lambda_sg_id = one(data.aws_security_groups.delete_ebs_volumes_lambda_security_group.ids)
+  default_security_group_additional_rules = (var.grant_delete_ebs_volumes_lambda_access && local.delete_ebs_volumes_lambda_sg_id != null ?
+    ({
+      delete_ebs_volumes_lambda_ingress_rule = {
+        type = "ingress"
+        protocol = "all"
+        from_port = 0
+        to_port = 65535
+        source_security_group_id = local.delete_ebs_volumes_lambda_sg_id
+        description = "Allow API connections from the delete_ebs_volumes lambda."
+      }
+    }) :
+    {})
 }
 
 module "eks" {
@@ -114,7 +135,7 @@ module "eks" {
   cluster_endpoint_private_access         = var.cluster_endpoint_private_access
   cluster_endpoint_public_access          = var.cluster_endpoint_public_access
   cluster_enabled_log_types               = var.cluster_enabled_log_types
-  cluster_security_group_additional_rules = var.cluster_security_group_additional_rules
+  cluster_security_group_additional_rules = merge(local.default_security_group_additional_rules, var.cluster_security_group_additional_rules)
   enable_irsa                             = true
 
   openid_connect_audiences = var.openid_connect_audiences
