@@ -27,6 +27,7 @@ resource "kubernetes_cluster_role" "persistent_volume_management" {
     resources  = ["persistentvolumes"]
     verbs      = [ "create", "delete", "get", "list", "update", "watch" ]
   }
+  depends_on = [null_resource.kubernetes_requirements]
 }
 
 resource "kubernetes_cluster_role_binding" "delete_ebs_volumes_lambda" {
@@ -45,6 +46,7 @@ resource "kubernetes_cluster_role_binding" "delete_ebs_volumes_lambda" {
     kind      = "Group"
     name      = "batcave:persistent-volume-managers"
   }
+  depends_on = [null_resource.kubernetes_requirements]
 }
 
 locals {
@@ -75,7 +77,7 @@ resource "kubernetes_config_map" "aws_auth" {
       ))
     )
   }
-  depends_on = [module.eks]
+  depends_on = [null_resource.kubernetes_requirements]
 }
 
 provider "kubectl" {
