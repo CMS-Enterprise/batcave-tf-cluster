@@ -158,20 +158,13 @@ module "eks" {
   self_managed_node_groups = local.custom_node_pools
 }
 
-resource "null_resource" "instance_cleanup" {
-  for_each = toset([var.cluster_name])
+# pseudo resource to capture critical infrastructure needed to access the Kubernetes API
+resource "null_resource" "kubernetes_requirements" {
   depends_on = [
-    module.eks
+    module.eks,
+    # without this security group rule the Kubernetes API is unreachable
+    aws_security_group_rule.allow_ingress_additional_prefix_lists
   ]
-  triggers = {
-    cluster_arn = module.eks.cluster_arn
-  }
-  provisioner "local-exec" {
-    when = destroy
-    # Clean up nodes created by karpenter for this cluster to ensure a clean delete
-    command     = "aws ec2 terminate-instances --instance-ids $(aws ec2 describe-instances --filters \"Name=tag:kubernetes.io/cluster/${each.key},Values=owned\" \"Name=tag:karpenter.sh/provisioner-name,Values=*\" --query Reservations[].Instances[].InstanceId --output text) || true"
-    interpreter = ["/bin/bash", "-c"]
-  }
 }
 
 ################################################################################
