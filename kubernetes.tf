@@ -25,7 +25,7 @@ resource "kubernetes_cluster_role" "persistent_volume_management" {
   rule {
     api_groups = [""]
     resources  = ["persistentvolumes"]
-    verbs      = [ "create", "delete", "get", "list", "update", "watch" ]
+    verbs      = ["create", "delete", "get", "list", "update", "watch"]
   }
   depends_on = [null_resource.kubernetes_requirements]
 }
@@ -52,11 +52,11 @@ resource "kubernetes_cluster_role_binding" "delete_ebs_volumes_lambda" {
 locals {
   delete_ebs_volumes_lambda_role_mapping = (var.grant_delete_ebs_volumes_lambda_access ?
     ([{
-      rolearn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/delete_ebs_volumes_lambda_role",
+      rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/delete_ebs_volumes_lambda_role",
       username = "batcave:delete-ebs-volumes-lambda",
-      groups = [kubernetes_cluster_role_binding.delete_ebs_volumes_lambda[0].subject[0].name]
+      groups   = [kubernetes_cluster_role_binding.delete_ebs_volumes_lambda[0].subject[0].name]
     }]) :
-    [])
+  [])
 }
 
 resource "kubernetes_config_map" "aws_auth" {
