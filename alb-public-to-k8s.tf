@@ -16,6 +16,7 @@ resource "aws_lb" "batcave_alb_proxy" {
   security_groups = [aws_security_group.batcave_alb_proxy[0].id]
 
   enable_deletion_protection = var.alb_deletion_protection
+  drop_invalid_header_fields = var.alb_drop_invalid_header_fields
 
   access_logs {
     bucket  = var.logging_bucket
