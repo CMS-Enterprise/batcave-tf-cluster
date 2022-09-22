@@ -149,3 +149,14 @@ resource "aws_security_group_rule" "batcave_alb_proxy_egress" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.batcave_alb_proxy[0].id
 }
+
+data "aws_wafv2_web_acl" "cms_waf" {
+  name  = "RegSamQuickACLEnforcingV2"
+  scope = "REGIONAL"
+}
+
+resource "aws_wafv2_web_acl_association" "cms_waf_assoc" {
+  count = var.create_alb_proxy ? 1 : 0
+  resource_arn = aws_lb.batcave_alb_proxy[0].arn
+  web_acl_arn  = data.aws_wafv2_web_acl.cms_waf.arn
+}

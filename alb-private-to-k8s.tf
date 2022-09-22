@@ -154,3 +154,8 @@ resource "aws_security_group_rule" "batcave_alb_ingress_cidrs_https" {
   description       = "Allow inbound Prefix Lists https"
   cidr_blocks       = var.node_https_ingress_cidr_blocks
 }
+
+resource "aws_wafv2_web_acl_association" "cms_waf_priv_assoc" {
+  resource_arn = aws_lb.batcave_alb.arn
+  web_acl_arn  = data.aws_wafv2_web_acl.cms_waf.arn
+}
