@@ -26,7 +26,7 @@ variable "general_node_pool" {
     taints = {}
     #tags = {}
 
-    # Extra args for kubelet in form of: "--node-labels=general=true <...>'.  Will be in _addition_ to any 
+    # Extra args for kubelet in form of: "--node-labels=general=true <...>'.  Will be in _addition_ to any
     # other args added by the labels and taints values
     #extra_args = "--node-labels=general=true"
 
@@ -202,8 +202,8 @@ variable "cluster_security_group_additional_rules" {
 }
 
 variable "grant_delete_ebs_volumes_lambda_access" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "When set to true, a cluster role and permissions will be created to grant the delete-ebs-volumes Lambda access to the PersistentVolumes API."
 }
 
@@ -249,6 +249,11 @@ variable "alb_proxy_ingress_prefix_lists" {
 variable "alb_deletion_protection" {
   description = "Enable/Disable ALB deletion protection for both ALBs"
   default     = false
+  type        = bool
+}
+variable "alb_drop_invalid_header_fields" {
+  description = "Indicates whether HTTP headers with header fields that are not valid are removed by the load balancer (true) or routed to targets (false). The default is false. Elastic Load Balancing requires that message header names contain only alphanumeric characters and hyphens. Only valid for Load Balancers of type application"
+  default     = true
   type        = bool
 }
 variable "s3_bucket_access_grants" {

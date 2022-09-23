@@ -106,15 +106,15 @@ locals {
   default_security_group_additional_rules = (var.grant_delete_ebs_volumes_lambda_access && local.delete_ebs_volumes_lambda_sg_id != null ?
     ({
       delete_ebs_volumes_lambda_ingress_rule = {
-        type = "ingress"
-        protocol = "all"
-        from_port = 0
-        to_port = 65535
+        type                     = "ingress"
+        protocol                 = "all"
+        from_port                = 0
+        to_port                  = 65535
         source_security_group_id = local.delete_ebs_volumes_lambda_sg_id
-        description = "Allow API connections from the delete_ebs_volumes lambda."
+        description              = "Allow API connections from the delete_ebs_volumes lambda."
       }
     }) :
-    {})
+  {})
 }
 
 module "eks" {
@@ -264,7 +264,7 @@ resource "aws_security_group_rule" "https-tg-ingress" {
   cidr_blocks       = ["10.0.0.0/8"]
 }
 
-## Setup for cosign keyless signatures 
+## Setup for cosign keyless signatures
 locals {
   oidc_provider = module.eks.oidc_provider
 }
