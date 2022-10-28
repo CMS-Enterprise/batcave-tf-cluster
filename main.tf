@@ -6,7 +6,8 @@ locals {
 
 data "aws_ami" "eks_ami" {
   most_recent = true
-  name_regex  = "^amzn2-eks-1.21"
+  name_regex  = "^amzn2-eks-${var.cluster_version}"
+  # name_regex  = "^amzn2-eks-1.22"
   owners      = ["743302140042"]
 }
 
