@@ -154,7 +154,7 @@ module "eks" {
   self_managed_node_group_defaults = {
     subnet_ids = var.private_subnets
   }
-   ## CLUSTER Addons
+  ## CLUSTER Addons
   cluster_addons = {
     vpc-cni = {
       resolve_conflicts        = "OVERWRITE"
@@ -166,15 +166,15 @@ module "eks" {
 
 }
 module "vpc_cni_irsa" {
-source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-role_name            = "${var.cluster_name}-vpc_cni"
-attach_vpc_cni_policy = true
-vpc_cni_enable_ipv4   = true
-role_path = var.iam_role_path
-role_permissions_boundary_arn = var.iam_role_permissions_boundary
+  role_name                     = "${var.cluster_name}-vpc_cni"
+  attach_vpc_cni_policy         = true
+  vpc_cni_enable_ipv4           = true
+  role_path                     = var.iam_role_path
+  role_permissions_boundary_arn = var.iam_role_permissions_boundary
 
-oidc_providers = {
+  oidc_providers = {
     main = {
       provider_arn               = module.eks.oidc_provider_arn
       namespace_service_accounts = ["kube-system:aws-node"]
