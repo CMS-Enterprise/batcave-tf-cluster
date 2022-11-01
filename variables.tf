@@ -287,6 +287,11 @@ variable "autoscaling_group_tags" {
 
 variable "ami_regex_override" {
   description = "Overrides default AMI lookup regex, which grabs latest AMI matching cluster_version by default"
-  default = ""
-  type = string
+  default     = ""
+  type        = string
+}
+variable "addon_vpc_cni_version" {
+  description = "This is the image of the CNI pod used in the vpc-cni addon.  For other options, run: aws eks describe-addon-versions --add"
+  default     = "v1.11.4-eksbuild.1"
+  string      = string
 }
