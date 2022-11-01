@@ -284,3 +284,9 @@ variable "autoscaling_group_tags" {
   default     = {}
   type        = map(any)
 }
+
+variable "ami_regex_override" {
+  description = "Overrides default AMI lookup regex, which grabs latest AMI matching cluster_version by default"
+  default = ""
+  type = string
+}

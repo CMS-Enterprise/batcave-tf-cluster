@@ -6,9 +6,7 @@ locals {
 
 data "aws_ami" "eks_ami" {
   most_recent = true
-  name_regex  = "^amzn2-eks-${var.cluster_version}"
-  # name_regex  = "^amzn2-eks-1.22"
-  owners      = ["743302140042"]
+  name_regex  = var.ami_regex_override == "" ? "^amzn2-eks-${var.cluster_version}" : var.ami_regex_override
 }
 
 data "aws_security_groups" "delete_ebs_volumes_lambda_security_group" {
@@ -120,7 +118,7 @@ locals {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "18.27.1"
+  version = "18.30.2"
 
   cluster_name    = local.name
   cluster_version = local.cluster_version
@@ -155,8 +153,32 @@ module "eks" {
   self_managed_node_group_defaults = {
     subnet_ids = var.private_subnets
   }
+  ## CLUSTER Addons
+  cluster_addons = {
+    vpc-cni = {
+      resolve_conflicts        = "OVERWRITE"
+      service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
+    }
+  }
   # Worker groups (using Launch Configurations)
   self_managed_node_groups = local.custom_node_pools
+
+}
+module "vpc_cni_irsa" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+
+  role_name                     = "${var.cluster_name}-vpc_cni"
+  attach_vpc_cni_policy         = true
+  vpc_cni_enable_ipv4           = true
+  role_path                     = var.iam_role_path
+  role_permissions_boundary_arn = var.iam_role_permissions_boundary
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:aws-node"]
+    }
+  }
 }
 
 # pseudo resource to capture critical infrastructure needed to access the Kubernetes API
