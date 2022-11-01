@@ -7,7 +7,7 @@ variable "environment" {
 }
 
 variable "cluster_version" {
-  default = "1.21"
+  default = "1.22"
 }
 
 ## Default node group
