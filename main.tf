@@ -159,6 +159,7 @@ module "eks" {
     vpc-cni = {
       resolve_conflicts        = "OVERWRITE"
       service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
+      addon_version            = var.cni_image
     }
   }
   # Worker groups (using Launch Configurations)
