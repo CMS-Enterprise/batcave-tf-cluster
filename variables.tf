@@ -293,5 +293,5 @@ variable "ami_regex_override" {
 variable "addon_vpc_cni_version" {
   description = "This is the image of the CNI pod used in the vpc-cni addon.  For other options, run: aws eks describe-addon-versions --add"
   default     = "v1.11.4-eksbuild.1"
-  string      = string
+  type     = string
 }
