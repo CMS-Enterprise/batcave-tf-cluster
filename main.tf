@@ -7,7 +7,7 @@ locals {
 data "aws_ami" "eks_ami" {
   most_recent = true
   name_regex  = var.ami_regex_override == "" ? "^amzn2-eks-${var.cluster_version}" : var.ami_regex_override
-  owners = ["743302140042"]
+  owners      = ["743302140042"]
 }
 
 data "aws_security_groups" "delete_ebs_volumes_lambda_security_group" {
@@ -160,6 +160,10 @@ module "eks" {
       resolve_conflicts        = "OVERWRITE"
       service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
       addon_version            = var.addon_vpc_cni_version
+    }
+    kube-proxy = {
+      resolve_conflicts = "OVERWRITE"
+      addon_version     = var.addon_kube_proxy_version
     }
   }
   # Worker groups (using Launch Configurations)
