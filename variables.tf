@@ -66,9 +66,10 @@ variable "private_subnets" {
   type = list(any)
 }
 
-variable "container_subnets" {
-  type    = list(any)
-  default = []
+variable "host_subnets" {
+  type        = list(any)
+  default     = []
+  description = "Override the ec2 instance subnets.  By default, they are launche in private_subnets, just like the EKS control plane."
 }
 
 variable "alb_subnets_by_zone" {

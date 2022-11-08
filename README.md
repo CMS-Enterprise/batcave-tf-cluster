@@ -134,7 +134,6 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | n/a | `any` | n/a | yes |
 | <a name="input_cluster_security_group_additional_rules"></a> [cluster\_security\_group\_additional\_rules](#input\_cluster\_security\_group\_additional\_rules) | Map of security group rules to attach to the cluster security group, as you cannot change cluster security groups without replacing the instance | `map(any)` | `{}` | no |
 | <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | n/a | `string` | `"1.22"` | no |
-| <a name="input_container_subnets"></a> [container\_subnets](#input\_container\_subnets) | n/a | `list(any)` | `[]` | no |
 | <a name="input_create_alb_proxy"></a> [create\_alb\_proxy](#input\_create\_alb\_proxy) | Create an Application Load Balancer proxy to live in front of the K8s ALB and act as a proxy from the public Internet | `bool` | `false` | no |
 | <a name="input_create_cosign_iam_role"></a> [create\_cosign\_iam\_role](#input\_create\_cosign\_iam\_role) | Flag to create Cosign IAM role | `bool` | `false` | no |
 | <a name="input_custom_node_pools"></a> [custom\_node\_pools](#input\_custom\_node\_pools) | n/a | `any` | `{}` | no |
@@ -143,6 +142,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_general_node_pool"></a> [general\_node\_pool](#input\_general\_node\_pool) | General node pool, required for hosting core services | `any` | <pre>{<br>  "desired_size": 3,<br>  "instance_type": "c5.2xlarge",<br>  "labels": {<br>    "general": "true"<br>  },<br>  "max_size": 5,<br>  "min_size": 2,<br>  "taints": {}<br>}</pre> | no |
 | <a name="input_general_nodepool_tags"></a> [general\_nodepool\_tags](#input\_general\_nodepool\_tags) | n/a | `any` | `{}` | no |
 | <a name="input_grant_delete_ebs_volumes_lambda_access"></a> [grant\_delete\_ebs\_volumes\_lambda\_access](#input\_grant\_delete\_ebs\_volumes\_lambda\_access) | When set to true, a cluster role and permissions will be created to grant the delete-ebs-volumes Lambda access to the PersistentVolumes API. | `bool` | `false` | no |
+| <a name="input_host_subnets"></a> [host\_subnets](#input\_host\_subnets) | Override the ec2 instance subnets.  By default, they are launche in private\_subnets, just like the EKS control plane. | `list(any)` | `[]` | no |
 | <a name="input_iam_role_path"></a> [iam\_role\_path](#input\_iam\_role\_path) | n/a | `string` | `"/delegatedadmin/developer/"` | no |
 | <a name="input_iam_role_permissions_boundary"></a> [iam\_role\_permissions\_boundary](#input\_iam\_role\_permissions\_boundary) | n/a | `string` | `"arn:aws:iam::373346310182:policy/cms-cloud-admin/developer-boundary-policy"` | no |
 | <a name="input_instance_tag"></a> [instance\_tag](#input\_instance\_tag) | n/a | `string` | `"Instance custom tag"` | no |
