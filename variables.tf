@@ -66,17 +66,7 @@ variable "private_subnets" {
   type = list(any)
 }
 
-variable "transport_subnet_cidr_blocks" {
-  type    = map(string)
-  default = {}
-}
-
-variable "transport_subnets_by_zone" {
-  type    = map(string)
-  default = {}
-}
-
-variable "transport_subnets" {
+variable "container_subnets" {
   type    = list(any)
   default = []
 }
