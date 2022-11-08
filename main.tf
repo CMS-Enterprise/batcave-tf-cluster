@@ -23,7 +23,7 @@ data "aws_security_groups" "delete_ebs_volumes_lambda_security_group" {
 locals {
   custom_node_pools = { for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
     name                          = "${var.cluster_name}-${k}"
-    subnet_ids                    = var.private_subnets
+    subnet_ids                    = coalescelist(var.container_subnets, var.private_subnets)
     ami_id                        = data.aws_ami.eks_ami.id
     iam_role_path                 = var.iam_role_path
     iam_role_permissions_boundary = var.iam_role_permissions_boundary
@@ -152,7 +152,7 @@ module "eks" {
   ]
 
   self_managed_node_group_defaults = {
-    subnet_ids = var.private_subnets
+    subnet_ids = coalescelist(var.container_subnets, var.private_subnets)
   }
   ## CLUSTER Addons
   cluster_addons = {
