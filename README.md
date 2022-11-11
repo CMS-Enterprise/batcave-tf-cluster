@@ -156,7 +156,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_network_int_associate_public_ip_address"></a> [network\_int\_associate\_public\_ip\_address](#input\_network\_int\_associate\_public\_ip\_address) | ## Network Interfaces | `string` | `"false"` | no |
 | <a name="input_network_int_delete_on_termination"></a> [network\_int\_delete\_on\_termination](#input\_network\_int\_delete\_on\_termination) | n/a | `string` | `"true"` | no |
 | <a name="input_network_interface_tag"></a> [network\_interface\_tag](#input\_network\_interface\_tag) | n/a | `string` | `"Network Interface custom tag"` | no |
-| <a name="input_node_https_ingress_cidr_blocks"></a> [node\_https\_ingress\_cidr\_blocks](#input\_node\_https\_ingress\_cidr\_blocks) | List of CIDR blocks to allow into the node over the HTTPs port | `list(string)` | <pre>[<br>  "10.0.0.0/8"<br>]</pre> | no |
+| <a name="input_node_https_ingress_cidr_blocks"></a> [node\_https\_ingress\_cidr\_blocks](#input\_node\_https\_ingress\_cidr\_blocks) | List of CIDR blocks to allow into the node over the HTTPs port | `list(string)` | <pre>[<br>  "10.0.0.0/8",<br>  "100.0.0.0/8"<br>]</pre> | no |
 | <a name="input_openid_connect_audiences"></a> [openid\_connect\_audiences](#input\_openid\_connect\_audiences) | OpenID Connect Audiences | `list(string)` | `[]` | no |
 | <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | n/a | `list(any)` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | n/a | `string` | `"us-east-1"` | no |
