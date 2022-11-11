@@ -200,7 +200,7 @@ variable "grant_delete_ebs_volumes_lambda_access" {
 
 variable "node_https_ingress_cidr_blocks" {
   description = "List of CIDR blocks to allow into the node over the HTTPs port"
-  default     = ["10.0.0.0/8"]
+  default     = ["10.0.0.0/8", "100.0.0.0/8"]
   type        = list(string)
 }
 
