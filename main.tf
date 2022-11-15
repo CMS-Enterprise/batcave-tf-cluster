@@ -168,7 +168,6 @@ module "eks" {
   }
   # Worker groups (using Launch Configurations)
   self_managed_node_groups = local.custom_node_pools
-
 }
 module "vpc_cni_irsa" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
@@ -192,7 +191,9 @@ resource "null_resource" "kubernetes_requirements" {
   depends_on = [
     module.eks,
     # without this security group rule the Kubernetes API is unreachable
-    aws_security_group_rule.allow_ingress_additional_prefix_lists
+    aws_security_group_rule.allow_ingress_additional_prefix_lists,
+    aws_security_group_rule.allow_all_nodes_to_other_nodes,
+    aws_security_group_rule.https-tg-ingress,
   ]
 }
 
@@ -323,3 +324,24 @@ resource "aws_iam_role" "cosign" {
   path                 = var.iam_role_path
   permissions_boundary = var.iam_role_permissions_boundary
 }
+
+## Planning to move these out of the eks module, but need to wait until we're ready to deploy
+#resource "aws_eks_addon" "vpc_cni" {
+#  cluster_name = var.cluster_name
+#  addon_name   = "vpc-cni"
+#
+#  addon_version     = var.addon_vpc_cni_version
+#  resolve_conflicts = "OVERWRITE"
+#
+#  depends_on = [null_resource.kubernetes_requirements]
+#}
+#
+#resource "aws_eks_addon" "kube_proxy" {
+#  cluster_name = var.cluster_name
+#  addon_name   = "kube-proxy"
+#
+#  addon_version     = var.addon_kube_proxy_version
+#  resolve_conflicts = "OVERWRITE"
+#
+#  depends_on = [null_resource.kubernetes_requirements]
+#}

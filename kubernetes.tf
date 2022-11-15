@@ -30,6 +30,9 @@ resource "kubernetes_cluster_role" "persistent_volume_management" {
   depends_on = [null_resource.kubernetes_requirements]
 }
 
+locals {
+  delete_ebs_volumes_lambda_subject_name = "batcave:persistent-volume-managers"
+}
 resource "kubernetes_cluster_role_binding" "delete_ebs_volumes_lambda" {
   count = var.grant_delete_ebs_volumes_lambda_access ? 1 : 0
 
@@ -44,7 +47,7 @@ resource "kubernetes_cluster_role_binding" "delete_ebs_volumes_lambda" {
   subject {
     api_group = "rbac.authorization.k8s.io"
     kind      = "Group"
-    name      = "batcave:persistent-volume-managers"
+    name      = local.delete_ebs_volumes_lambda_subject_name
   }
   depends_on = [null_resource.kubernetes_requirements]
 }
@@ -54,7 +57,7 @@ locals {
     ([{
       rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/delete_ebs_volumes_lambda_role",
       username = "batcave:delete-ebs-volumes-lambda",
-      groups   = [kubernetes_cluster_role_binding.delete_ebs_volumes_lambda[0].subject[0].name]
+      groups   = [local.delete_ebs_volumes_lambda_subject_name]
     }]) :
   [])
 }
@@ -77,7 +80,10 @@ resource "kubernetes_config_map" "aws_auth" {
       ))
     )
   }
-  depends_on = [null_resource.kubernetes_requirements]
+  depends_on = [
+    null_resource.kubernetes_requirements,
+    kubernetes_cluster_role_binding.delete_ebs_volumes_lambda,
+  ]
 }
 
 provider "kubectl" {
@@ -102,5 +108,5 @@ kind: Namespace
 metadata:
   name: batcave
 YAML
-  depends_on    = [module.eks]
+  depends_on    = [null_resource.kubernetes_requirements]
 }
