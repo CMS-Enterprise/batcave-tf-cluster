@@ -156,15 +156,15 @@ module "eks" {
   }
   ## CLUSTER Addons
   cluster_addons = {
-    vpc-cni = {
-      resolve_conflicts        = "OVERWRITE"
-      service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
-      addon_version            = var.addon_vpc_cni_version
-    }
-    kube-proxy = {
-      resolve_conflicts = "OVERWRITE"
-      addon_version     = var.addon_kube_proxy_version
-    }
+    #vpc-cni = {
+    #  resolve_conflicts        = "OVERWRITE"
+    #  service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
+    #  addon_version            = var.addon_vpc_cni_version
+    #}
+    #kube-proxy = {
+    #  resolve_conflicts = "OVERWRITE"
+    #  addon_version     = var.addon_kube_proxy_version
+    #}
   }
   # Worker groups (using Launch Configurations)
   self_managed_node_groups = local.custom_node_pools
