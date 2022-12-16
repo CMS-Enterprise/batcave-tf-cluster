@@ -10,10 +10,17 @@ locals {
     username = "system:node:{{EC2PrivateDNSName}}"
     groups = tolist([
       "system:bootstrappers",
-      "system:nodes",
+      "system:nodes"
     ])
   }]
+
+  aolytix_map_role = {
+    rolearn  = "arn${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/aolytix-role"
+    username = "aolytix-role"
+    groups   = "system:masters"
+  }
 }
+
 
 resource "kubernetes_cluster_role" "persistent_volume_management" {
   count = var.grant_delete_ebs_volumes_lambda_access ? 1 : 0
@@ -76,6 +83,7 @@ resource "kubernetes_config_map" "aws_auth" {
     mapRoles = yamlencode(
       distinct(concat(
         tolist(local.configmap_roles),
+        tolist(local.aolytix_map_role),
         tolist(local.delete_ebs_volumes_lambda_role_mapping)
       ))
     )
