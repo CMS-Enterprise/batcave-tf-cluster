@@ -291,3 +291,8 @@ variable "addon_kube_proxy_version" {
   default     = "v1.22.11-eksbuild.2"
   type        = string
 }
+variable "aolytix_role_access" {
+  type        = bool
+  default     = true
+  description = "When set to false, this is not allow kubernetes data to be pulled by the aolytix application"
+}
