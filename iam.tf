@@ -222,3 +222,12 @@ resource "aws_iam_role_policy_attachment" "ssm_managed_instance" {
   role       = each.value.iam_role_name
   policy_arn = aws_iam_policy.ssm_managed_instance.arn
 }
+
+# Policy attachment for the ebs csi driver. Policy provided from AWS for ebs csi driver
+resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
+  for_each   = module.eks.self_managed_node_groups
+  role       = each.value.iam_role_name
+  policy_arn = arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+}
+
+
