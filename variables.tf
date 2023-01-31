@@ -247,6 +247,13 @@ variable "alb_drop_invalid_header_fields" {
   default     = true
   type        = bool
 }
+
+variable "alb_proxy_idle_timeout" {
+  description = "Default idle request timeout for the ALB"
+  default     = "60"
+  type        = string
+}
+
 variable "s3_bucket_access_grants" {
   description = "A list of s3 bucket names to grant the cluster roles R/W access to"
   default     = null
