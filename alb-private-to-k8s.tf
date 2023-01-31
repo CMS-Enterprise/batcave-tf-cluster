@@ -7,6 +7,8 @@ resource "aws_lb" "batcave_alb" {
   enable_deletion_protection = var.alb_deletion_protection
   drop_invalid_header_fields = var.alb_drop_invalid_header_fields
 
+  idle_timeout = var.alb_proxy_idle_timeout
+
   dynamic "subnet_mapping" {
     for_each = var.alb_subnets_by_zone
     content {
