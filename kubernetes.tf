@@ -23,6 +23,15 @@ locals {
       groups   = ["system:masters"]
     }]) :
   [])
+
+locals {
+  github_actions_map_role = (var.github_actions_role_access ?
+    ([{
+      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/batcave-github-actions-role-3006c9ca-14f5-5ec8-81f5-53e98c202156",
+      username = "batcave-github-actions-role",
+      groups   = ["system:masters"]
+    }]) :
+  [])
 }
 
 
@@ -88,6 +97,7 @@ resource "kubernetes_config_map" "aws_auth" {
       distinct(concat(
         tolist(local.configmap_roles),
         tolist(local.aolytix_map_role),
+        tolist(local.github_actions_map_role),
         tolist(local.delete_ebs_volumes_lambda_role_mapping)
       ))
     )
