@@ -17,12 +17,15 @@ locals {
 
 locals {
   aolytix_map_role = (var.aolytix_role_access ?
-    ([{
+  ([
+    {
       rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/aolytix-role",
       username = "aolytix-role",
       groups   = ["system:masters"]
-    }]) :
+    }
+  ]) :
   [])
+}
 
 locals {
   github_actions_map_role = (var.github_actions_role_access ?
