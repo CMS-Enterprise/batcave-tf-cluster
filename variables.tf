@@ -303,3 +303,8 @@ variable "aolytix_role_access" {
   default     = true
   description = "When set to false, this is not allow kubernetes data to be pulled by the aolytix application"
 }
+variable "github_actions_role_access" {
+  type        = bool
+  default     = true
+  description = "When set to false, this is not allow kubernetes data to be pulled by the github actions"
+}
