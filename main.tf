@@ -2,6 +2,7 @@ locals {
   name            = var.cluster_name
   cluster_version = var.cluster_version
   region          = var.region
+  alb_proxy_idle_timeout = var.alb_proxy_idle_timeout
 }
 
 data "aws_ami" "eks_ami" {
