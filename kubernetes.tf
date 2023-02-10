@@ -17,11 +17,13 @@ locals {
 
 locals {
   aolytix_map_role = (var.aolytix_role_access ?
-    ([{
+  ([
+    {
       rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/aolytix-role",
       username = "aolytix-role",
       groups   = ["system:masters"]
-    }]) :
+    }
+  ]) :
   [])
 }
 
@@ -34,7 +36,6 @@ locals {
     }]) :
   [])
 }
-
 
 resource "kubernetes_cluster_role" "persistent_volume_management" {
   count = var.grant_delete_ebs_volumes_lambda_access ? 1 : 0
