@@ -248,7 +248,7 @@ variable "alb_drop_invalid_header_fields" {
   type        = bool
 }
 
-variable "alb_proxy_idle_timeout" {
+variable "alb_idle_timeout" {
   description = "Default idle request timeout for the ALB"
   default     = "60"
   type        = string
