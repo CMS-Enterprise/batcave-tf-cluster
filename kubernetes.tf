@@ -30,13 +30,12 @@ locals {
 locals {
   github_actions_map_role = (var.github_actions_role_access ?
     ([{
-      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/batcave-github-actions-role-3006c9ca-14f5-5ec8-81f5-53e98c202156",
+      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/batcave-github-actions-role",
       username = "batcave-github-actions-role",
       groups   = ["system:masters"]
     }]) :
   [])
 }
-
 
 resource "kubernetes_cluster_role" "persistent_volume_management" {
   count = var.grant_delete_ebs_volumes_lambda_access ? 1 : 0
