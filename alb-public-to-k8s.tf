@@ -18,6 +18,8 @@ resource "aws_lb" "batcave_alb_proxy" {
   enable_deletion_protection = var.alb_deletion_protection
   drop_invalid_header_fields = var.alb_drop_invalid_header_fields
 
+  idle_timeout = var.alb_idle_timeout
+
   access_logs {
     bucket  = var.logging_bucket
     enabled = true
