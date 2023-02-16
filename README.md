@@ -58,6 +58,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | [aws_iam_role.cosign](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy_attachment.additional](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.cloudwatch_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.ebs_csi_driver](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.secretsmanager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.ssm_managed_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_service_linked_role.autoscaling](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_service_linked_role) | resource |
@@ -121,6 +122,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_alb_proxy_subnets"></a> [alb\_proxy\_subnets](#input\_alb\_proxy\_subnets) | List of subnet ids for the ALB Proxy to be deployed into | `list(string)` | `[]` | no |
 | <a name="input_alb_subnets_by_zone"></a> [alb\_subnets\_by\_zone](#input\_alb\_subnets\_by\_zone) | n/a | `map(string)` | n/a | yes |
 | <a name="input_ami_regex_override"></a> [ami\_regex\_override](#input\_ami\_regex\_override) | Overrides default AMI lookup regex, which grabs latest AMI matching cluster\_version by default | `string` | `""` | no |
+| <a name="input_aolytix_role_access"></a> [aolytix\_role\_access](#input\_aolytix\_role\_access) | When set to false, this is not allow kubernetes data to be pulled by the aolytix application | `bool` | `true` | no |
 | <a name="input_autoscaling_group_tags"></a> [autoscaling\_group\_tags](#input\_autoscaling\_group\_tags) | Tags to apply to all autoscaling groups created | `map(any)` | `{}` | no |
 | <a name="input_block_delete_on_termination"></a> [block\_delete\_on\_termination](#input\_block\_delete\_on\_termination) | n/a | `string` | `"true"` | no |
 | <a name="input_block_device_name"></a> [block\_device\_name](#input\_block\_device\_name) | n/a | `string` | `"/dev/xvda"` | no |
@@ -133,7 +135,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_cluster_endpoint_public_access"></a> [cluster\_endpoint\_public\_access](#input\_cluster\_endpoint\_public\_access) | n/a | `string` | `"true"` | no |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | n/a | `any` | n/a | yes |
 | <a name="input_cluster_security_group_additional_rules"></a> [cluster\_security\_group\_additional\_rules](#input\_cluster\_security\_group\_additional\_rules) | Map of security group rules to attach to the cluster security group, as you cannot change cluster security groups without replacing the instance | `map(any)` | `{}` | no |
-| <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | n/a | `string` | `"1.22"` | no |
+| <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | n/a | `string` | `"1.23"` | no |
 | <a name="input_create_alb_proxy"></a> [create\_alb\_proxy](#input\_create\_alb\_proxy) | Create an Application Load Balancer proxy to live in front of the K8s ALB and act as a proxy from the public Internet | `bool` | `false` | no |
 | <a name="input_create_cosign_iam_role"></a> [create\_cosign\_iam\_role](#input\_create\_cosign\_iam\_role) | Flag to create Cosign IAM role | `bool` | `false` | no |
 | <a name="input_custom_node_pools"></a> [custom\_node\_pools](#input\_custom\_node\_pools) | n/a | `any` | `{}` | no |
@@ -141,6 +143,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_environment"></a> [environment](#input\_environment) | n/a | `string` | `"dev"` | no |
 | <a name="input_general_node_pool"></a> [general\_node\_pool](#input\_general\_node\_pool) | General node pool, required for hosting core services | `any` | <pre>{<br>  "desired_size": 3,<br>  "instance_type": "c5.2xlarge",<br>  "labels": {<br>    "general": "true"<br>  },<br>  "max_size": 5,<br>  "min_size": 2,<br>  "taints": {}<br>}</pre> | no |
 | <a name="input_general_nodepool_tags"></a> [general\_nodepool\_tags](#input\_general\_nodepool\_tags) | n/a | `any` | `{}` | no |
+| <a name="input_github_actions_role_access"></a> [github\_actions\_role\_access](#input\_github\_actions\_role\_access) | When set to false, this is not allow kubernetes data to be pulled by the github actions | `bool` | `true` | no |
 | <a name="input_grant_delete_ebs_volumes_lambda_access"></a> [grant\_delete\_ebs\_volumes\_lambda\_access](#input\_grant\_delete\_ebs\_volumes\_lambda\_access) | When set to true, a cluster role and permissions will be created to grant the delete-ebs-volumes Lambda access to the PersistentVolumes API. | `bool` | `false` | no |
 | <a name="input_host_subnets"></a> [host\_subnets](#input\_host\_subnets) | Override the ec2 instance subnets.  By default, they are launche in private\_subnets, just like the EKS control plane. | `list(any)` | `[]` | no |
 | <a name="input_iam_role_path"></a> [iam\_role\_path](#input\_iam\_role\_path) | n/a | `string` | `"/delegatedadmin/developer/"` | no |
@@ -149,7 +152,6 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_logging_bucket"></a> [logging\_bucket](#input\_logging\_bucket) | Name of the S3 bucket to send load balancer access logs. | `string` | `null` | no |
 | <a name="input_lt_CustomTag"></a> [lt\_CustomTag](#input\_lt\_CustomTag) | n/a | `string` | `"Launch template custom tag"` | no |
 | <a name="input_lt_description"></a> [lt\_description](#input\_lt\_description) | n/a | `string` | `"Default Launch-Template"` | no |
-| <a name="input_lt_image_id"></a> [lt\_image\_id](#input\_lt\_image\_id) | n/a | `string` | `"ami-0d111bb0f1e4a9787"` | no |
 | <a name="input_lt_monitoring_enabled"></a> [lt\_monitoring\_enabled](#input\_lt\_monitoring\_enabled) | ## Monitoring | `string` | `"true"` | no |
 | <a name="input_lt_name_prefix"></a> [lt\_name\_prefix](#input\_lt\_name\_prefix) | n/a | `string` | `"eks-lt-"` | no |
 | <a name="input_lt_update_default_version"></a> [lt\_update\_default\_version](#input\_lt\_update\_default\_version) | n/a | `string` | `"true"` | no |

@@ -104,10 +104,6 @@ variable "lt_description" {
 variable "lt_update_default_version" {
   default = "true"
 }
-variable "lt_image_id" {
-  default = "ami-0d111bb0f1e4a9787"
-}
-
 
 ### Block device mappings
 
