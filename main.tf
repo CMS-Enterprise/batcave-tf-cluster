@@ -1,7 +1,7 @@
 locals {
-  name            = var.cluster_name
-  cluster_version = var.cluster_version
-  region          = var.region
+  name             = var.cluster_name
+  cluster_version  = var.cluster_version
+  region           = var.region
   alb_idle_timeout = var.alb_idle_timeout
 }
 
