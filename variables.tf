@@ -30,10 +30,11 @@ variable "general_node_pool" {
     # other args added by the labels and taints values
     #extra_args = "--node-labels=general=true"
 
-
     #volume_size                  = "300"
     #volume_type                  = "gp3"
     #volume_delete_on_termination = true
+
+    #subnet_ids = [ "list","of","subnet","ids" ]
   }
 }
 
@@ -47,6 +48,7 @@ variable "custom_node_pools" {
   #    min_size = 1
   #    labels = { gitlab-runners-go-here = "true" }
   #    taints = { better-watch-out-for-gitlab-runners = "true:NoSchedule" }
+  #    subnet_ids = [ "list","of","subnet","ids" ]
   #  }
 }
 
