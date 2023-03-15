@@ -58,7 +58,7 @@ locals {
       var.create_alb_proxy ? [aws_lb_target_group.batcave_alb_proxy_https[0].arn] : []
     ) : null
 
-    tags = try(v.tags, null)
+    tags = merge(v.tags, var.tags)
     autoscaling_group_tags = merge(
       {
         "k8s.io/cluster-autoscaler/enabled"             = "true",
@@ -70,6 +70,7 @@ locals {
       { "k8s.io/cluster-autoscaler/node-template/label/${k}" = "true" },
       try({ for label_key, label_value in v.labels : "k8s.io/cluster-autoscaler/node-template/label/${label_key}" => label_value }, {}),
       var.autoscaling_group_tags,
+      var.tags,
     )
     propagate_tags = [
       {
@@ -169,6 +170,9 @@ module "eks" {
   }
   # Worker groups (using Launch Configurations)
   self_managed_node_groups = local.custom_node_pools
+
+  # apply any global tags to the cluster itself
+  cluster_tags = var.tags
 }
 module "vpc_cni_irsa" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"

@@ -25,10 +25,10 @@ resource "aws_lb" "batcave_alb_proxy" {
     enabled = true
   }
 
-  tags = {
-    Name        = "${var.cluster_name} Application Load Balancer Proxy"
-    Environment = var.environment
-  }
+  tags = merge(
+    var.tags, 
+    var.alb_public_tags, 
+  )
 }
 
 # Listener HTTPS

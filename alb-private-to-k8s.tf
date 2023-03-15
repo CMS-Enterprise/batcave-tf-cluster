@@ -21,10 +21,10 @@ resource "aws_lb" "batcave_alb" {
     enabled = true
   }
 
-  tags = {
-    Name        = "${var.cluster_name}-Shared-ALB"
-    Environment = var.environment
-  }
+  tags = merge(
+    var.tags, 
+    var.alb_private_tags, 
+  )
 }
 
 # Listener HTTPS

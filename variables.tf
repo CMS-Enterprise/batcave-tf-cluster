@@ -144,6 +144,10 @@ variable "network_int_delete_on_termination" {
 
 ### Resource tags
 
+variable "tags" {
+  default = null
+  description = "Global resource tags to apply to all resources"
+}
 variable "instance_tag" {
   default = "Instance custom tag"
 }
@@ -250,6 +254,16 @@ variable "alb_idle_timeout" {
   description = "Default idle request timeout for the ALB"
   default     = "60"
   type        = string
+}
+
+variable "alb_public_tags" {
+  description = "Additional public ALB tags"
+  default     = null
+}
+
+variable "alb_private_tags" {
+  description = "Additional private ALB tags"
+  default     = null
 }
 
 variable "s3_bucket_access_grants" {
