@@ -10,6 +10,10 @@ variable "cluster_version" {
   default = "1.23"
 }
 
+variable "ami_date" {
+  default = "2023-02"
+}
+
 ## Default node group
 variable "general_node_pool" {
   type        = any
