@@ -11,7 +11,7 @@ variable "cluster_version" {
 }
 
 variable "ami_date" {
-  default = "2023-02"
+  default = ""
 }
 
 ## Default node group
