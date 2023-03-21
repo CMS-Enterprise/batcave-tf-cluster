@@ -7,7 +7,7 @@ locals {
 
 data "aws_ami" "eks_ami" {
   most_recent = true
-  name_regex  = var.ami_regex_override == "" ? "^amzn2-eks-${var.cluster_version}" : var.ami_regex_override
+  name_regex  = var.ami_regex_override == "" ? "^amzn2-eks-${var.cluster_version}-gi-${var.ami_date}" : var.ami_regex_override
   owners      = ["743302140042"]
 }
 
