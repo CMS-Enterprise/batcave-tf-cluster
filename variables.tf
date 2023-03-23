@@ -154,24 +154,32 @@ variable "tags" {
   type        = map(any)
 }
 variable "instance_tag" {
-  default = "Instance custom tag"
+  default = null
+  description = "Instance custom tags"
+  type        = map(any)
 }
 variable "volume_tag" {
-  default = "Volume custom tag"
+  default = null
+  description = "Volume custom tag"
+  type        = map(any)
 }
 variable "network_interface_tag" {
-  default = "Network Interface custom tag"
+  default = null
+  description = "Network Interface custom tag"
+  type        = map(any)
 }
 
 variable "general_nodepool_tags" {
-  type = any
-  default = {
-  }
+  default = null
+  description = "General Node Pool tags"
+  type        = map(any)
 }
 ### Launch template tags
 
 variable "lt_CustomTag" {
-  default = "Launch template custom tag"
+  default = null
+  description = "Launch template custom tag"
+  type        = map(any)
 }
 
 
