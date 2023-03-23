@@ -153,7 +153,7 @@ variable "tags" {
   description = "Global resource tags to apply to all resources"
   type        = map(any)
 }
-variable "instance_tag" {
+variable "instance_tags" {
   default = null
   description = "Instance custom tags"
   type        = map(any)
