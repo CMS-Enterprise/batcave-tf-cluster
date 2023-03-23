@@ -1,0 +1,17 @@
+iac-scan-pr:
+    stage: test
+    image: snyk/snyk:alpine
+    before_script: 
+        - snyk auth $SNYK_TOKEN
+    script:
+        - snyk iac test --report
+    only:
+        - external_pull_requests
+
+iac-scan:
+    stage: test
+    image: snyk/snyk:alpine
+    before_script: 
+        - snyk auth $SNYK_TOKEN
+    script:
+        - snyk iac test --report
