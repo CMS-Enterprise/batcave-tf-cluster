@@ -58,7 +58,7 @@ locals {
       var.create_alb_proxy ? [aws_lb_target_group.batcave_alb_proxy_https[0].arn] : []
     ) : null
 
-    tags = merge(try(v.tags, null), var.tags, var.instance_tags)
+    tags = merge(var.tags, var.instance_tags, try(v.tags, null))
     autoscaling_group_tags = merge(
       {
         "k8s.io/cluster-autoscaler/enabled"             = "true",
@@ -69,8 +69,8 @@ locals {
       # Label tags for Cluster Autoscaler hints
       { "k8s.io/cluster-autoscaler/node-template/label/${k}" = "true" },
       try({ for label_key, label_value in v.labels : "k8s.io/cluster-autoscaler/node-template/label/${label_key}" => label_value }, {}),
-      var.autoscaling_group_tags,
       var.tags,
+      var.autoscaling_group_tags,
     )
     propagate_tags = [
       {
