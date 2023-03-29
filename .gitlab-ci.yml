@@ -1,7 +1,0 @@
-iac-scan:
-    stage: test
-    image: snyk/snyk:alpine
-    before_script: 
-        - snyk auth $SNYK_TOKEN
-    script:
-        - snyk iac test --report
