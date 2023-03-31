@@ -122,6 +122,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_alb_proxy_is_internal"></a> [alb\_proxy\_is\_internal](#input\_alb\_proxy\_is\_internal) | If the ALB Proxy should be using internal ips.  Defaults to false, because the reason for ALB proxy existing is typically to make it accessible over the Internet | `bool` | `false` | no |
 | <a name="input_alb_proxy_subnets"></a> [alb\_proxy\_subnets](#input\_alb\_proxy\_subnets) | List of subnet ids for the ALB Proxy to be deployed into | `list(string)` | `[]` | no |
 | <a name="input_alb_subnets_by_zone"></a> [alb\_subnets\_by\_zone](#input\_alb\_subnets\_by\_zone) | n/a | `map(string)` | n/a | yes |
+| <a name="input_ami_date"></a> [ami\_date](#input\_ami\_date) | n/a | `string` | `""` | no |
 | <a name="input_ami_regex_override"></a> [ami\_regex\_override](#input\_ami\_regex\_override) | Overrides default AMI lookup regex, which grabs latest AMI matching cluster\_version by default | `string` | `""` | no |
 | <a name="input_aolytix_role_access"></a> [aolytix\_role\_access](#input\_aolytix\_role\_access) | When set to false, this is not allow kubernetes data to be pulled by the aolytix application | `bool` | `true` | no |
 | <a name="input_autoscaling_group_tags"></a> [autoscaling\_group\_tags](#input\_autoscaling\_group\_tags) | Tags to apply to all autoscaling groups created | `map(any)` | `{}` | no |
@@ -160,6 +161,9 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_network_int_delete_on_termination"></a> [network\_int\_delete\_on\_termination](#input\_network\_int\_delete\_on\_termination) | n/a | `string` | `"true"` | no |
 | <a name="input_network_interface_tag"></a> [network\_interface\_tag](#input\_network\_interface\_tag) | n/a | `string` | `"Network Interface custom tag"` | no |
 | <a name="input_node_https_ingress_cidr_blocks"></a> [node\_https\_ingress\_cidr\_blocks](#input\_node\_https\_ingress\_cidr\_blocks) | List of CIDR blocks to allow into the node over the HTTPs port | `list(string)` | <pre>[<br>  "10.0.0.0/8",<br>  "100.0.0.0/8"<br>]</pre> | no |
+| <a name="input_node_schedule_shutdown_hour"></a> [node\_schedule\_shutdown\_hour](#input\_node\_schedule\_shutdown\_hour) | The hour of the day (0-23) the cluster should be shutdown.  If left empty, the cluster will not be stopped. Will run every day otherwise. | `number` | `-1` | no |
+| <a name="input_node_schedule_startup_hour"></a> [node\_schedule\_startup\_hour](#input\_node\_schedule\_startup\_hour) | The hour of the day (0-23) the cluster should be restarted.  If left empty, the cluster will not be restarted after shutdown. Will run every weekday otherwise. | `number` | `-1` | no |
+| <a name="input_node_schedule_timezone"></a> [node\_schedule\_timezone](#input\_node\_schedule\_timezone) | The timezone of the schedule. Ex: 'America/New\_York', 'America/Chicago', 'America/Denver', 'America/Los\_Angeles', 'Pacific/Honolulu'  See: https://www.joda.org/joda-time/timezones.html | `string` | `"America/New_York"` | no |
 | <a name="input_openid_connect_audiences"></a> [openid\_connect\_audiences](#input\_openid\_connect\_audiences) | OpenID Connect Audiences | `list(string)` | `[]` | no |
 | <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | n/a | `list(any)` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | n/a | `string` | `"us-east-1"` | no |
