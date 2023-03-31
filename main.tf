@@ -101,6 +101,27 @@ locals {
       "WarmPoolTotalCapacity",
       "WarmPoolWarmedCapacity",
     ]
+    create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
+    schedules = merge(
+      var.node_schedule_shutdown_hour >= 0 ? {} : {
+        shutdown = {
+          min_size     = 0
+          max_size     = 0
+          desired_size = 0
+          time_zone    = var.node_schedule_timezone
+          recurrence   = "0 ${var.node_schedule_shutdown_hour} * * *"
+        }
+      },
+      var.node_schedule_startup_hour >= 0 ? {} : {
+        startup = {
+          min_size     = v.min_size
+          max_size     = v.max_size
+          desired_size = v.desired_size
+          time_zone    = var.node_schedule_timezone
+          recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
+        }
+      }
+    )
   } }
   # Allow ingress to the control plane from the delete_ebs_volumes lambda (if it exists)
   delete_ebs_volumes_lambda_sg_id = one(data.aws_security_groups.delete_ebs_volumes_lambda_security_group.ids)

@@ -310,3 +310,18 @@ variable "github_actions_role_access" {
   default     = true
   description = "When set to false, this is not allow kubernetes data to be pulled by the github actions"
 }
+variable "node_schedule_shutdown_hour" {
+  type        = number
+  default     = -1
+  description = "The hour of the day (0-23) the cluster should be shutdown.  If left empty, the cluster will not be stopped. Will run every day otherwise."
+}
+variable "node_schedule_startup_hour" {
+  type        = number
+  default     = -1
+  description = "The hour of the day (0-23) the cluster should be restarted.  If left empty, the cluster will not be restarted after shutdown. Will run every weekday otherwise."
+}
+variable "node_schedule_timezone" {
+  type        = string
+  default     = "America/New_York"
+  description = "The timezone of the schedule. Ex: 'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Pacific/Honolulu'  See: https://www.joda.org/joda-time/timezones.html"
+}
