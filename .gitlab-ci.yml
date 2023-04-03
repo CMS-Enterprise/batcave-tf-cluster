@@ -20,11 +20,12 @@ iac-scan:
         # --scan=<TERRAFORM_PLAN_SCAN_MODE>
         - snyk iac test --report --json-file-output=report.json
         # - curl -L -X PATCH -H "Accept: application/vnd.github+json" -H "Authorization: Bearer <YOUR-TOKEN>" -H "X-GitHub-Api-Version: 2022-11-28" https://github.com/CMS-Enterprise/batcave-landing-zone/pull/998
-        - | curl -L \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $GITHUB_TOKEN"\
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://github.com/CMS-Enterprise/batcave-landing-zone/pull/998
+        - | 
+          curl -L \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer $GITHUB_TOKEN"\
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          https://github.com/CMS-Enterprise/batcave-landing-zone/pull/998
     artifacts:
       paths:
         - report.json        
