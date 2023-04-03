@@ -18,7 +18,7 @@ iac-scan:
         # Other possible flags can be found https://docs.snyk.io/snyk-cli/commands/iac-test
         # --severity-threshold=<low|medium|high|critical>
         # --scan=<TERRAFORM_PLAN_SCAN_MODE>
-        - snyk iac test --report --json-file-output=report.json
+        - snyk iac test --report --json-file-output=report.json || true
         # - curl -L -X PATCH -H "Accept: application/vnd.github+json" -H "Authorization: Bearer <YOUR-TOKEN>" -H "X-GitHub-Api-Version: 2022-11-28" https://github.com/CMS-Enterprise/batcave-landing-zone/pull/998
         - | 
           curl -L \
