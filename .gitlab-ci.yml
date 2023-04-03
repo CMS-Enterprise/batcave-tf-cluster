@@ -19,6 +19,9 @@ iac-scan:
         # --severity-threshold=<low|medium|high|critical>
         # --scan=<TERRAFORM_PLAN_SCAN_MODE>
         - snyk iac test --report --json-file-output=report.json
+    artifacts:
+      paths:
+        - report.json        
     allow_failure: 
       exit_codes: 1
 
