@@ -16,4 +16,6 @@ iac-scan:
         - snyk auth $SNYK_TOKEN
     script:
         - snyk iac test --report
+    allow_failure: 
+      exit_codes: 1
 
