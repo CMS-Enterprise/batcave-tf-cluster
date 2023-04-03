@@ -15,7 +15,10 @@ iac-scan:
     before_script: 
         - snyk auth $SNYK_TOKEN
     script:
-        - snyk iac test --report
+        # Other possible flags can be found https://docs.snyk.io/snyk-cli/commands/iac-test
+        # --severity-threshold=<low|medium|high|critical>
+        # --scan=<TERRAFORM_PLAN_SCAN_MODE>
+        - snyk iac test --report --json-file-output=report.json
     allow_failure: 
       exit_codes: 1
 
