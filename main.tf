@@ -35,7 +35,7 @@ locals {
     max_size                   = v.max_size
     min_size                   = v.min_size
     enable_bootstrap_user_data = true
-    pre_bootstrap_user_data    = "sudo sysctl -w net.ipv4.ip_forward=1"
+    pre_bootstrap_user_data    = "sudo sysctl -w net.ipv4.ip_forward=1 "
     bootstrap_extra_args = join(" ",
       ["--kubelet-extra-args '--node-labels=${k}=true", try(v.extra_args, "")],
       [for label_key, label_value in try(v.labels, {}) : "--node-labels=${label_key}=${label_value}"],
