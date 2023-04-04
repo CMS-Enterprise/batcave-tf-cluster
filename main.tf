@@ -55,7 +55,8 @@ locals {
     # On the general node group or any node group labeled "general", attach target groups
     target_group_arns = (k == "general" || contains(keys(try(v.labels, {})), "general")) ? concat(
       [aws_lb_target_group.batcave_alb_https.arn],
-      var.create_alb_proxy ? [aws_lb_target_group.batcave_alb_proxy_https[0].arn] : []
+      var.create_alb_proxy ? [aws_lb_target_group.batcave_alb_proxy_https[0].arn] : [],
+      var.create_alb_shared ? [aws_lb_target_group.batcave_alb_shared_https[0].arn] : []
     ) : null
 
     tags = merge(var.tags, var.instance_tags, try(v.tags, null))
@@ -102,6 +103,27 @@ locals {
       "WarmPoolTotalCapacity",
       "WarmPoolWarmedCapacity",
     ]
+    create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
+    schedules = merge(
+      var.node_schedule_shutdown_hour >= 0 ? {} : {
+        shutdown = {
+          min_size     = 0
+          max_size     = 0
+          desired_size = 0
+          time_zone    = var.node_schedule_timezone
+          recurrence   = "0 ${var.node_schedule_shutdown_hour} * * *"
+        }
+      },
+      var.node_schedule_startup_hour >= 0 ? {} : {
+        startup = {
+          min_size     = v.min_size
+          max_size     = v.max_size
+          desired_size = v.desired_size
+          time_zone    = var.node_schedule_timezone
+          recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
+        }
+      }
+    )
   } }
   # Allow ingress to the control plane from the delete_ebs_volumes lambda (if it exists)
   delete_ebs_volumes_lambda_sg_id = one(data.aws_security_groups.delete_ebs_volumes_lambda_security_group.ids)
@@ -287,7 +309,18 @@ resource "aws_security_group_rule" "eks_node_ingress_alb_proxy" {
   protocol                 = "tcp"
   security_group_id        = module.eks.node_security_group_id
   source_security_group_id = aws_security_group.batcave_alb_proxy[0].id
-  description              = "Allow access form alb_proxy over port ${each.key}"
+  description              = "Allow access from alb_proxy over port ${each.key}"
+}
+
+resource "aws_security_group_rule" "eks_node_ingress_alb_shared" {
+  for_each                 = var.create_alb_shared ? toset(["80", "443"]) : toset([])
+  type                     = "ingress"
+  to_port                  = each.key
+  from_port                = each.key
+  protocol                 = "tcp"
+  security_group_id        = module.eks.node_security_group_id
+  source_security_group_id = aws_security_group.batcave_alb_shared[0].id
+  description              = "Allow access from shared ALB over port ${each.key}"
 }
 
 resource "aws_security_group_rule" "https-tg-ingress" {

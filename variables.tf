@@ -18,16 +18,16 @@ variable "ami_date" {
 variable "general_node_pool" {
   type        = any
   description = "General node pool, required for hosting core services"
-  default = {
+  default     = {
     instance_type = "c5.2xlarge"
     desired_size  = 3
     max_size      = 5
     min_size      = 2
     # Map of label flags for kubelets.
-    labels = { general = "true" }
+    labels        = { general = "true" }
     # Map of taint flags for kubelets.
     # Ex: `{MyTaint = "true:NoSchedule"}`
-    taints = {}
+    taints        = {}
     #tags = {}
 
     # Extra args for kubelet in form of: "--node-labels=general=true <...>'.  Will be in _addition_ to any
@@ -226,12 +226,30 @@ variable "create_alb_proxy" {
 }
 variable "alb_proxy_is_internal" {
   type        = bool
-  description = "If the ALB Proxy should be using internal ips.  Defaults to false, because the reason for ALB proxy existing is typically to make it accessible over the Internet"
+  description = "If the ALB Proxy should be using internal ips. Defaults to false, because the reason for ALB proxy existing is typically to make it accessible over the Internet"
   default     = false
 }
 
 variable "alb_proxy_subnets" {
   description = "List of subnet ids for the ALB Proxy to be deployed into"
+  default     = []
+  type        = list(string)
+}
+
+variable "create_alb_shared" {
+  type        = bool
+  description = "Creaes an ALB in the shared subnet"
+  default     = false
+}
+
+variable "alb_shared_is_internal" {
+  type        = bool
+  description = "If the ALB in the shared subnet should be using internal ips. Defaults to false, because the reason for this ALB existing is to make it accessible over the Internet"
+  default     = false
+}
+
+variable "alb_shared_subnets" {
+  description = "List of subnet ids for the ALB in the shared subnet"
   default     = []
   type        = list(string)
 }
@@ -252,6 +270,18 @@ variable "alb_proxy_ingress_prefix_lists" {
   default     = []
   type        = list(string)
 }
+
+variable "alb_shared_ingress_cidrs" {
+  description = "List of CIDR blocks allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs"
+  default     = []
+  type        = list(string)
+}
+variable "alb_shared_ingress_prefix_lists" {
+  description = "List of Prefix List IDs allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs"
+  default     = []
+  type        = list(string)
+}
+
 variable "alb_deletion_protection" {
   description = "Enable/Disable ALB deletion protection for both ALBs"
   default     = false
@@ -334,4 +364,19 @@ variable "github_actions_role_access" {
   type        = bool
   default     = true
   description = "When set to false, this is not allow kubernetes data to be pulled by the github actions"
+}
+variable "node_schedule_shutdown_hour" {
+  type        = number
+  default     = -1
+  description = "The hour of the day (0-23) the cluster should be shutdown.  If left empty, the cluster will not be stopped. Will run every day otherwise."
+}
+variable "node_schedule_startup_hour" {
+  type        = number
+  default     = -1
+  description = "The hour of the day (0-23) the cluster should be restarted.  If left empty, the cluster will not be restarted after shutdown. Will run every weekday otherwise."
+}
+variable "node_schedule_timezone" {
+  type        = string
+  default     = "America/New_York"
+  description = "The timezone of the schedule. Ex: 'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Pacific/Honolulu'  See: https://www.joda.org/joda-time/timezones.html"
 }
