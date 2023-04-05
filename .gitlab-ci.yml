@@ -24,12 +24,7 @@ iac-scan:
         # - curl -L -X PATCH -H "Accept: application/vnd.github+json" -H "Authorization: Bearer <YOUR-TOKEN>" -H "X-GitHub-Api-Version: 2022-11-28" https://github.com/CMS-Enterprise/batcave-landing-zone/pull/998
         # - $CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_SHA
         # Get all pulls for the repo in Github
-        - | 
-          curl -L \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer $GITHUB_TOKEN"\
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/CMS-Enterprise/$CI_PROJECT_NAME/pulls > PULL_REQUESTS
+        - PULL_REQUESTS=$(curl -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GITHUB_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/CMS-Enterprise/$CI_PROJECT_NAME/pulls)
         # Parse through for most recent pull request matching source branch SHA
         - echo $PULL_REQUESTS
         - echo $PULL_REQUESTS| jq ". | select(.head.sha == \"$CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_SHA\") | {id}"  
