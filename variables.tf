@@ -148,25 +148,38 @@ variable "network_int_delete_on_termination" {
 
 ### Resource tags
 
-variable "instance_tag" {
-  default = "Instance custom tag"
+variable "tags" {
+  default = null
+  description = "Global resource tags to apply to all resources"
+  type        = map(any)
+}
+variable "instance_tags" {
+  default = null
+  description = "Instance custom tags"
+  type        = map(any)
 }
 variable "volume_tag" {
-  default = "Volume custom tag"
+  default = null
+  description = "Volume custom tag"
+  type        = map(any)
 }
 variable "network_interface_tag" {
-  default = "Network Interface custom tag"
+  default = null
+  description = "Network Interface custom tag"
+  type        = map(any)
 }
 
 variable "general_nodepool_tags" {
-  type    = any
-  default = {
-  }
+  default = null
+  description = "General Node Pool tags"
+  type        = map(any)
 }
 ### Launch template tags
 
 variable "lt_CustomTag" {
-  default = "Launch template custom tag"
+  default = null
+  description = "Launch template custom tag"
+  type        = map(any)
 }
 
 
@@ -284,6 +297,18 @@ variable "alb_idle_timeout" {
   description = "Default idle request timeout for the ALB"
   default     = "60"
   type        = string
+}
+
+variable "alb_public_tags" {
+  description = "Additional public ALB tags"
+  default     = null
+  type        = map(any)
+}
+
+variable "alb_private_tags" {
+  description = "Additional private ALB tags"
+  default     = null
+  type        = map(any)
 }
 
 variable "s3_bucket_access_grants" {
