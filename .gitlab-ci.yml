@@ -36,14 +36,14 @@ iac-scan:
         # --severity-threshold=<low|medium|high|critical>
         # --scan=<TERRAFORM_PLAN_SCAN_MODE>
         - apk add --no-cache curl jq github-cli
-        - snyk iac test --report --json-file-output=report.json || true
+        - snyk iac test --report --json-file-output=report.json > report.txt || true
         # Get all pulls for the repo in Github
         - |
           PULL_REQUESTS=$(curl -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GITHUB_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/CMS-Enterprise/$CI_PROJECT_NAME/pulls)
         # Parse through for most recent pull request matching source branch SHA
         - |
           ISSUE_NUMBER=$(echo $PULL_REQUESTS| jq ".[].number")
-        - gh issue comment $ISSUE_NUMBER --repo CMS-Enterprise/$CI_PROJECT_NAME --body-file report.json   
+        - gh issue comment $ISSUE_NUMBER --repo CMS-Enterprise/$CI_PROJECT_NAME --body-file report.txt
     artifacts:
       paths:
         - report.json        
