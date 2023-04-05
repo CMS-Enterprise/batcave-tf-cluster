@@ -34,7 +34,7 @@ iac-scan:
         # Other possible flags can be found https://docs.snyk.io/snyk-cli/commands/iac-test
         # --severity-threshold=<low|medium|high|critical>
         # --scan=<TERRAFORM_PLAN_SCAN_MODE>
-        - apk add --no-cache curl github-cli
+        - apk add --no-cache curl jq github-cli
         - snyk iac test --report --json-file-output=report.json || true
         # Get all pulls for the repo in Github
         - |
