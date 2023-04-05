@@ -43,7 +43,7 @@ iac-scan:
         # Parse through for most recent pull request matching source branch SHA
         - |
           ISSUE_NUMBER=$(echo $PULL_REQUESTS| jq ".[].number")
-        - gh issue view $ISSUE_NUMBER 
+        - gh issue view --repo CMS-Enterprise/$CI_PROJECT_NAME $ISSUE_NUMBER 
         # - gh issue comment $ISSUE_NUMBER --body-file report.json   
     artifacts:
       paths:
