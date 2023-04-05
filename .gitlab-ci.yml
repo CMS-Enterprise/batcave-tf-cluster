@@ -19,7 +19,7 @@ iac-scan:
         # Other possible flags can be found https://docs.snyk.io/snyk-cli/commands/iac-test
         # --severity-threshold=<low|medium|high|critical>
         # --scan=<TERRAFORM_PLAN_SCAN_MODE>
-        - apk add --no-cache curl
+        - apk add --no-cache curl jq
         - snyk iac test --report --json-file-output=report.json || true
         # - curl -L -X PATCH -H "Accept: application/vnd.github+json" -H "Authorization: Bearer <YOUR-TOKEN>" -H "X-GitHub-Api-Version: 2022-11-28" https://github.com/CMS-Enterprise/batcave-landing-zone/pull/998
         # - $CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_SHA
@@ -29,8 +29,10 @@ iac-scan:
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer $GITHUB_TOKEN"\
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/CMS-Enterprise/$CI_PROJECT_NAME/pulls
-        # Parse through for most recent pull request matching source branch SHA 
+          https://api.github.com/repos/CMS-Enterprise/$CI_PROJECT_NAME/pulls > PULL_REQUESTS
+        # Parse through for most recent pull request matching source branch SHA
+        - echo $PULL_REQUESTS
+        - echo $PULL_REQUESTS| jq ". | select(.head.sha == \"$CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_SHA\") | {id}"  
     artifacts:
       paths:
         - report.json        
