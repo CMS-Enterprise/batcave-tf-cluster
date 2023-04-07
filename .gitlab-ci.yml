@@ -1,4 +1,4 @@
-# Attempting to trigger pipeline
+# Adding new commit to update pull request
 iac-scan-pr:
     stage: test
     image: snyk/snyk:alpine
