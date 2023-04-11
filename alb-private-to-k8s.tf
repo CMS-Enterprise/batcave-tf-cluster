@@ -22,8 +22,8 @@ resource "aws_lb" "batcave_alb" {
   }
 
   tags = merge(
-    var.tags, 
-    var.alb_private_tags, 
+    var.tags,
+    var.alb_private_tags,
   )
 }
 

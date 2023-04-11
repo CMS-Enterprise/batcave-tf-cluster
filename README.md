@@ -65,15 +65,20 @@ Note that this example may create resources which cost money. Run `terraform des
 | [aws_kms_key.eks](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_lb.batcave_alb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
 | [aws_lb.batcave_alb_proxy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
+| [aws_lb.batcave_alb_shared](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
 | [aws_lb_listener.batcave_alb_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
 | [aws_lb_listener.batcave_alb_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
 | [aws_lb_listener.batcave_alb_proxy_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
 | [aws_lb_listener.batcave_alb_proxy_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
+| [aws_lb_listener.batcave_alb_shared_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
+| [aws_lb_listener.batcave_alb_shared_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
 | [aws_lb_target_group.batcave_alb_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
 | [aws_lb_target_group.batcave_alb_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
 | [aws_lb_target_group.batcave_alb_proxy_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
+| [aws_lb_target_group.batcave_alb_shared_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
 | [aws_security_group.batcave_alb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.batcave_alb_proxy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.batcave_alb_shared](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group_rule.allow_all_node_internet_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.allow_all_nodes_to_other_nodes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.allow_ingress_additional_prefix_lists](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
@@ -87,7 +92,13 @@ Note that this example may create resources which cost money. Run `terraform des
 | [aws_security_group_rule.batcave_alb_proxy_ingress_cidrs_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.batcave_alb_proxy_ingress_pl_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.batcave_alb_proxy_ingress_pl_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.batcave_alb_shared_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.batcave_alb_shared_ingress_cidrs_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.batcave_alb_shared_ingress_cidrs_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.batcave_alb_shared_ingress_pl_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.batcave_alb_shared_ingress_pl_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.eks_node_ingress_alb_proxy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.eks_node_ingress_alb_shared](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.https-tg-ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_wafv2_web_acl_association.cms_waf_assoc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl_association) | resource |
 | [aws_wafv2_web_acl_association.cms_waf_priv_assoc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl_association) | resource |
@@ -117,10 +128,16 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_alb_deletion_protection"></a> [alb\_deletion\_protection](#input\_alb\_deletion\_protection) | Enable/Disable ALB deletion protection for both ALBs | `bool` | `false` | no |
 | <a name="input_alb_drop_invalid_header_fields"></a> [alb\_drop\_invalid\_header\_fields](#input\_alb\_drop\_invalid\_header\_fields) | Indicates whether HTTP headers with header fields that are not valid are removed by the load balancer (true) or routed to targets (false). The default is false. Elastic Load Balancing requires that message header names contain only alphanumeric characters and hyphens. Only valid for Load Balancers of type application | `bool` | `true` | no |
 | <a name="input_alb_idle_timeout"></a> [alb\_idle\_timeout](#input\_alb\_idle\_timeout) | Default idle request timeout for the ALB | `string` | `"60"` | no |
+| <a name="input_alb_private_tags"></a> [alb\_private\_tags](#input\_alb\_private\_tags) | Additional private ALB tags | `map(any)` | `null` | no |
 | <a name="input_alb_proxy_ingress_cidrs"></a> [alb\_proxy\_ingress\_cidrs](#input\_alb\_proxy\_ingress\_cidrs) | List of CIDR blocks allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs | `list(string)` | `[]` | no |
 | <a name="input_alb_proxy_ingress_prefix_lists"></a> [alb\_proxy\_ingress\_prefix\_lists](#input\_alb\_proxy\_ingress\_prefix\_lists) | List of Prefix List IDs allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs | `list(string)` | `[]` | no |
-| <a name="input_alb_proxy_is_internal"></a> [alb\_proxy\_is\_internal](#input\_alb\_proxy\_is\_internal) | If the ALB Proxy should be using internal ips.  Defaults to false, because the reason for ALB proxy existing is typically to make it accessible over the Internet | `bool` | `false` | no |
+| <a name="input_alb_proxy_is_internal"></a> [alb\_proxy\_is\_internal](#input\_alb\_proxy\_is\_internal) | If the ALB Proxy should be using internal ips. Defaults to false, because the reason for ALB proxy existing is typically to make it accessible over the Internet | `bool` | `false` | no |
 | <a name="input_alb_proxy_subnets"></a> [alb\_proxy\_subnets](#input\_alb\_proxy\_subnets) | List of subnet ids for the ALB Proxy to be deployed into | `list(string)` | `[]` | no |
+| <a name="input_alb_public_tags"></a> [alb\_public\_tags](#input\_alb\_public\_tags) | Additional public ALB tags | `map(any)` | `null` | no |
+| <a name="input_alb_shared_ingress_cidrs"></a> [alb\_shared\_ingress\_cidrs](#input\_alb\_shared\_ingress\_cidrs) | List of CIDR blocks allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs | `list(string)` | `[]` | no |
+| <a name="input_alb_shared_ingress_prefix_lists"></a> [alb\_shared\_ingress\_prefix\_lists](#input\_alb\_shared\_ingress\_prefix\_lists) | List of Prefix List IDs allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs | `list(string)` | `[]` | no |
+| <a name="input_alb_shared_is_internal"></a> [alb\_shared\_is\_internal](#input\_alb\_shared\_is\_internal) | If the ALB in the shared subnet should be using internal ips. Defaults to false, because the reason for this ALB existing is to make it accessible over the Internet | `bool` | `false` | no |
+| <a name="input_alb_shared_subnets"></a> [alb\_shared\_subnets](#input\_alb\_shared\_subnets) | List of subnet ids for the ALB in the shared subnet | `list(string)` | `[]` | no |
 | <a name="input_alb_subnets_by_zone"></a> [alb\_subnets\_by\_zone](#input\_alb\_subnets\_by\_zone) | n/a | `map(string)` | n/a | yes |
 | <a name="input_ami_date"></a> [ami\_date](#input\_ami\_date) | n/a | `string` | `""` | no |
 | <a name="input_ami_regex_override"></a> [ami\_regex\_override](#input\_ami\_regex\_override) | Overrides default AMI lookup regex, which grabs latest AMI matching cluster\_version by default | `string` | `""` | no |
@@ -139,27 +156,28 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_cluster_security_group_additional_rules"></a> [cluster\_security\_group\_additional\_rules](#input\_cluster\_security\_group\_additional\_rules) | Map of security group rules to attach to the cluster security group, as you cannot change cluster security groups without replacing the instance | `map(any)` | `{}` | no |
 | <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | n/a | `string` | `"1.23"` | no |
 | <a name="input_create_alb_proxy"></a> [create\_alb\_proxy](#input\_create\_alb\_proxy) | Create an Application Load Balancer proxy to live in front of the K8s ALB and act as a proxy from the public Internet | `bool` | `false` | no |
+| <a name="input_create_alb_shared"></a> [create\_alb\_shared](#input\_create\_alb\_shared) | Creaes an ALB in the shared subnet | `bool` | `false` | no |
 | <a name="input_create_cosign_iam_role"></a> [create\_cosign\_iam\_role](#input\_create\_cosign\_iam\_role) | Flag to create Cosign IAM role | `bool` | `false` | no |
 | <a name="input_custom_node_pools"></a> [custom\_node\_pools](#input\_custom\_node\_pools) | n/a | `any` | `{}` | no |
 | <a name="input_enable_irsa"></a> [enable\_irsa](#input\_enable\_irsa) | n/a | `string` | `"true"` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | n/a | `string` | `"dev"` | no |
 | <a name="input_general_node_pool"></a> [general\_node\_pool](#input\_general\_node\_pool) | General node pool, required for hosting core services | `any` | <pre>{<br>  "desired_size": 3,<br>  "instance_type": "c5.2xlarge",<br>  "labels": {<br>    "general": "true"<br>  },<br>  "max_size": 5,<br>  "min_size": 2,<br>  "taints": {}<br>}</pre> | no |
-| <a name="input_general_nodepool_tags"></a> [general\_nodepool\_tags](#input\_general\_nodepool\_tags) | n/a | `any` | `{}` | no |
+| <a name="input_general_nodepool_tags"></a> [general\_nodepool\_tags](#input\_general\_nodepool\_tags) | General Node Pool tags | `map(any)` | `null` | no |
 | <a name="input_github_actions_role_access"></a> [github\_actions\_role\_access](#input\_github\_actions\_role\_access) | When set to false, this is not allow kubernetes data to be pulled by the github actions | `bool` | `true` | no |
 | <a name="input_grant_delete_ebs_volumes_lambda_access"></a> [grant\_delete\_ebs\_volumes\_lambda\_access](#input\_grant\_delete\_ebs\_volumes\_lambda\_access) | When set to true, a cluster role and permissions will be created to grant the delete-ebs-volumes Lambda access to the PersistentVolumes API. | `bool` | `false` | no |
 | <a name="input_host_subnets"></a> [host\_subnets](#input\_host\_subnets) | Override the ec2 instance subnets.  By default, they are launche in private\_subnets, just like the EKS control plane. | `list(any)` | `[]` | no |
 | <a name="input_iam_role_path"></a> [iam\_role\_path](#input\_iam\_role\_path) | n/a | `string` | `"/delegatedadmin/developer/"` | no |
 | <a name="input_iam_role_permissions_boundary"></a> [iam\_role\_permissions\_boundary](#input\_iam\_role\_permissions\_boundary) | n/a | `string` | `"arn:aws:iam::373346310182:policy/cms-cloud-admin/developer-boundary-policy"` | no |
-| <a name="input_instance_tag"></a> [instance\_tag](#input\_instance\_tag) | n/a | `string` | `"Instance custom tag"` | no |
+| <a name="input_instance_tags"></a> [instance\_tags](#input\_instance\_tags) | Instance custom tags | `map(any)` | `null` | no |
 | <a name="input_logging_bucket"></a> [logging\_bucket](#input\_logging\_bucket) | Name of the S3 bucket to send load balancer access logs. | `string` | `null` | no |
-| <a name="input_lt_CustomTag"></a> [lt\_CustomTag](#input\_lt\_CustomTag) | n/a | `string` | `"Launch template custom tag"` | no |
+| <a name="input_lt_CustomTag"></a> [lt\_CustomTag](#input\_lt\_CustomTag) | Launch template custom tag | `map(any)` | `null` | no |
 | <a name="input_lt_description"></a> [lt\_description](#input\_lt\_description) | n/a | `string` | `"Default Launch-Template"` | no |
 | <a name="input_lt_monitoring_enabled"></a> [lt\_monitoring\_enabled](#input\_lt\_monitoring\_enabled) | ## Monitoring | `string` | `"true"` | no |
 | <a name="input_lt_name_prefix"></a> [lt\_name\_prefix](#input\_lt\_name\_prefix) | n/a | `string` | `"eks-lt-"` | no |
 | <a name="input_lt_update_default_version"></a> [lt\_update\_default\_version](#input\_lt\_update\_default\_version) | n/a | `string` | `"true"` | no |
 | <a name="input_network_int_associate_public_ip_address"></a> [network\_int\_associate\_public\_ip\_address](#input\_network\_int\_associate\_public\_ip\_address) | ## Network Interfaces | `string` | `"false"` | no |
 | <a name="input_network_int_delete_on_termination"></a> [network\_int\_delete\_on\_termination](#input\_network\_int\_delete\_on\_termination) | n/a | `string` | `"true"` | no |
-| <a name="input_network_interface_tag"></a> [network\_interface\_tag](#input\_network\_interface\_tag) | n/a | `string` | `"Network Interface custom tag"` | no |
+| <a name="input_network_interface_tag"></a> [network\_interface\_tag](#input\_network\_interface\_tag) | Network Interface custom tag | `map(any)` | `null` | no |
 | <a name="input_node_https_ingress_cidr_blocks"></a> [node\_https\_ingress\_cidr\_blocks](#input\_node\_https\_ingress\_cidr\_blocks) | List of CIDR blocks to allow into the node over the HTTPs port | `list(string)` | <pre>[<br>  "10.0.0.0/8",<br>  "100.0.0.0/8"<br>]</pre> | no |
 | <a name="input_node_schedule_shutdown_hour"></a> [node\_schedule\_shutdown\_hour](#input\_node\_schedule\_shutdown\_hour) | The hour of the day (0-23) the cluster should be shutdown.  If left empty, the cluster will not be stopped. Will run every day otherwise. | `number` | `-1` | no |
 | <a name="input_node_schedule_startup_hour"></a> [node\_schedule\_startup\_hour](#input\_node\_schedule\_startup\_hour) | The hour of the day (0-23) the cluster should be restarted.  If left empty, the cluster will not be restarted after shutdown. Will run every weekday otherwise. | `number` | `-1` | no |
@@ -168,9 +186,10 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | n/a | `list(any)` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | n/a | `string` | `"us-east-1"` | no |
 | <a name="input_s3_bucket_access_grants"></a> [s3\_bucket\_access\_grants](#input\_s3\_bucket\_access\_grants) | A list of s3 bucket names to grant the cluster roles R/W access to | `list(string)` | `null` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Global resource tags to apply to all resources | `map(any)` | `null` | no |
 | <a name="input_transport_proxy_is_internal"></a> [transport\_proxy\_is\_internal](#input\_transport\_proxy\_is\_internal) | Boolean to trigger a public transport proxy ip | `bool` | `true` | no |
 | <a name="input_transport_proxy_static_ip"></a> [transport\_proxy\_static\_ip](#input\_transport\_proxy\_static\_ip) | n/a | `bool` | `true` | no |
-| <a name="input_volume_tag"></a> [volume\_tag](#input\_volume\_tag) | n/a | `string` | `"Volume custom tag"` | no |
+| <a name="input_volume_tag"></a> [volume\_tag](#input\_volume\_tag) | Volume custom tag | `map(any)` | `null` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | n/a | `any` | n/a | yes |
 
 ## Outputs
@@ -178,7 +197,8 @@ Note that this example may create resources which cost money. Run `terraform des
 | Name | Description |
 |------|-------------|
 | <a name="output_aws_auth_configmap_yaml"></a> [aws\_auth\_configmap\_yaml](#output\_aws\_auth\_configmap\_yaml) | n/a |
-| <a name="output_batcave_alb_proxy_dns"></a> [batcave\_alb\_proxy\_dns](#output\_batcave\_alb\_proxy\_dns) | DNS value of NLB created for proxying requests through the application load balancer |
+| <a name="output_batcave_alb_proxy_dns"></a> [batcave\_alb\_proxy\_dns](#output\_batcave\_alb\_proxy\_dns) | DNS value of ALB created for proxying request |
+| <a name="output_batcave_alb_shared_dns"></a> [batcave\_alb\_shared\_dns](#output\_batcave\_alb\_shared\_dns) | DNS value of ALB created for proxying requests through an ALB in the shared subnet |
 | <a name="output_batcave_lb_dns"></a> [batcave\_lb\_dns](#output\_batcave\_lb\_dns) | DNS value of NLB created for routing traffic to apps |
 | <a name="output_cloudwatch_log_group_arn"></a> [cloudwatch\_log\_group\_arn](#output\_cloudwatch\_log\_group\_arn) | Arn of cloudwatch log group created |
 | <a name="output_cloudwatch_log_group_name"></a> [cloudwatch\_log\_group\_name](#output\_cloudwatch\_log\_group\_name) | Name of cloudwatch log group created |
