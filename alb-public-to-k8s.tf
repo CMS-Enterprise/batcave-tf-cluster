@@ -26,8 +26,8 @@ resource "aws_lb" "batcave_alb_proxy" {
   }
 
   tags = merge(
-    var.tags, 
-    var.alb_public_tags, 
+    var.tags,
+    var.alb_public_tags,
   )
 }
 

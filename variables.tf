@@ -18,16 +18,16 @@ variable "ami_date" {
 variable "general_node_pool" {
   type        = any
   description = "General node pool, required for hosting core services"
-  default     = {
+  default = {
     instance_type = "c5.2xlarge"
     desired_size  = 3
     max_size      = 5
     min_size      = 2
     # Map of label flags for kubelets.
-    labels        = { general = "true" }
+    labels = { general = "true" }
     # Map of taint flags for kubelets.
     # Ex: `{MyTaint = "true:NoSchedule"}`
-    taints        = {}
+    taints = {}
     #tags = {}
 
     # Extra args for kubelet in form of: "--node-labels=general=true <...>'.  Will be in _addition_ to any
@@ -149,35 +149,35 @@ variable "network_int_delete_on_termination" {
 ### Resource tags
 
 variable "tags" {
-  default = null
+  default     = null
   description = "Global resource tags to apply to all resources"
   type        = map(any)
 }
 variable "instance_tags" {
-  default = null
+  default     = null
   description = "Instance custom tags"
   type        = map(any)
 }
 variable "volume_tag" {
-  default = null
+  default     = null
   description = "Volume custom tag"
   type        = map(any)
 }
 variable "network_interface_tag" {
-  default = null
+  default     = null
   description = "Network Interface custom tag"
   type        = map(any)
 }
 
 variable "general_nodepool_tags" {
-  default = null
+  default     = null
   description = "General Node Pool tags"
   type        = map(any)
 }
 ### Launch template tags
 
 variable "lt_CustomTag" {
-  default = null
+  default     = null
   description = "Launch template custom tag"
   type        = map(any)
 }
