@@ -100,38 +100,6 @@ resource "aws_iam_role_policy_attachment" "additional" {
   role       = each.value.iam_role_name
 }
 
-# Secrets Manager policy
-resource "aws_iam_policy" "secretsmanager_policy" {
-  name        = "${local.name}-secretsmanager-policy"
-  path        = var.iam_role_path
-  description = "IAM policy to access secretsm manager"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "secretsfullaccess",
-        "Action" : [
-          "secretsmanager:ListSecrets",
-          "secretsmanager:GetResourcePolicy",
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret",
-          "secretsmanager:ListSecretVersionIds"
-        ],
-        "Effect" : "Allow",
-        "Resource" : "*"
-      }
-    ]
-  })
-}
-
-# Attach secretsmanager policy to node IAM role
-resource "aws_iam_role_policy_attachment" "secretsmanager" {
-  for_each   = module.eks.self_managed_node_groups
-  policy_arn = aws_iam_policy.secretsmanager_policy.arn
-  role       = each.value.iam_role_name
-}
-
-
 # Cloudwatch Logs policy
 data "aws_iam_policy_document" "cloudwatch_logs" {
   statement {
