@@ -60,6 +60,9 @@ locals {
     ) : null
 
     tags = merge(var.tags, var.instance_tags, try(v.tags, null))
+
+    ## Tags that are applied _ONLY_ to the ASG resource and not propagated to the nodes
+    ## All the "tags" var will be applied to both ASG and Propagated out to the nodes
     autoscaling_group_tags = merge(
       {
         "k8s.io/cluster-autoscaler/enabled"             = "true",
@@ -70,16 +73,8 @@ locals {
       # Label tags for Cluster Autoscaler hints
       { "k8s.io/cluster-autoscaler/node-template/label/${k}" = "true" },
       try({ for label_key, label_value in v.labels : "k8s.io/cluster-autoscaler/node-template/label/${label_key}" => label_value }, {}),
-      var.tags,
       var.autoscaling_group_tags,
     )
-    propagate_tags = [
-      {
-        key                 = "ProjectName"
-        value               = k
-        propagate_at_launch = "true"
-      }
-    ]
     enabled_metrics = [
       "GroupAndWarmPoolDesiredCapacity",
       "GroupAndWarmPoolTotalCapacity",
@@ -124,6 +119,9 @@ locals {
         }
       }
     )
+
+    ## https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group#instance_refresh
+    instance_refresh = lookup(v, "instance_refresh", {})
   } }
   # Allow ingress to the control plane from the delete_ebs_volumes lambda (if it exists)
   delete_ebs_volumes_lambda_sg_id = one(data.aws_security_groups.delete_ebs_volumes_lambda_security_group.ids)
@@ -142,8 +140,9 @@ locals {
 }
 
 module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "18.30.2"
+  ## https://github.com/terraform-aws-modules/terraform-aws-eks
+  source = "terraform-aws-modules/eks/aws"
+  version = "19.0.4"
 
   cluster_name    = local.name
   cluster_version = local.cluster_version
@@ -162,18 +161,19 @@ module "eks" {
   cluster_security_group_additional_rules = merge(local.default_security_group_additional_rules, var.cluster_security_group_additional_rules)
   enable_irsa                             = true
 
+  # This is handled externally
+  create_kms_key = false
+
   openid_connect_audiences = var.openid_connect_audiences
 
   ## VERY IMPORTANT WARNING: Changing security group ids associated with a cluster will
   ## ***DELETE AND RECREATE*** existing clusters.  Do not modify this for already existing clusters
   cluster_additional_security_group_ids = []
 
-  cluster_encryption_config = [
-    {
-      provider_key_arn = aws_kms_key.eks.arn
-      resources        = ["secrets"]
-    }
-  ]
+  cluster_encryption_config = {
+    provider_key_arn = aws_kms_key.eks.arn
+    resources        = ["secrets"]
+  }
 
   self_managed_node_group_defaults = {
     subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
@@ -228,7 +228,7 @@ resource "null_resource" "kubernetes_requirements" {
 # Kubernetes provider configuration
 ################################################################################
 data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_id
+  name = module.eks.cluster_name
 }
 
 resource "aws_kms_key" "eks" {
@@ -274,19 +274,6 @@ resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists" {
   protocol          = "-1"
   prefix_list_ids   = var.cluster_additional_sg_prefix_lists
   security_group_id = each.value
-}
-
-
-# egress for the worker nodes
-resource "aws_security_group_rule" "allow_all_node_internet_egress" {
-  for_each          = local.cluster_security_groups_created
-  description       = "allow_all_node_internet_egress"
-  type              = "egress"
-  to_port           = 0
-  from_port         = 0
-  protocol          = "-1"
-  security_group_id = each.value
-  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 ## ingress between the cluster security groups
