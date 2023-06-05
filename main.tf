@@ -141,7 +141,7 @@ locals {
 
 module "eks" {
   ## https://github.com/terraform-aws-modules/terraform-aws-eks
-  source = "terraform-aws-modules/eks/aws"
+  source  = "terraform-aws-modules/eks/aws"
   version = "19.0.4"
 
   cluster_name    = local.name
@@ -340,7 +340,7 @@ resource "aws_iam_role" "cosign" {
         Condition = {
           StringEquals = {
             "${local.oidc_provider}:aud" : "sigstore",
-            "${local.oidc_provider}:sub" : "system:serviceaccount:gitlab:cosign"
+            "${local.oidc_provider}:sub" : "system:serviceaccount:gitlab-runner:cosign"
           }
         }
       },
