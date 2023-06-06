@@ -45,6 +45,7 @@ variable "general_node_pool" {
 variable "custom_node_pools" {
   type    = any
   default = {}
+  metadata_options = {}
   #  runners = {
   #    instance_type = "c4.xlarge"
   #    desired_size = 1
@@ -379,4 +380,10 @@ variable "node_schedule_timezone" {
   type        = string
   default     = "America/New_York"
   description = "The timezone of the schedule. Ex: 'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Pacific/Honolulu'  See: https://www.joda.org/joda-time/timezones.html"
+}
+
+variable "enable_hoplimit" {
+  type        = bool
+  default     = false
+  description = "Enables a IMDSv2 hop limit of 1 on all nodes. Defaults to false"
 }

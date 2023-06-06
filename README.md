@@ -188,6 +188,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_transport_proxy_static_ip"></a> [transport\_proxy\_static\_ip](#input\_transport\_proxy\_static\_ip) | n/a | `bool` | `true` | no |
 | <a name="input_volume_tag"></a> [volume\_tag](#input\_volume\_tag) | Volume custom tag | `map(any)` | `null` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | n/a | `any` | n/a | yes |
+| <a name="input_enable_hoplimit"></a> [enable\_hoplimit](#enable\_hoplimit) | Boolean to enable a IMDSv2 hop limit of 1 on all nodes. Defaults to false | `bool` | `false` | no | 
 
 ## Outputs
 
