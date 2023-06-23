@@ -3,6 +3,7 @@ locals {
   cluster_version  = var.cluster_version
   region           = var.region
   alb_idle_timeout = var.alb_idle_timeout
+  azs              = ["us-east-1a","us-east-1b","us-east-1c"]
 }
 
 data "aws_ami" "eks_ami" {
@@ -204,24 +205,41 @@ module "eks" {
     iam_role_path = var.iam_role_path
   }
 
-  fargate_profiles = {
-    default = {
-      name = "default"
-      selectors = [
-        {
-          namespace = "*"
-        }
-      ]
-      tags = {
-        Owner = "srii"
-      }
 
-      timeouts = {
-        create = "20m"
-        delete = "20m"
+  fargate_profiles = merge(
+    {
+      example = {
+        name = "default"
+        selectors = [
+          {
+            namespace = "default"
+            labels = {
+              Application = "backend"
+            }
+          },
+          {
+            namespace = "*"
+            labels = {
+              Application = "*"
+            }
+          }
+        ]
+
+        timeouts = {
+          create = "20m"
+          delete = "20m"
+        }
+      }
+    },
+    { for i in range(3) :
+      "kube-system-${element(split("-", local.azs[i]), 2)}" => {
+        selectors = [
+          { namespace = "kube-system" }
+        ]
+        subnet_ids = [element(var.private_subnets, i)]
       }
     }
-  }
+  )
   
   # # Worker groups (using Launch Configurations)
   # self_managed_node_groups = local.custom_node_pools
