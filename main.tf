@@ -201,6 +201,7 @@ module "eks" {
   # Fargate Profile(s)
   fargate_profile_defaults = {
     iam_role_permissions_boundary = var.iam_role_permissions_boundary
+    iam_role_path = var.iam_role_path
   }
 
   fargate_profiles = {
