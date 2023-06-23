@@ -199,10 +199,13 @@ module "eks" {
   }
   
   # Fargate Profile(s)
+  fargate_profile_defaults = {
+    iam_role_permissions_boundary = var.iam_role_permissions_boundary
+  }
+
   fargate_profiles = {
     default = {
       name = "default"
-      iam_role_permissions_boundary = var.iam_role_permissions_boundary
       selectors = [
         {
           namespace = "kube-system"
