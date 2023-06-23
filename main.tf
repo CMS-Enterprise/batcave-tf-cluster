@@ -273,11 +273,11 @@ resource "aws_kms_key" "eks" {
 data "aws_partition" "current" {}
 data "aws_caller_identity" "current" {}
 
-# locals {
-#   cluster_security_groups_created = {
-#     "node" : module.eks.node_security_group_id,
-#     "cluster" : module.eks.cluster_security_group_id,
-#   }
+ locals {
+  cluster_security_groups_created = {
+    #"node" : module.eks.node_security_group_id,
+    "cluster" : module.eks.cluster_security_group_id,
+  }
 
   cluster_security_groups_all = {
     #"node" : module.eks.node_security_group_id,
@@ -285,17 +285,17 @@ data "aws_caller_identity" "current" {}
     "cluster_primary" : module.eks.cluster_primary_security_group_id,
   }
 
-#   # List of all combinations of security_groups_created and security_groups_all
-#   node_security_group_setproduct = setproduct(
-#     [for k, v in local.cluster_security_groups_created : { "${k}" : v }],
-#     [for k, v in local.cluster_security_groups_all : { "${k}" : v }],
-#   )
-#   # Map of type: {"node_allow_cluster": {sg: "sg-1234", source_sg: "sg-2345"}, ...}
-#   node_security_group_src_dst = { for sg_pair in local.node_security_group_setproduct :
-#     "${keys(sg_pair[0])[0]}_allow_${keys(sg_pair[1])[0]}" =>
-#     { sg = one(values(sg_pair[0])), source_sg = one(values(sg_pair[1])) }
-#   }
-# }
+  # List of all combinations of security_groups_created and security_groups_all
+  # node_security_group_setproduct = setproduct(
+  #   [for k, v in local.cluster_security_groups_created : { "${k}" : v }],
+  #   [for k, v in local.cluster_security_groups_all : { "${k}" : v }],
+  # )
+  # # Map of type: {"node_allow_cluster": {sg: "sg-1234", source_sg: "sg-2345"}, ...}
+  # node_security_group_src_dst = { for sg_pair in local.node_security_group_setproduct :
+  #   "${keys(sg_pair[0])[0]}_allow_${keys(sg_pair[1])[0]}" =>
+  #   { sg = one(values(sg_pair[0])), source_sg = one(values(sg_pair[1])) }
+  # }
+}
 
 # Ingress for provided prefix lists
 resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists" {
