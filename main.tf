@@ -1,8 +1,9 @@
 locals {
-  name             = var.cluster_name
-  cluster_version  = var.cluster_version
-  region           = var.region
-  alb_idle_timeout = var.alb_idle_timeout
+  name              = var.cluster_name
+  cluster_version   = var.cluster_version
+  region            = var.region
+  alb_idle_timeout  = var.alb_idle_timeout
+  hoplimit_metadata = var.enable_hoplimit ? { http_put_response_hop_limit = 1 } : {}
 }
 
 data "aws_ami" "eks_ami" {
@@ -60,6 +61,8 @@ locals {
     ) : null
 
     tags = merge(var.tags, var.instance_tags, try(v.tags, null))
+
+    metadata_options = merge(local.hoplimit_metadata, try(v.metadata_options, {}))
 
     ## Tags that are applied _ONLY_ to the ASG resource and not propagated to the nodes
     ## All the "tags" var will be applied to both ASG and Propagated out to the nodes
