@@ -181,15 +181,6 @@ module "eks" {
   # }
   ## CLUSTER Addons
   cluster_addons = {
-    vpc-cni = {
-     resolve_conflicts        = "OVERWRITE"
-     service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
-     addon_version            = var.addon_vpc_cni_version
-    }
-    kube-proxy = {
-     resolve_conflicts = "OVERWRITE"
-     addon_version     = var.addon_kube_proxy_version
-    }
     coredns = {
       preserve    = true
       most_recent = true
@@ -198,6 +189,12 @@ module "eks" {
         create = "25m"
         delete = "10m"
       }
+    }
+    kube-proxy = {
+      most_recent = true
+    }
+    vpc-cni = {
+      most_recent = true
     }
   }
   
