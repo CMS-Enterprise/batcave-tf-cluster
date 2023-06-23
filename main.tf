@@ -200,6 +200,7 @@ module "eks" {
   
   # Fargate Profile(s)
   fargate_profiles = {
+    iam_role_permissions_boundary = var.iam_role_permissions_boundary
     default = {
       name = "default"
       selectors = [
