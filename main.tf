@@ -279,11 +279,11 @@ data "aws_caller_identity" "current" {}
 #     "cluster" : module.eks.cluster_security_group_id,
 #   }
 
-#   cluster_security_groups_all = {
-#     "node" : module.eks.node_security_group_id,
-#     "cluster" : module.eks.cluster_security_group_id,
-#     "cluster_primary" : module.eks.cluster_primary_security_group_id,
-#   }
+  cluster_security_groups_all = {
+    #"node" : module.eks.node_security_group_id,
+    "cluster" : module.eks.cluster_security_group_id,
+    "cluster_primary" : module.eks.cluster_primary_security_group_id,
+  }
 
 #   # List of all combinations of security_groups_created and security_groups_all
 #   node_security_group_setproduct = setproduct(
