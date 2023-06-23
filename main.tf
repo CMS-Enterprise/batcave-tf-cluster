@@ -197,33 +197,33 @@ module "eks" {
   # apply any global tags to the cluster itself
   cluster_tags = var.tags
 }
-module "vpc_cni_irsa" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+# module "vpc_cni_irsa" {
+#   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-  role_name                     = "${var.cluster_name}-vpc_cni"
-  attach_vpc_cni_policy         = true
-  vpc_cni_enable_ipv4           = true
-  role_path                     = var.iam_role_path
-  role_permissions_boundary_arn = var.iam_role_permissions_boundary
+#   role_name                     = "${var.cluster_name}-vpc_cni"
+#   attach_vpc_cni_policy         = true
+#   vpc_cni_enable_ipv4           = true
+#   role_path                     = var.iam_role_path
+#   role_permissions_boundary_arn = var.iam_role_permissions_boundary
 
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:aws-node"]
-    }
-  }
-}
+#   oidc_providers = {
+#     main = {
+#       provider_arn               = module.eks.oidc_provider_arn
+#       namespace_service_accounts = ["kube-system:aws-node"]
+#     }
+#   }
+# }
 
 # pseudo resource to capture critical infrastructure needed to access the Kubernetes API
-resource "null_resource" "kubernetes_requirements" {
-  depends_on = [
-    module.eks,
-    # without this security group rule the Kubernetes API is unreachable
-    aws_security_group_rule.allow_ingress_additional_prefix_lists,
-    aws_security_group_rule.allow_all_nodes_to_other_nodes,
-    aws_security_group_rule.https-tg-ingress,
-  ]
-}
+# resource "null_resource" "kubernetes_requirements" {
+#   depends_on = [
+#     module.eks,
+#     # without this security group rule the Kubernetes API is unreachable
+#     aws_security_group_rule.allow_ingress_additional_prefix_lists,
+#     aws_security_group_rule.allow_all_nodes_to_other_nodes,
+#     aws_security_group_rule.https-tg-ingress,
+#   ]
+# }
 
 ################################################################################
 # Kubernetes provider configuration
@@ -232,124 +232,124 @@ data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_name
 }
 
-resource "aws_kms_key" "eks" {
-  description             = "EKS Secret Encryption Key"
-  deletion_window_in_days = 7
-  enable_key_rotation     = true
-}
+# resource "aws_kms_key" "eks" {
+#   description             = "EKS Secret Encryption Key"
+#   deletion_window_in_days = 7
+#   enable_key_rotation     = true
+# }
 
 data "aws_partition" "current" {}
 data "aws_caller_identity" "current" {}
 
-locals {
-  cluster_security_groups_created = {
-    "node" : module.eks.node_security_group_id,
-    "cluster" : module.eks.cluster_security_group_id,
-  }
+# locals {
+#   cluster_security_groups_created = {
+#     "node" : module.eks.node_security_group_id,
+#     "cluster" : module.eks.cluster_security_group_id,
+#   }
 
-  cluster_security_groups_all = {
-    "node" : module.eks.node_security_group_id,
-    "cluster" : module.eks.cluster_security_group_id,
-    "cluster_primary" : module.eks.cluster_primary_security_group_id,
-  }
+#   cluster_security_groups_all = {
+#     "node" : module.eks.node_security_group_id,
+#     "cluster" : module.eks.cluster_security_group_id,
+#     "cluster_primary" : module.eks.cluster_primary_security_group_id,
+#   }
 
-  # List of all combinations of security_groups_created and security_groups_all
-  node_security_group_setproduct = setproduct(
-    [for k, v in local.cluster_security_groups_created : { "${k}" : v }],
-    [for k, v in local.cluster_security_groups_all : { "${k}" : v }],
-  )
-  # Map of type: {"node_allow_cluster": {sg: "sg-1234", source_sg: "sg-2345"}, ...}
-  node_security_group_src_dst = { for sg_pair in local.node_security_group_setproduct :
-    "${keys(sg_pair[0])[0]}_allow_${keys(sg_pair[1])[0]}" =>
-    { sg = one(values(sg_pair[0])), source_sg = one(values(sg_pair[1])) }
-  }
-}
+#   # List of all combinations of security_groups_created and security_groups_all
+#   node_security_group_setproduct = setproduct(
+#     [for k, v in local.cluster_security_groups_created : { "${k}" : v }],
+#     [for k, v in local.cluster_security_groups_all : { "${k}" : v }],
+#   )
+#   # Map of type: {"node_allow_cluster": {sg: "sg-1234", source_sg: "sg-2345"}, ...}
+#   node_security_group_src_dst = { for sg_pair in local.node_security_group_setproduct :
+#     "${keys(sg_pair[0])[0]}_allow_${keys(sg_pair[1])[0]}" =>
+#     { sg = one(values(sg_pair[0])), source_sg = one(values(sg_pair[1])) }
+#   }
+# }
 
-# Ingress for provided prefix lists
-resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists" {
-  for_each          = local.cluster_security_groups_all
-  type              = "ingress"
-  description       = "allow_ingress_additional_prefix_lists"
-  to_port           = 0
-  from_port         = 0
-  protocol          = "-1"
-  prefix_list_ids   = var.cluster_additional_sg_prefix_lists
-  security_group_id = each.value
-}
+# # Ingress for provided prefix lists
+# resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists" {
+#   for_each          = local.cluster_security_groups_all
+#   type              = "ingress"
+#   description       = "allow_ingress_additional_prefix_lists"
+#   to_port           = 0
+#   from_port         = 0
+#   protocol          = "-1"
+#   prefix_list_ids   = var.cluster_additional_sg_prefix_lists
+#   security_group_id = each.value
+# }
 
-## ingress between the cluster security groups
-resource "aws_security_group_rule" "allow_all_nodes_to_other_nodes" {
-  for_each                 = local.node_security_group_src_dst
-  description              = "allow all cluster nodes to other nodes"
-  type                     = "ingress"
-  to_port                  = 0
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = each.value.sg
-  source_security_group_id = each.value.source_sg
-}
+# ## ingress between the cluster security groups
+# resource "aws_security_group_rule" "allow_all_nodes_to_other_nodes" {
+#   for_each                 = local.node_security_group_src_dst
+#   description              = "allow all cluster nodes to other nodes"
+#   type                     = "ingress"
+#   to_port                  = 0
+#   from_port                = 0
+#   protocol                 = "-1"
+#   security_group_id        = each.value.sg
+#   source_security_group_id = each.value.source_sg
+# }
 
-resource "aws_security_group_rule" "eks_node_ingress_alb_proxy" {
-  for_each                 = var.create_alb_proxy ? toset(["80", "443"]) : toset([])
-  type                     = "ingress"
-  to_port                  = each.key
-  from_port                = each.key
-  protocol                 = "tcp"
-  security_group_id        = module.eks.node_security_group_id
-  source_security_group_id = aws_security_group.batcave_alb_proxy[0].id
-  description              = "Allow access from alb_proxy over port ${each.key}"
-}
+# resource "aws_security_group_rule" "eks_node_ingress_alb_proxy" {
+#   for_each                 = var.create_alb_proxy ? toset(["80", "443"]) : toset([])
+#   type                     = "ingress"
+#   to_port                  = each.key
+#   from_port                = each.key
+#   protocol                 = "tcp"
+#   security_group_id        = module.eks.node_security_group_id
+#   source_security_group_id = aws_security_group.batcave_alb_proxy[0].id
+#   description              = "Allow access from alb_proxy over port ${each.key}"
+# }
 
-resource "aws_security_group_rule" "eks_node_ingress_alb_shared" {
-  for_each                 = var.create_alb_shared ? toset(["80", "443"]) : toset([])
-  type                     = "ingress"
-  to_port                  = each.key
-  from_port                = each.key
-  protocol                 = "tcp"
-  security_group_id        = module.eks.node_security_group_id
-  source_security_group_id = aws_security_group.batcave_alb_shared[0].id
-  description              = "Allow access from shared ALB over port ${each.key}"
-}
+# resource "aws_security_group_rule" "eks_node_ingress_alb_shared" {
+#   for_each                 = var.create_alb_shared ? toset(["80", "443"]) : toset([])
+#   type                     = "ingress"
+#   to_port                  = each.key
+#   from_port                = each.key
+#   protocol                 = "tcp"
+#   security_group_id        = module.eks.node_security_group_id
+#   source_security_group_id = aws_security_group.batcave_alb_shared[0].id
+#   description              = "Allow access from shared ALB over port ${each.key}"
+# }
 
-resource "aws_security_group_rule" "https-tg-ingress" {
-  type              = "ingress"
-  to_port           = 0
-  from_port         = 0
-  protocol          = "-1"
-  security_group_id = module.eks.node_security_group_id
-  cidr_blocks       = ["10.0.0.0/8"]
-}
+# resource "aws_security_group_rule" "https-tg-ingress" {
+#   type              = "ingress"
+#   to_port           = 0
+#   from_port         = 0
+#   protocol          = "-1"
+#   security_group_id = module.eks.node_security_group_id
+#   cidr_blocks       = ["10.0.0.0/8"]
+# }
 
 ## Setup for cosign keyless signatures
-locals {
-  oidc_provider = module.eks.oidc_provider
-}
+# locals {
+#   oidc_provider = module.eks.oidc_provider
+# }
 
-resource "aws_iam_role" "cosign" {
-  count = var.create_cosign_iam_role ? 1 : 0
+# resource "aws_iam_role" "cosign" {
+#   count = var.create_cosign_iam_role ? 1 : 0
 
-  name = "${var.cluster_name}-cosign"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRoleWithWebIdentity"
-        Effect = "Allow"
-        Principal = {
-          Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${local.oidc_provider}"
-        }
-        Condition = {
-          StringEquals = {
-            "${local.oidc_provider}:aud" : "sigstore",
-            "${local.oidc_provider}:sub" : "system:serviceaccount:gitlab-runner:cosign"
-          }
-        }
-      },
-    ]
-  })
-  path                 = var.iam_role_path
-  permissions_boundary = var.iam_role_permissions_boundary
-}
+#   name = "${var.cluster_name}-cosign"
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Action = "sts:AssumeRoleWithWebIdentity"
+#         Effect = "Allow"
+#         Principal = {
+#           Federated = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/${local.oidc_provider}"
+#         }
+#         Condition = {
+#           StringEquals = {
+#             "${local.oidc_provider}:aud" : "sigstore",
+#             "${local.oidc_provider}:sub" : "system:serviceaccount:gitlab-runner:cosign"
+#           }
+#         }
+#       },
+#     ]
+#   })
+#   path                 = var.iam_role_path
+#   permissions_boundary = var.iam_role_permissions_boundary
+# }
 
 ## Planning to move these out of the eks module, but need to wait until we're ready to deploy
 #resource "aws_eks_addon" "vpc_cni" {
