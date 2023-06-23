@@ -232,11 +232,11 @@ data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_name
 }
 
-# resource "aws_kms_key" "eks" {
-#   description             = "EKS Secret Encryption Key"
-#   deletion_window_in_days = 7
-#   enable_key_rotation     = true
-# }
+resource "aws_kms_key" "eks" {
+  description             = "EKS Secret Encryption Key"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+}
 
 data "aws_partition" "current" {}
 data "aws_caller_identity" "current" {}
