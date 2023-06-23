@@ -297,17 +297,17 @@ data "aws_caller_identity" "current" {}
 #   }
 # }
 
-# # Ingress for provided prefix lists
-# resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists" {
-#   for_each          = local.cluster_security_groups_all
-#   type              = "ingress"
-#   description       = "allow_ingress_additional_prefix_lists"
-#   to_port           = 0
-#   from_port         = 0
-#   protocol          = "-1"
-#   prefix_list_ids   = var.cluster_additional_sg_prefix_lists
-#   security_group_id = each.value
-# }
+# Ingress for provided prefix lists
+resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists" {
+  for_each          = local.cluster_security_groups_all
+  type              = "ingress"
+  description       = "allow_ingress_additional_prefix_lists"
+  to_port           = 0
+  from_port         = 0
+  protocol          = "-1"
+  prefix_list_ids   = var.cluster_additional_sg_prefix_lists
+  security_group_id = each.value
+}
 
 # ## ingress between the cluster security groups
 # resource "aws_security_group_rule" "allow_all_nodes_to_other_nodes" {
@@ -384,22 +384,22 @@ data "aws_caller_identity" "current" {}
 # }
 
 ## Planning to move these out of the eks module, but need to wait until we're ready to deploy
-#resource "aws_eks_addon" "vpc_cni" {
+# resource "aws_eks_addon" "vpc_cni" {
 #  cluster_name = var.cluster_name
 #  addon_name   = "vpc-cni"
-#
+
 #  addon_version     = var.addon_vpc_cni_version
 #  resolve_conflicts = "OVERWRITE"
-#
+
 #  depends_on = [null_resource.kubernetes_requirements]
-#}
-#
-#resource "aws_eks_addon" "kube_proxy" {
+# }
+
+# resource "aws_eks_addon" "kube_proxy" {
 #  cluster_name = var.cluster_name
 #  addon_name   = "kube-proxy"
-#
+
 #  addon_version     = var.addon_kube_proxy_version
 #  resolve_conflicts = "OVERWRITE"
-#
+
 #  depends_on = [null_resource.kubernetes_requirements]
-#}
+# }
