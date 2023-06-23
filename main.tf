@@ -181,15 +181,51 @@ module "eks" {
   # }
   ## CLUSTER Addons
   cluster_addons = {
-    #vpc-cni = {
-    #  resolve_conflicts        = "OVERWRITE"
-    #  service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
-    #  addon_version            = var.addon_vpc_cni_version
-    #}
-    #kube-proxy = {
-    #  resolve_conflicts = "OVERWRITE"
-    #  addon_version     = var.addon_kube_proxy_version
-    #}
+    vpc-cni = {
+     resolve_conflicts        = "OVERWRITE"
+     service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
+     addon_version            = var.addon_vpc_cni_version
+    }
+    kube-proxy = {
+     resolve_conflicts = "OVERWRITE"
+     addon_version     = var.addon_kube_proxy_version
+    }
+    coredns = {
+      preserve    = true
+      most_recent = true
+
+      timeouts = {
+        create = "25m"
+        delete = "10m"
+      }
+    }
+  }
+  
+  # Fargate Profile(s)
+  fargate_profiles = {
+    default = {
+      name = "default"
+      selectors = [
+        {
+          namespace = "kube-system"
+          labels = {
+            k8s-app = "kube-dns"
+          }
+        },
+        {
+          namespace = "default"
+        }
+      ]
+
+      tags = {
+        Owner = "test"
+      }
+
+      timeouts = {
+        create = "20m"
+        delete = "20m"
+      }
+    }
   }
   # # Worker groups (using Launch Configurations)
   # self_managed_node_groups = local.custom_node_pools
@@ -197,22 +233,22 @@ module "eks" {
   # apply any global tags to the cluster itself
   cluster_tags = var.tags
 }
-# module "vpc_cni_irsa" {
-#   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+module "vpc_cni_irsa" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
-#   role_name                     = "${var.cluster_name}-vpc_cni"
-#   attach_vpc_cni_policy         = true
-#   vpc_cni_enable_ipv4           = true
-#   role_path                     = var.iam_role_path
-#   role_permissions_boundary_arn = var.iam_role_permissions_boundary
+  role_name                     = "${var.cluster_name}-vpc_cni"
+  attach_vpc_cni_policy         = true
+  vpc_cni_enable_ipv4           = true
+  role_path                     = var.iam_role_path
+  role_permissions_boundary_arn = var.iam_role_permissions_boundary
 
-#   oidc_providers = {
-#     main = {
-#       provider_arn               = module.eks.oidc_provider_arn
-#       namespace_service_accounts = ["kube-system:aws-node"]
-#     }
-#   }
-# }
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:aws-node"]
+    }
+  }
+}
 
 # pseudo resource to capture critical infrastructure needed to access the Kubernetes API
 # resource "null_resource" "kubernetes_requirements" {
