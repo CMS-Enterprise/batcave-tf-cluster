@@ -45,7 +45,6 @@ variable "general_node_pool" {
 variable "custom_node_pools" {
   type    = any
   default = {}
-  metadata_options = {}
   #  runners = {
   #    instance_type = "c4.xlarge"
   #    desired_size = 1
