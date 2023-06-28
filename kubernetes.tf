@@ -10,7 +10,7 @@
 #     username = "system:node:{{EC2PrivateDNSName}}"
 #     groups = tolist([
 #       "system:bootstrappers",
-#       "system:nodes"
+#       "system:nodes"w
 #     ])
 #   }]
 # }

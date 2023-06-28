@@ -218,10 +218,7 @@ module "eks" {
             }
           },
           {
-            namespace = "*"
-            labels = {
-              Application = "*"
-            }
+            namespace = "kube-system"
           }
         ]
 
@@ -229,14 +226,6 @@ module "eks" {
           create = "20m"
           delete = "20m"
         }
-      }
-    },
-    { for i in range(3) :
-      "kube-system-${element(split("-", local.azs[i]), 2)}" => {
-        selectors = [
-          { namespace = "kube-system" }
-        ]
-        subnet_ids = [element(var.private_subnets, i)]
       }
     }
   )
