@@ -147,7 +147,7 @@ module "eks" {
   version = "19.0.4"
 
   cluster_name    = local.name
-  cluster_version = local.cluster_version
+  cluster_version = 1.25
 
   iam_role_path                  = var.iam_role_path
   iam_role_permissions_boundary  = var.iam_role_permissions_boundary
