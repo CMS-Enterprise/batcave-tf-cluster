@@ -285,3 +285,25 @@ resource "kubernetes_service_account" "cloudwatch-service-account" {
   }
 }
 
+data "aws_iam_policy_document" "fluentbit_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:CreateLogGroup",
+      "logs:DescribeLogStreams",
+      "logs:PutLogEvents"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "fluentbit_policy" {
+  name   = "example-policy"
+  policy = data.aws_iam_policy_document.fluentbit_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch-pol-attachment" {
+ role = "default-20230628185814046000000003"
+ policy_arn = aws_iam_policy.fluentbit_policy.arn
+}
