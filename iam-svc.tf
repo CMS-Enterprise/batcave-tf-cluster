@@ -255,3 +255,33 @@ resource "kubernetes_service_account" "mesh_ingress_service_account" {
     }
   }
 }
+
+resource "aws_iam_role" "cloudwatch-role" {
+  name        = "cloudwatch-role"
+  path        = var.iam_role_path
+  description = " Cloud Watch role"
+
+  assume_role_policy    = data.aws_iam_policy_document.appmesh_trust_policy.json
+  max_session_duration  = var.max_session_duration
+  permissions_boundary  = var.iam_role_permissions_boundary
+  force_detach_policies = var.force_detach_policies
+
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch-policy-attachment" {
+ role = aws_iam_role.mesh_ingress_role.name
+ policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+resource "kubernetes_service_account" "cloudwatch-service-account" {
+  metadata {
+    name = "cloudwatch-agent"
+    namespace = "kube-system"
+
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.cloudwatch-role.arn
+    }
+  }
+}
+
