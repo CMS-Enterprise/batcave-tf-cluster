@@ -132,27 +132,27 @@ data "aws_iam_policy_document" "appmesh_policy" {
 }
 
 
-resource "aws_iam_role" "appmesh_role" {
-  name               = "appmesh-role"
-  assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Sid": "",
-        "Effect": "Allow",
-        "Principal": {
-          "Federated": "arn:aws:iam::373346310182:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/37E176AEE22E1343BDD9631E150AAD9A"
-        },
-        "Action": "sts:AssumeRoleWithWebIdentity",
-        "Condition": {
-          "StringEquals": {
-            "oidc.eks.us-east-1.amazonaws.com/id/37E176AEE22E1343BDD9631E150AAD9A:aud": "sts.amazonaws.com",
-            "oidc.eks.us-east-1.amazonaws.com/id/37E176AEE22E1343BDD9631E150AAD9A:sub": "system:serviceaccount:appmesh-system:appmesh-controller"
-          }
-        }
-      }
-    ]
-  })
+# resource "aws_iam_role" "appmesh_role" {
+#   name               = "appmesh-role"
+#   assume_role_policy = jsonencode({
+#     "Version": "2012-10-17",
+#     "Statement": [
+#       {
+#         "Sid": "",
+#         "Effect": "Allow",
+#         "Principal": {
+#           "Federated": "arn:aws:iam::373346310182:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/37E176AEE22E1343BDD9631E150AAD9A"
+#         },
+#         "Action": "sts:AssumeRoleWithWebIdentity",
+#         "Condition": {
+#           "StringEquals": {
+#             "oidc.eks.us-east-1.amazonaws.com/id/37E176AEE22E1343BDD9631E150AAD9A:aud": "sts.amazonaws.com",
+#             "oidc.eks.us-east-1.amazonaws.com/id/37E176AEE22E1343BDD9631E150AAD9A:sub": "system:serviceaccount:appmesh-system:appmesh-controller"
+#           }
+#         }
+#       }
+#     ]
+#   })
 
-  permissions_boundary = var.iam_role_permissions_boundary
-}
+#   permissions_boundary = var.iam_role_permissions_boundary
+# }
