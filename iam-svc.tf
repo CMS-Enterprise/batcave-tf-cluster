@@ -42,18 +42,17 @@
 # }
 
 data "aws_iam_policy_document" "appmesh_trust_policy" {
-  dynamic "statement" {
-    content {
-      effect  = "Allow"
-      actions = ["sts:AssumeRoleWithWebIdentity"]
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
 
-      principals {
-        type        = "Federated"
-        identifiers = [module.eks.oidc_provider_arn]
-      }
+    principals {
+      type        = "Federated"
+      identifiers = [module.eks.oidc_provider_arn]
     }
   }
 }
+
 
 data "aws_iam_policy_document" "appmesh_policy" {
   statement {
