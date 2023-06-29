@@ -112,6 +112,7 @@ data "aws_iam_policy_document" "appmesh_policy" {
 
 resource "aws_iam_policy" "appmesh_policy" {
   name   = "appmesh_policy"
+  path        = var.role_path
   policy = data.aws_iam_policy_document.appmesh_policy.json
 }
 
