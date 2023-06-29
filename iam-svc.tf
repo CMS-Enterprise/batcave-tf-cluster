@@ -182,8 +182,8 @@ resource "aws_iam_role_policy_attachment" "appmesh_support_policy_attachment" {
 
 resource "kubernetes_service_account" "appmesh_service_account" {
   metadata {
-    name = "appmesh-system"
-    namespace = "appmesh-controller"
+    name = "appmesh-controller"
+    namespace = "appmesh-system"
 
     annotations = {
       "eks.amazonaws.com/role-arn" = aws_iam_role.appmesh_role.arn
