@@ -213,12 +213,12 @@ module "eks" {
         selectors = [
           {
             namespace = "default"
-            labels = {
-              Application = "backend"
-            }
           },
           {
             namespace = "kube-system"
+          },
+          {
+            namespace = "kyverno"
           }
         ]
 
