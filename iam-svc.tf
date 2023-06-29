@@ -45,6 +45,7 @@
 resource "aws_iam_policy" "appmesh_policy" {
   name        = "AppMesh-IAM"
   description = "IAM policy for AppMesh"
+  path        = var.iam_role_path
 
   policy = jsonencode({
     Version   = "2012-10-17"
