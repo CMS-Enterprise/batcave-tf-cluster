@@ -37,6 +37,16 @@ locals {
   [])
 }
 
+locals {
+  batcave_developer_admin_role = (var.batcave_developer_admin_role_access ?
+    ([{
+      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/ct-ado-batcave-developer-admin",
+      username = "ct-ado-batcave-developer-admin",
+      groups   = ["system:masters"]
+    }]) :
+  [])
+}
+
 resource "kubernetes_cluster_role" "persistent_volume_management" {
   count = var.grant_delete_ebs_volumes_lambda_access ? 1 : 0
 
@@ -100,6 +110,7 @@ resource "kubernetes_config_map" "aws_auth" {
         tolist(local.configmap_roles),
         tolist(local.aolytix_map_role),
         tolist(local.github_actions_map_role),
+        tolist(local.batcave_developer_admin_role),
         tolist(local.delete_ebs_volumes_lambda_role_mapping)
       ))
     )

@@ -365,6 +365,11 @@ variable "github_actions_role_access" {
   default     = true
   description = "When set to false, this is not allow kubernetes data to be pulled by the github actions"
 }
+variable "batcave_developer_admin_role_access" {
+  type        = bool
+  default     = true
+  description = "When set to false, this will not allow kubernetes data to be pulled by the batcave admins"
+}
 variable "node_schedule_shutdown_hour" {
   type        = number
   default     = -1
