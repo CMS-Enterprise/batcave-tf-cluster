@@ -219,6 +219,9 @@ module "eks" {
           },
           {
             namespace = "kyverno"
+          },
+          {
+            namespace = "appmesh-system"
           }
         ]
 
