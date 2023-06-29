@@ -41,18 +41,30 @@
 #   role       = aws_iam_role.this[0].name
 # }
 
-# data "aws_iam_policy_document" "appmesh_trust_policy" {
-#   statement {
-#     effect  = "Allow"
-#     actions = ["sts:AssumeRoleWithWebIdentity"]
+data "aws_iam_policy_document" "appmesh_trust_policy" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
 
-#     principals {
-#       type        = "Federated"
-#       identifiers = [module.eks.oidc_provider_arn]
-#     }
-#   }
-# }
+    principals {
+      type        = "Federated"
+      identifiers = [module.eks.oidc_provider_arn]
+    }
+  }
+}
 
+resource "aws_iam_role" "appmesh_role" {
+  name        = "app_mesh"
+  path        = var.iam_role_path
+  description = " App Mesh role"
+
+  assume_role_policy    = data.aws_iam_policy_document.appmesh_trust_policy.json
+  max_session_duration  = var.max_session_duration
+  permissions_boundary  = var.iam_role_permissions_boundary
+  force_detach_policies = var.force_detach_policies
+
+  tags = var.tags
+}
 
 # data "aws_iam_policy_document" "appmesh_policy" {
 #   statement {
@@ -147,18 +159,7 @@
 # }
 
 
-# resource "aws_iam_role" "appmesh_role" {
-#   name        = "app_mesh"
-#   path        = var.iam_role_path
-#   description = " App Mesh role"
 
-#   assume_role_policy    = data.aws_iam_policy_document.appmesh_trust_policy.json
-#   max_session_duration  = var.max_session_duration
-#   permissions_boundary  = var.iam_role_permissions_boundary
-#   force_detach_policies = var.force_detach_policies
-
-#   tags = var.tags
-# }
 
 # resource "aws_iam_policy" "appmesh_policy" {
 #   name   = "appmesh_policy"
