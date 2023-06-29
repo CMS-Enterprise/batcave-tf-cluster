@@ -1,8 +1,8 @@
-# provider "kubernetes" {
-#   host                   = module.eks.cluster_endpoint
-#   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-#   token                  = data.aws_eks_cluster_auth.cluster.token
-# }
+provider "kubernetes" {
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+}
 
 # locals {
 #   configmap_roles = [for k, v in module.eks.self_managed_node_groups : {
@@ -110,12 +110,12 @@
 #   ]
 # }
 
-# provider "kubectl" {
-#   host                   = module.eks.cluster_endpoint
-#   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-#   token                  = data.aws_eks_cluster_auth.cluster.token
-#   load_config_file       = false
-# }
+provider "kubectl" {
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+  load_config_file       = false
+}
 
 # Create the batcave namespace, but don't delete it upon destroy
 # This is to work around an issue where dev clusters were prevented
