@@ -190,3 +190,67 @@ resource "kubernetes_service_account" "appmesh_service_account" {
     }
   }
 }
+
+
+data "aws_iam_policy_document" "meshingress_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "appmesh:StreamAggregatedResources",
+      "appmesh:*",
+      "xray:*"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "acm:ExportCertificate",
+      "acm-pca:GetCertificateAuthorityCertificate"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:*"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "mesh_ingress_role" {
+  name        = "app_mesh_ingress"
+  path        = var.iam_role_path
+  description = " App Mesh role"
+
+  assume_role_policy    = data.aws_iam_policy_document.appmesh_trust_policy.json
+  max_session_duration  = var.max_session_duration
+  permissions_boundary  = var.iam_role_permissions_boundary
+  force_detach_policies = var.force_detach_policies
+
+  tags = var.tags
+}
+
+resource "aws_iam_policy" "mesh_ingress_policy" {
+  name   = "mesh_ingress_policy"
+  policy = data.aws_iam_policy_document.meshingress_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "mesh_ingress_policy_attachment" {
+ role = aws_iam_role.mesh_ingress_role.name
+ policy_arn = aws_iam_policy.mesh_ingress_policy.arn
+}
+
+resource "kubernetes_service_account" "mesh_ingress_service_account" {
+  metadata {
+    name = "prodcatalog-envoy-proxies"
+    namespace = "prodcatalog-ns"
+
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.mesh_ingress_role.arn
+    }
+  }
+}
