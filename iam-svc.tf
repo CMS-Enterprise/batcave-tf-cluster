@@ -299,7 +299,8 @@ data "aws_iam_policy_document" "fluentbit_policy" {
 }
 
 resource "aws_iam_policy" "fluentbit_policy" {
-  name   = "example-policy"
+  name   = "fluentbit-fargate-policy"
+  path        = var.iam_role_path
   policy = data.aws_iam_policy_document.fluentbit_policy.json
 }
 
