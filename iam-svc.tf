@@ -134,7 +134,7 @@ data "aws_iam_policy_document" "appmesh_policy" {
 
 resource "aws_iam_role" "appmesh_role" {
   name        = "app_mesh"
-  path        = var.role_path
+  path        = var.iam_role_path
   description = " App Mesh role"
 
   assume_role_policy    = data.aws_iam_policy_document.appmesh_policy.json
