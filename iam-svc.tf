@@ -139,8 +139,8 @@ resource "aws_iam_role" "appmesh_role" {
 
   assume_role_policy    = data.aws_iam_policy_document.appmesh_policy.json
   max_session_duration  = var.max_session_duration
-  permissions_boundary  = var.role_permissions_boundary_arn
-  force_detach_policies = true
+  permissions_boundary  = var.iam_role_permissions_boundary
+  force_detach_policies = var.force_detach_policies
 
   tags = var.tags
 }

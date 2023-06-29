@@ -380,3 +380,15 @@ variable "node_schedule_timezone" {
   default     = "America/New_York"
   description = "The timezone of the schedule. Ex: 'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Pacific/Honolulu'  See: https://www.joda.org/joda-time/timezones.html"
 }
+
+variable "force_detach_policies" {
+  description = "Whether policies should be detached from this role when destroying"
+  type        = bool
+  default     = true
+}
+
+variable "max_session_duration" {
+  description = "Maximum CLI/API session duration in seconds between 3600 and 43200"
+  type        = number
+  default     = null
+}
