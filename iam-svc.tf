@@ -236,6 +236,7 @@ resource "aws_iam_role" "mesh_ingress_role" {
 
 resource "aws_iam_policy" "mesh_ingress_policy" {
   name   = "mesh_ingress_policy"
+  path        = var.iam_role_path
   policy = data.aws_iam_policy_document.meshingress_policy.json
 }
 
