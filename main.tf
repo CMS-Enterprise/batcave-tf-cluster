@@ -30,11 +30,11 @@ locals {
     iam_role_path                 = var.iam_role_path
     iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
-    instance_type              = v.instance_type
-    desired_size               = v.desired_size
-    max_size                   = v.max_size
-    min_size                   = v.min_size
-    pre_bootstrap_user_data    = "sysctl -w net.ipv4.ip_forward=1\n"
+    instance_type           = v.instance_type
+    desired_size            = v.desired_size
+    max_size                = v.max_size
+    min_size                = v.min_size
+    pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
     bootstrap_extra_args = join(" ",
       ["--kubelet-extra-args '--node-labels=${k}=true", try(v.extra_args, "")],
       [for label_key, label_value in try(v.labels, {}) : "--node-labels=${label_key}=${label_value}"],
@@ -164,6 +164,10 @@ module "eks" {
   cluster_enabled_log_types               = var.cluster_enabled_log_types
   cluster_security_group_additional_rules = merge(local.default_security_group_additional_rules, var.cluster_security_group_additional_rules)
   enable_irsa                             = true
+
+  # Self managed node groups will not automatically create the aws-auth configmap so we need to
+  create_aws_auth_configmap = false
+  manage_aws_auth_configmap = true
 
   # This is handled externally
   create_kms_key = false
