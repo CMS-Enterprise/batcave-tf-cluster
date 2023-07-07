@@ -49,7 +49,7 @@ locals {
     ([
       {
         rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/ct-ado-batcave-developer-admin",
-        username = "ct-ado-batcave-developer-admin",
+        username = "{{SessionName}}",
         groups   = ["system:masters"]
       }
     ]) :
