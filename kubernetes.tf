@@ -9,52 +9,52 @@ provider "kubernetes" {
   # }
 }
 
-# locals {
-#   configmap_roles = [for k, v in module.eks.self_managed_node_groups : {
-#     rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${v.iam_role_name}"
-#     username = "system:node:{{EC2PrivateDNSName}}"
-#     groups = tolist([
-#       "system:bootstrappers",
-#       "system:nodes"
-#     ])
-#   }]
-# }
+locals {
+  configmap_roles = [for k, v in module.eks.self_managed_node_groups : {
+    rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${v.iam_role_name}"
+    username = "system:node:{{EC2PrivateDNSName}}"
+    groups = tolist([
+      "system:bootstrappers",
+      "system:nodes"
+    ])
+  }]
+}
 
-# locals {
-#   aolytix_map_role = (var.aolytix_role_access ?
-#     ([
-#       {
-#         rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/aolytix-role",
-#         username = "aolytix-role",
-#         groups   = ["system:masters"]
-#       }
-#     ]) :
-#   [])
-# }
+locals {
+  aolytix_map_role = (var.aolytix_role_access ?
+    ([
+      {
+        rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/aolytix-role",
+        username = "aolytix-role",
+        groups   = ["system:masters"]
+      }
+    ]) :
+  [])
+}
 
-# locals {
-#   github_actions_map_role = (var.github_actions_role_access ?
-#     ([
-#       {
-#       rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/batcave-github-actions-role",
-#       username = "batcave-github-actions-role",
-#       groups   = ["system:masters"]
-#       }
-#     ]) :
-#   [])
-# }
+locals {
+  github_actions_map_role = (var.github_actions_role_access ?
+    ([
+      {
+        rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/batcave-github-actions-role",
+        username = "batcave-github-actions-role",
+        groups   = ["system:masters"]
+      }
+    ]) :
+  [])
+}
 
-# locals {
-#   batcave_developer_admin_role = (var.batcave_developer_admin_role_access ?
-#     ([
-#       {
-#       rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/ct-ado-batcave-developer-admin",
-#       username = "ct-ado-batcave-developer-admin",
-#       groups   = ["system:masters"]
-#       }
-#     ]) :
-#   [])
-# }
+locals {
+  batcave_developer_admin_role = (var.batcave_developer_admin_role_access ?
+    ([
+      {
+        rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/ct-ado-batcave-developer-admin",
+        username = "ct-ado-batcave-developer-admin",
+        groups   = ["system:masters"]
+      }
+    ]) :
+  [])
+}
 
 resource "kubernetes_cluster_role" "persistent_volume_management" {
   count = var.grant_delete_ebs_volumes_lambda_access ? 1 : 0
@@ -103,32 +103,32 @@ locals {
   [])
 }
 
-# resource "kubernetes_config_map" "aws_auth" {
-#   metadata {
-#     name      = "aws-auth"
-#     namespace = "kube-system"
-#     labels = merge(
-#       {
-#         "app.kubernetes.io/managed-by" = "Terraform"
-#       }
-#     )
-#   }
-#   data = {
-#     mapRoles = yamlencode(
-#       distinct(concat(
-#         tolist(local.configmap_roles),
-#         tolist(local.aolytix_map_role),
-#         tolist(local.github_actions_map_role),
-#         tolist(local.batcave_developer_admin_role),
-#         tolist(local.delete_ebs_volumes_lambda_role_mapping)
-#       ))
-#     )
-#   }
-#   depends_on = [
-#     null_resource.kubernetes_requirements,
-#     kubernetes_cluster_role_binding.delete_ebs_volumes_lambda,
-#   ]
-# }
+resource "kubernetes_config_map" "aws_auth" {
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+    labels = merge(
+      {
+        "app.kubernetes.io/managed-by" = "Terraform"
+      }
+    )
+  }
+  data = {
+    mapRoles = yamlencode(
+      distinct(concat(
+        tolist(local.configmap_roles),
+        tolist(local.aolytix_map_role),
+        tolist(local.github_actions_map_role),
+        tolist(local.batcave_developer_admin_role),
+        tolist(local.delete_ebs_volumes_lambda_role_mapping)
+      ))
+    )
+  }
+  depends_on = [
+    null_resource.kubernetes_requirements,
+    kubernetes_cluster_role_binding.delete_ebs_volumes_lambda,
+  ]
+}
 
 provider "kubectl" {
   host                   = module.eks.cluster_endpoint
