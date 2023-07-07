@@ -162,7 +162,7 @@ module "eks" {
   cluster_endpoint_private_access         = var.cluster_endpoint_private_access
   cluster_endpoint_public_access          = var.cluster_endpoint_public_access
   cluster_enabled_log_types               = var.cluster_enabled_log_types
-  cluster_security_group_additional_rules = merge(local.default_security_group_additional_rules, var.cluster_security_group_additional_rules)
+  cluster_security_group_additional_rules = merge(local.default_security_group_additional_rules, var.cluster_security_group_additional_rules, var.node_https_ingress_cidr_blocks)
   enable_irsa                             = true
 
   # Self managed node groups will not automatically create the aws-auth configmap so we need to
