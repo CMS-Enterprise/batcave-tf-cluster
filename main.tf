@@ -166,11 +166,11 @@ module "eks" {
   enable_irsa                             = true
 
   # Self managed node groups will not automatically create the aws-auth configmap so we need to
-  #create_aws_auth_configmap = true
-  #manage_aws_auth_configmap = true
+  create_aws_auth_configmap = true
+  manage_aws_auth_configmap = true
 
   # aws-auth configmap
-  manage_aws_auth_configmap = true
+  #manage_aws_auth_configmap = true
 
   aws_auth_roles = [
     {
