@@ -48,7 +48,7 @@ locals {
   batcave_developer_admin_role = (var.batcave_developer_admin_role_access ?
     ([
       {
-        rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/ct-ado-batcave-developer-admin",
+        rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/ct-ado-batcave-application-admin",
         username = "{{SessionName}}",
         groups   = ["system:masters"]
       }
