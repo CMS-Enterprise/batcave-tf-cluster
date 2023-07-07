@@ -350,7 +350,7 @@ resource "aws_security_group_rule" "https-tg-ingress" {
 
 resource "aws_security_group_rule" "https-k8s-ingress" {
   type              = "ingress"
-  to_port           = 433
+  to_port           = 443
   from_port         = 0
   protocol          = "tcp"
   security_group_id = module.eks.cluster_primary_security_group_id
