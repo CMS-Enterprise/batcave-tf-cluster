@@ -146,7 +146,7 @@ locals {
 module "eks" {
   ## https://github.com/terraform-aws-modules/terraform-aws-eks
   source  = "terraform-aws-modules/eks/aws"
-  version = "19.0.4"
+  version = "19.15.2"
 
   cluster_name    = local.name
   cluster_version = local.cluster_version
