@@ -354,7 +354,7 @@ resource "aws_security_group_rule" "https-k8s-ingress" {
   from_port         = 0
   protocol          = "tcp"
   security_group_id = module.eks.cluster_primary_security_group_id
-  cidr_blocks       = ["10.0.0.0/8", "100.0.0.0/8"]
+  cidr_blocks       = var.vpc_cidr_blocks
 }
 
 ## Setup for cosign keyless signatures

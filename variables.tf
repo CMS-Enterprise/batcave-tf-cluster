@@ -68,6 +68,11 @@ variable "iam_role_permissions_boundary" {
 
 variable "vpc_id" {}
 
+variable "vpc_cidr_blocks" {
+  description = "List of VPC CIDR blocks"
+  type        = list(string)
+}
+
 variable "private_subnets" {
   type = list(any)
 }
