@@ -36,7 +36,7 @@ locals {
   github_actions_map_role = (var.github_actions_role_access ?
     ([
       {
-        rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/batcave-github-actions-role",
+        rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.github_actions_role}",
         username = "batcave-github-actions-role",
         groups   = ["system:masters"]
       }
@@ -45,10 +45,10 @@ locals {
 }
 
 locals {
-  batcave_developer_admin_role = (var.batcave_developer_admin_role_access ?
+  federated_access_role = (var.federated_access_role_access ?
     ([
       {
-        rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/ct-ado-batcave-application-admin",
+        rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.federated_access_role}",
         username = "{{SessionName}}",
         groups   = ["system:masters"]
       }
@@ -119,7 +119,7 @@ resource "kubernetes_config_map" "aws_auth" {
         tolist(local.configmap_roles),
         tolist(local.aolytix_map_role),
         tolist(local.github_actions_map_role),
-        tolist(local.batcave_developer_admin_role),
+        tolist(local.federated_access_role),
         tolist(local.delete_ebs_volumes_lambda_role_mapping)
       ))
     )
