@@ -82,13 +82,6 @@ variable "alb_subnets_by_zone" {
   type = map(string)
 }
 
-variable "cluster_endpoint_private_access" {
-  default = "true"
-}
-variable "cluster_endpoint_public_access" {
-  default = "true"
-}
-
 variable "cluster_enabled_log_types" {
   description = "A list of the desired control plane logging to enable. For more information, see Amazon EKS Control Plane Logging documentation (https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html)"
   type        = list(string)
