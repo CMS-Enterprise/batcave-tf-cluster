@@ -120,8 +120,8 @@ Note that this example may create resources which cost money. Run `terraform des
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_acm_cert_base_domain"></a> [acm\_cert\_base\_domain](#input\_acm\_cert\_base\_domain) | Base domain of the certificate used for the ALB Proxy | `string` | `""` | no |
-| <a name="input_addon_kube_proxy_version"></a> [addon\_kube\_proxy\_version](#input\_addon\_kube\_proxy\_version) | This is the image of the kube\_proxy used as addon | `string` | `"v1.22.11-eksbuild.2"` | no |
-| <a name="input_addon_vpc_cni_version"></a> [addon\_vpc\_cni\_version](#input\_addon\_vpc\_cni\_version) | This is the image of the CNI pod used in the vpc-cni addon.  For other options, run: aws eks describe-addon-versions --add | `string` | `"v1.11.4-eksbuild.1"` | no |
+| <a name="input_addon_kube_proxy_version"></a> [addon\_kube\_proxy\_version](#input\_addon\_kube\_proxy\_version) | This is the image of the kube\_proxy used as addon | `string` | `"v1.24.10-eksbuild.2 "` | no |
+| <a name="input_addon_vpc_cni_version"></a> [addon\_vpc\_cni\_version](#input\_addon\_vpc\_cni\_version) | This is the image of the CNI pod used in the vpc-cni addon.  For other options, run: aws eks describe-addon-versions --add | `string` | `"v1.12.6-eksbuild.1"` | no |
 | <a name="input_alb_deletion_protection"></a> [alb\_deletion\_protection](#input\_alb\_deletion\_protection) | Enable/Disable ALB deletion protection for both ALBs | `bool` | `false` | no |
 | <a name="input_alb_drop_invalid_header_fields"></a> [alb\_drop\_invalid\_header\_fields](#input\_alb\_drop\_invalid\_header\_fields) | Indicates whether HTTP headers with header fields that are not valid are removed by the load balancer (true) or routed to targets (false). The default is false. Elastic Load Balancing requires that message header names contain only alphanumeric characters and hyphens. Only valid for Load Balancers of type application | `bool` | `true` | no |
 | <a name="input_alb_idle_timeout"></a> [alb\_idle\_timeout](#input\_alb\_idle\_timeout) | Default idle request timeout for the ALB | `string` | `"60"` | no |
@@ -147,15 +147,14 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_block_volume_type"></a> [block\_volume\_type](#input\_block\_volume\_type) | n/a | `string` | `"gp2"` | no |
 | <a name="input_cluster_additional_sg_prefix_lists"></a> [cluster\_additional\_sg\_prefix\_lists](#input\_cluster\_additional\_sg\_prefix\_lists) | n/a | `list(string)` | n/a | yes |
 | <a name="input_cluster_enabled_log_types"></a> [cluster\_enabled\_log\_types](#input\_cluster\_enabled\_log\_types) | A list of the desired control plane logging to enable. For more information, see Amazon EKS Control Plane Logging documentation (https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html) | `list(string)` | <pre>[<br>  "api",<br>  "audit",<br>  "authenticator",<br>  "controllerManager",<br>  "scheduler"<br>]</pre> | no |
-| <a name="input_cluster_endpoint_private_access"></a> [cluster\_endpoint\_private\_access](#input\_cluster\_endpoint\_private\_access) | n/a | `string` | `"true"` | no |
-| <a name="input_cluster_endpoint_public_access"></a> [cluster\_endpoint\_public\_access](#input\_cluster\_endpoint\_public\_access) | n/a | `string` | `"true"` | no |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | n/a | `any` | n/a | yes |
 | <a name="input_cluster_security_group_additional_rules"></a> [cluster\_security\_group\_additional\_rules](#input\_cluster\_security\_group\_additional\_rules) | Map of security group rules to attach to the cluster security group, as you cannot change cluster security groups without replacing the instance | `map(any)` | `{}` | no |
-| <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | n/a | `string` | `"1.24"` | no |
+| <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | n/a | `string` | `"1.25"` | no |
 | <a name="input_create_alb_proxy"></a> [create\_alb\_proxy](#input\_create\_alb\_proxy) | Create an Application Load Balancer proxy to live in front of the K8s ALB and act as a proxy from the public Internet | `bool` | `false` | no |
 | <a name="input_create_alb_shared"></a> [create\_alb\_shared](#input\_create\_alb\_shared) | Creaes an ALB in the shared subnet | `bool` | `false` | no |
 | <a name="input_create_cosign_iam_role"></a> [create\_cosign\_iam\_role](#input\_create\_cosign\_iam\_role) | Flag to create Cosign IAM role | `bool` | `false` | no |
 | <a name="input_custom_node_pools"></a> [custom\_node\_pools](#input\_custom\_node\_pools) | n/a | `any` | `{}` | no |
+| <a name="input_enable_hoplimit"></a> [enable\_hoplimit](#input\_enable\_hoplimit) | Enables a IMDSv2 hop limit of 1 on all nodes. Defaults to false | `bool` | `false` | no |
 | <a name="input_enable_irsa"></a> [enable\_irsa](#input\_enable\_irsa) | n/a | `string` | `"true"` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | n/a | `string` | `"dev"` | no |
 | <a name="input_general_node_pool"></a> [general\_node\_pool](#input\_general\_node\_pool) | General node pool, required for hosting core services | `any` | <pre>{<br>  "desired_size": 3,<br>  "instance_type": "c5.2xlarge",<br>  "labels": {<br>    "general": "true"<br>  },<br>  "max_size": 5,<br>  "min_size": 2,<br>  "taints": {}<br>}</pre> | no |
@@ -188,7 +187,6 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_transport_proxy_static_ip"></a> [transport\_proxy\_static\_ip](#input\_transport\_proxy\_static\_ip) | n/a | `bool` | `true` | no |
 | <a name="input_volume_tag"></a> [volume\_tag](#input\_volume\_tag) | Volume custom tag | `map(any)` | `null` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | n/a | `any` | n/a | yes |
-| <a name="input_enable_hoplimit"></a> [enable\_hoplimit](#enable\_hoplimit) | Boolean to enable a IMDSv2 hop limit of 1 on all nodes. Defaults to false | `bool` | `false` | no | 
 
 ## Outputs
 
