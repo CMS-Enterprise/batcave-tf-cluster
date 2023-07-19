@@ -183,6 +183,47 @@ module "eks" {
   self_managed_node_group_defaults = {
     subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
   }
+    # EKS Managed Node Group(s)
+  eks_managed_node_group_defaults = {
+    ami_type       = "AL2_x86_64"
+    instance_types = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
+    subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
+    attach_cluster_primary_security_group = true
+  }
+
+  eks_managed_node_groups = {
+
+    green = {
+      ami_type = "AL2_x86_64"
+      ami_id  = data.aws_ami.eks_ami.id
+      min_size     = 1
+      max_size     = 4
+      desired_size = 1
+
+      instance_types = ["c5.4xlarge"]
+      labels = {
+        Environment = "test"
+        GithubRepo  = "terraform-aws-eks"
+        GithubOrg   = "terraform-aws-modules"
+      }
+
+      taints = {
+        dedicated = {
+          key    = "bat_app"
+          value  = "utility_belt"
+          effect = "NoSchedule"
+        }
+      }
+
+      update_config = {
+        max_unavailable_percentage = 33 # or set `max_unavailable`
+      }
+
+      tags = {
+        Name = "SRII-Test"
+      }
+    }
+  }
   ## CLUSTER Addons
   cluster_addons = {
     #vpc-cni = {
