@@ -190,6 +190,7 @@ module "eks" {
     subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
     attach_cluster_primary_security_group = true
     iam_role_permissions_boundary = var.iam_role_permissions_boundary
+    iam_role_path - var.iam_role_path
   }
 
   eks_managed_node_groups = {
@@ -201,6 +202,7 @@ module "eks" {
       max_size     = 4
       desired_size = 1
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
+      iam_role_path - var.iam_role_path
 
       instance_types = ["c5.4xlarge"]
       labels = {
