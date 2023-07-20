@@ -189,6 +189,7 @@ module "eks" {
     instance_types = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
     subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
     attach_cluster_primary_security_group = true
+    iam_role_permissions_boundary = var.iam_role_permissions_boundary
   }
 
   eks_managed_node_groups = {
