@@ -211,7 +211,7 @@ module "eks" {
         dedicated = {
           key    = "bat_app"
           value  = "utility_belt"
-          effect = "NoSchedule"
+          effect = "NOSCHEDULE"
         }
       }
 
