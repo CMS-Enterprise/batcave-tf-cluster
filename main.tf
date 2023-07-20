@@ -199,6 +199,7 @@ module "eks" {
       min_size     = 1
       max_size     = 4
       desired_size = 1
+      iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
       instance_types = ["c5.4xlarge"]
       labels = {
