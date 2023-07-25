@@ -372,8 +372,8 @@ variable "github_actions_role_access" {
 }
 
 variable "github_actions_role" {
-  type = string
-  #default     = "batcave-github-actions-role"
+  type        = string
+  default     = "batcave-github-actions-role"
   description = "Github actions role"
 }
 variable "federated_access_role_access" {
@@ -382,8 +382,8 @@ variable "federated_access_role_access" {
   description = "When set to false, this will not allow kubernetes data to be pulled by the batcave admins"
 }
 variable "federated_access_role" {
-  type = string
-  #default     = "ct-ado-batcave-application-admin"
+  type        = string
+  default     = "ct-ado-batcave-application-admin"
   description = "Federated access role"
 }
 variable "node_schedule_shutdown_hour" {
