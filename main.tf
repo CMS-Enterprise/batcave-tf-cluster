@@ -165,30 +165,6 @@ module "eks" {
   cluster_security_group_additional_rules = merge(local.default_security_group_additional_rules, var.cluster_security_group_additional_rules)
   enable_irsa                             = true
 
-  # Self managed node groups will not automatically create the aws-auth configmap so we need to
-  #create_aws_auth_configmap = true
-  #manage_aws_auth_configmap = true
-
-  # aws-auth configmap
-  #manage_aws_auth_configmap = true
-
-  # aws_auth_roles = [
-  #   {
-  #     rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/ct-ado-batcave-developer-admin",
-  #     username = "ct-ado-batcave-developer-admin",
-  #     groups   = ["system:masters"]
-  #   },
-  #   {
-  #     rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/batcave-github-actions-role",
-  #     username = "batcave-github-actions-role",
-  #     groups   = ["system:masters"]
-  #   },
-  #   {
-  #     rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/aolytix-role",
-  #     username = "aolytix-role",
-  #     groups   = ["system:masters"]
-  #   }
-  # ]
   # This is handled externally
   create_kms_key = false
 
@@ -249,7 +225,7 @@ resource "null_resource" "kubernetes_requirements" {
     aws_security_group_rule.allow_ingress_additional_prefix_lists,
     aws_security_group_rule.allow_all_nodes_to_other_nodes,
     aws_security_group_rule.https-tg-ingress,
-    aws_security_group_rule.https-k8s-ingress,
+    aws_security_group_rule.https-vpc-ingress,
   ]
 }
 
@@ -348,7 +324,7 @@ resource "aws_security_group_rule" "https-tg-ingress" {
   cidr_blocks       = ["10.0.0.0/8"]
 }
 
-resource "aws_security_group_rule" "https-k8s-ingress" {
+resource "aws_security_group_rule" "https-vpc-ingress" {
   type              = "ingress"
   to_port           = 443
   from_port         = 0

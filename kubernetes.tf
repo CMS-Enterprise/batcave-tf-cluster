@@ -2,11 +2,6 @@ provider "kubernetes" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
   token                  = data.aws_eks_cluster_auth.cluster.token
-  # exec {
-  #   api_version = "client.authentication.k8s.io/v1beta1"
-  #   args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
-  #   command     = "aws"
-  # }
 }
 
 locals {
@@ -37,7 +32,7 @@ locals {
     ([
       {
         rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.github_actions_role}",
-        username = "batcave-github-actions-role",
+        username = "${var.github_actions_role}",
         groups   = ["system:masters"]
       }
     ]) :
