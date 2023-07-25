@@ -39,6 +39,8 @@ locals {
   [])
 }
 
+### Federated role will be added to the ConfigMap so that the users can have access to the Kubernetes objects of the cluster.
+### By default the users will not have access when the cluster is created by GitHub runner.
 locals {
   federated_access_role = (var.federated_access_role_access ?
     ([
