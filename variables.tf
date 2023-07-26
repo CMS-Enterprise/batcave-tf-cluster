@@ -379,3 +379,9 @@ variable "enable_hoplimit" {
   default     = false
   description = "Enables a IMDSv2 hop limit of 1 on all nodes. Defaults to false"
 }
+
+variable "configmap_custom_roles" {
+  default = []
+  description = "A custom list of IAM role names to include in the aws-auth configmap"
+  type = list(string)
+}
