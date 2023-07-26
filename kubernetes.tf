@@ -5,6 +5,19 @@ provider "kubernetes" {
 }
 
 locals {
+  static_master_roles = ["aolytix-role", "batcave-github-actions-role"]
+  merged_master_roles = concat(local.static_master_roles, var.configmap_custom_roles)
+  custom_configmap_master_roles = (length(local.merged_master_roles) > 0 ? ([
+  for custom_iam_role_name in local.merged_master_roles : {
+    rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${custom_iam_role_name}"
+    username = custom_iam_role_name,
+    groups   = ["system:masters"]
+  }
+  ]) :
+  [])
+}
+
+locals {
   configmap_roles = [for k, v in module.eks.self_managed_node_groups : {
     rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${v.iam_role_name}"
     username = "system:node:{{EC2PrivateDNSName}}"
@@ -13,28 +26,6 @@ locals {
       "system:nodes"
     ])
   }]
-}
-
-locals {
-  aolytix_map_role = (var.aolytix_role_access ?
-    ([
-      {
-        rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/aolytix-role",
-        username = "aolytix-role",
-        groups   = ["system:masters"]
-      }
-    ]) :
-  [])
-}
-
-locals {
-  github_actions_map_role = (var.github_actions_role_access ?
-    ([{
-      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/batcave-github-actions-role",
-      username = "batcave-github-actions-role",
-      groups   = ["system:masters"]
-    }]) :
-  [])
 }
 
 resource "kubernetes_cluster_role" "persistent_volume_management" {
@@ -98,9 +89,8 @@ resource "kubernetes_config_map" "aws_auth" {
     mapRoles = yamlencode(
       distinct(concat(
         tolist(local.configmap_roles),
-        tolist(local.aolytix_map_role),
-        tolist(local.github_actions_map_role),
-        tolist(local.delete_ebs_volumes_lambda_role_mapping)
+        tolist(local.delete_ebs_volumes_lambda_role_mapping),
+        local.custom_configmap_master_roles,
       ))
     )
   }
