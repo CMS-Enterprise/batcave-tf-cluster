@@ -5,11 +5,14 @@ provider "kubernetes" {
 }
 
 locals {
-  custom_configmap_roles = [for custom_iam_role_name in var.configmap_custom_roles : {
+  custom_configmap_roles = (length(var.configmap_custom_roles) > 0 ? ([
+  for custom_iam_role_name in var.configmap_custom_roles : {
     rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${custom_iam_role_name}"
     username = custom_iam_role_name,
     groups   = ["system:masters"]
-  }]
+  }
+  ]) :
+  [])
 }
 
 locals {
@@ -109,7 +112,7 @@ resource "kubernetes_config_map" "aws_auth" {
         tolist(local.aolytix_map_role),
         tolist(local.github_actions_map_role),
         tolist(local.delete_ebs_volumes_lambda_role_mapping),
-        tolist(local.custom_configmap_roles),
+        local.custom_configmap_roles,
       ))
     )
   }
