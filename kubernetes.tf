@@ -125,8 +125,7 @@ resource "kubernetes_config_map" "aws_auth" {
         tolist(local.configmap_roles),
         tolist(local.aolytix_map_role),
         tolist(local.github_actions_map_role),
-        #tolist(local.federated_access_role),
-        local.federated_access_role,
+        tolist(local.federated_access_role),
         tolist(local.delete_ebs_volumes_lambda_role_mapping)
       ))
     )
