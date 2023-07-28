@@ -53,11 +53,13 @@ locals {
 #   [])
 # }
 locals {
-  federated_access_role = {
-    rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.federated_access_role}"
-    username = "{{SessionName}}"
-    groups   = ["system:masters"]
-  }
+  federated_access_role = ([
+    {
+      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.federated_access_role}",
+      username = "{{SessionName}}",
+      groups   = ["system:masters"]
+    }
+  ])
 }
 
 resource "kubernetes_cluster_role" "persistent_volume_management" {
