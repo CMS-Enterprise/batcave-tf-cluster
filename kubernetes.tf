@@ -43,13 +43,13 @@ locals {
 ### By default the users will not have access when the cluster is created by GitHub runner.
 locals {
   # federated_access_role = (var.federated_access_role_access ?
-    # ([
-      # {
-        rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.federated_access_role}",
-        username = "{{SessionName}}",
-        groups   = ["system:masters"]
-      # }
-    # ]) :
+  # ([
+  # {
+  rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.federated_access_role}"
+  username = "{{SessionName}}"
+  groups   = ["system:masters"]
+  # }
+  # ]) :
   # [])
 }
 
