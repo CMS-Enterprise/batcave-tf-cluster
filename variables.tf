@@ -381,7 +381,26 @@ variable "enable_hoplimit" {
 }
 
 variable "configmap_custom_roles" {
-  default = []
+  default     = []
   description = "A custom list of IAM role names to include in the aws-auth configmap"
-  type = list(string)
+  type        = list(string)
+}
+
+variable "vpc_cidr_blocks" {
+  description = "List of VPC CIDR blocks"
+  type        = list(string)
+}
+
+variable "github_actions_role" {
+  type        = string
+  default     = "batcave-github-actions-role"
+  description = "Github actions role"
+}
+
+### Federated role will be added to the ConfigMap so that the users can have access to the Kubernetes objects of the cluster.
+### By default the users will not have access when the cluster is created by GitHub runner.
+variable "federated_access_role" {
+  type        = string
+  default     = "ct-ado-batcave-application-admin"
+  description = "Federated access role"
 }

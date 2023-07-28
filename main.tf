@@ -226,6 +226,7 @@ resource "null_resource" "kubernetes_requirements" {
     aws_security_group_rule.allow_ingress_additional_prefix_lists,
     aws_security_group_rule.allow_all_nodes_to_other_nodes,
     aws_security_group_rule.https-tg-ingress,
+    aws_security_group_rule.https-vpc-ingress,
   ]
 }
 
@@ -323,6 +324,17 @@ resource "aws_security_group_rule" "https-tg-ingress" {
   security_group_id = module.eks.node_security_group_id
   cidr_blocks       = ["10.0.0.0/8"]
 }
+
+resource "aws_security_group_rule" "https-vpc-ingress" {
+  count             = length(var.vpc_cidr_blocks) > 0 ? 1 : 0
+  type              = "ingress"
+  to_port           = 443
+  from_port         = 0
+  protocol          = "tcp"
+  security_group_id = module.eks.cluster_primary_security_group_id
+  cidr_blocks       = var.vpc_cidr_blocks
+}
+
 
 ## Setup for cosign keyless signatures
 locals {
