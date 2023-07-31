@@ -201,7 +201,7 @@ module "eks" {
       enable_bootstrap_user_data = true
       
       min_size     = 1
-      max_size     = 4
+      max_size     = 5
       desired_size = 1
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
       iam_role_path = var.iam_role_path
