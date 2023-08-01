@@ -197,7 +197,7 @@ module "eks" {
 
     green = {
       ami_type = "AL2_x86_64"
-      ami_id  = "ami-0fe832d7417204b9e"
+      ami_id  = data.aws_ami.eks_ami.id
       platform = "linux"
       enable_bootstrap_user_data = true
       
@@ -209,7 +209,6 @@ module "eks" {
       
       pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
       bootstrap_extra_args = "--kubelet-extra-args '--node-labels=general=true'"
-
       instance_types = ["c5.4xlarge"]
       labels = {
         Environment = "test"
