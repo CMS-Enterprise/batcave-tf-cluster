@@ -190,13 +190,14 @@ module "eks" {
     attach_cluster_primary_security_group = true
     iam_role_permissions_boundary = var.iam_role_permissions_boundary
     iam_role_path = var.iam_role_path
+    
   }
 
   eks_managed_node_groups = {
 
     green = {
       ami_type = "AL2_x86_64"
-      ami_id  = data.aws_ami.eks_ami.id
+      ami_id  = "ami-0fe832d7417204b9e"
       platform = "linux"
       enable_bootstrap_user_data = true
       
@@ -205,7 +206,14 @@ module "eks" {
       desired_size = 1
       iam_role_permissions_boundary = var.iam_role_permissions_boundary
       iam_role_path = var.iam_role_path
-
+      
+      pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
+      bootstrap_extra_args = join(" ",
+      ["--kubelet-extra-args '--node-labels=${k}=true", try(v.extra_args, "")],
+      [for label_key, label_value in try(v.labels, {}) : "--node-labels=${label_key}=${label_value}"],
+      [for taint_key, taint_value in try(v.taints, {}) : "--register-with-taints=${taint_key}=${taint_value}"],
+      ["'"]
+      ) 
       instance_types = ["c5.4xlarge"]
       labels = {
         Environment = "test"
