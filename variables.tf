@@ -387,7 +387,6 @@ variable "configmap_custom_roles" {
 }
 
 variable "vpc_cidr_blocks" {
-  default = []
   description = "List of VPC CIDR blocks"
   type        = list(string)
 }
