@@ -326,7 +326,7 @@ resource "aws_security_group_rule" "https-tg-ingress" {
 }
 
 resource "aws_security_group_rule" "https-vpc-ingress" {
-  count             = length(var.vpc_cidr_blocks) > 0 ? 1 : 0
+  count             = 1
   type              = "ingress"
   to_port           = 443
   from_port         = 0
