@@ -197,7 +197,7 @@ module "eks" {
 
     green = {
       ami_type = "AL2_x86_64"
-      ami_id  = data.aws_ami.eks_ami.id
+      ami_id  = "ami-0fe832d7417204b9e"
       platform = "linux"
       enable_bootstrap_user_data = true
       
