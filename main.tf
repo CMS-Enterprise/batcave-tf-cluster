@@ -234,7 +234,7 @@ module "eks" {
   #   }
   }
   ## CLUSTER Addons
-  cluster_addons = {
+  #cluster_addons = {
     #vpc-cni = {
     #  resolve_conflicts        = "OVERWRITE"
     #  service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
