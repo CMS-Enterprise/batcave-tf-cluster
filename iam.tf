@@ -130,6 +130,13 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
   policy_arn = aws_iam_policy.cloudwatch_logs.arn
   role       = each.value.iam_role_name
 }
+
+resource "aws_iam_role_policy_attachment" "emi_cloudwatch_logs" {
+  for_each   = module.eks.eks_managed_node_groups
+  policy_arn = aws_iam_policy.cloudwatch_logs.arn
+  role       = each.value.iam_role_name
+}
+
 # SSM policy
 resource "aws_iam_policy" "ssm_managed_instance" {
   name = "ssm-policy-${var.cluster_name}"
@@ -191,9 +198,23 @@ resource "aws_iam_role_policy_attachment" "ssm_managed_instance" {
   policy_arn = aws_iam_policy.ssm_managed_instance.arn
 }
 
+# policy attachment
+resource "aws_iam_role_policy_attachment" "emi_ssm_managed_instance" {
+  for_each   = module.eks.eks_managed_node_groups
+  role       = each.value.iam_role_name
+  policy_arn = aws_iam_policy.ssm_managed_instance.arn
+}
+
 # Policy attachment for the ebs csi driver. Policy provided from AWS for ebs csi driver
 resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
   for_each   = module.eks.self_managed_node_groups
+  role       = each.value.iam_role_name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+}
+
+# Policy attachment for the ebs csi driver. Policy provided from AWS for ebs csi driver
+resource "aws_iam_role_policy_attachment" "emi_ebs_csi_driver" {
+  for_each   = module.eks.eks_managed_node_groups
   role       = each.value.iam_role_name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 }
