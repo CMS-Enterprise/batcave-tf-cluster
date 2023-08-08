@@ -208,12 +208,10 @@ module "eks" {
   #     iam_role_path = var.iam_role_path
       
   #     pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
-  #     bootstrap_extra_args = "--kubelet-extra-args '--node-labels=general=true'"
   #     instance_types = ["c5.4xlarge"]
   #     labels = {
-  #       Environment = "test"
-  #       GithubRepo  = "terraform-aws-eks"
-  #       GithubOrg   = "terraform-aws-modules"
+  #       genera1 = "true"
+  #       type    = "eks_managed"
   #     }
 
   #     taints = {

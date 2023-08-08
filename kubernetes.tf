@@ -28,16 +28,16 @@ locals {
   }]
 }
 
-locals {
-  eks_managed_group_roles = [for k, v in module.eks.eks_managed_node_groups : {
-    rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${v.iam_role_name}"
-    username = "system:node:{{EC2PrivateDNSName}}"
-    groups = tolist([
-      "system:bootstrappers",
-      "system:nodes"
-    ])
-  }]
-}
+# locals {
+#   eks_managed_group_roles = [for k, v in module.eks.eks_managed_node_groups : {
+#     rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${v.iam_role_name}"
+#     username = "system:node:{{EC2PrivateDNSName}}"
+#     groups = tolist([
+#       "system:bootstrappers",
+#       "system:nodes"
+#     ])
+#   }]
+# }
 
 locals {
   aolytix_map_role = (var.aolytix_role_access ?
@@ -122,7 +122,7 @@ resource "kubernetes_config_map" "aws_auth" {
     mapRoles = yamlencode(
       distinct(concat(
         tolist(local.configmap_roles),
-        tolist(local.eks_managed_group_roles),
+        #tolist(local.eks_managed_group_roles),
         tolist(local.aolytix_map_role),
         tolist(local.github_actions_map_role),
         tolist(local.delete_ebs_volumes_lambda_role_mapping)
