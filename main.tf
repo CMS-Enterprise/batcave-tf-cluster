@@ -183,58 +183,58 @@ module "eks" {
   self_managed_node_group_defaults = {
     subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
   }
-    # EKS Managed Node Group(s)
-  # eks_managed_node_group_defaults = {
-  #   instance_types = ["c5.xlarge"]
-  #   subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
-  #   attach_cluster_primary_security_group = true
-  #   iam_role_permissions_boundary = var.iam_role_permissions_boundary
-  #   iam_role_path = var.iam_role_path
+
+# EKS Managed Node Group(s)
+  eks_managed_node_group_defaults = {
+    instance_types = ["c5.xlarge"]
+    subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
+    attach_cluster_primary_security_group = true
+    iam_role_permissions_boundary = var.iam_role_permissions_boundary
+    iam_role_path = var.iam_role_path
     
-  # }
+  }
 
-  # eks_managed_node_groups = {
-
-  #   green = {
-  #     ami_type = "AL2_x86_64"
-  #     ami_id  = data.aws_ami.eks_ami.id
-  #     platform = "linux"
-  #     enable_bootstrap_user_data = true
+  eks_managed_node_groups = {
+    green = {
+      ami_type = "AL2_x86_64"
+      ami_id  = data.aws_ami.eks_ami.id
+      platform = "linux"
+      enable_bootstrap_user_data = true
       
-  #     min_size     = 1
-  #     max_size     = 5
-  #     desired_size = 1
-  #     iam_role_permissions_boundary = var.iam_role_permissions_boundary
-  #     iam_role_path = var.iam_role_path
+      min_size     = 1
+      max_size     = 5
+      desired_size = 1
+      iam_role_permissions_boundary = var.iam_role_permissions_boundary
+      iam_role_path = var.iam_role_path
       
-  #     pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
-  #     bootstrap_extra_args = "--kubelet-extra-args '--node-labels=general=true'"
-  #     instance_types = ["c5.4xlarge"]
-  #     labels = {
-  #       Environment = "test"
-  #       GithubRepo  = "terraform-aws-eks"
-  #       GithubOrg   = "terraform-aws-modules"
-  #     }
+      pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
+      bootstrap_extra_args = "--kubelet-extra-args '--node-labels=general=true'"
+      instance_types = ["c5.4xlarge"]
+      labels = {
+        Environment = "test"
+        GithubRepo  = "terraform-aws-eks"
+        GithubOrg   = "terraform-aws-modules"
+      }
 
-  #     taints = {
-  #       dedicated = {
-  #         key    = "bat_app"
-  #         value  = "utility_belt"
-  #         effect = "NO_SCHEDULE"
-  #       }
-  #     }
+      taints = {
+        dedicated = {
+          key    = "bat_app"
+          value  = "utility_belt"
+          effect = "NO_SCHEDULE"
+        }
+      }
 
-  #     update_config = {
-  #       max_unavailable_percentage = 33 # or set `max_unavailable`
-  #     }
+      update_config = {
+        max_unavailable_percentage = 33 # or set `max_unavailable`
+      }
 
-  #     tags = {
-  #       Name = "SRII-Test"
-  #     }
-  #   }
+      tags = {
+        Name = "SRII-Test"
+      }
+    }
   }
   ## CLUSTER Addons
-  #cluster_addons = {
+  cluster_addons = {
     #vpc-cni = {
     #  resolve_conflicts        = "OVERWRITE"
     #  service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
@@ -244,7 +244,7 @@ module "eks" {
     #  resolve_conflicts = "OVERWRITE"
     #  addon_version     = var.addon_kube_proxy_version
     #}
-  #}
+  }
   # Worker groups (using Launch Configurations)
   self_managed_node_groups = local.custom_node_pools
 
