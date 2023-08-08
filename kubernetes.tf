@@ -124,6 +124,7 @@ resource "kubernetes_config_map_v1_data" "aws_auth" {
       ))
     )
   }
+  force = true
   depends_on = [
     null_resource.kubernetes_requirements,
     kubernetes_cluster_role_binding.delete_ebs_volumes_lambda,
