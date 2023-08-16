@@ -197,3 +197,11 @@ resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
   role       = each.value.iam_role_name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 }
+
+# Policy attachment for shipping metrics to cloudwatch to view metrics in container insights.
+resource "aws_iam_role_policy_attachment" "cloudwatch_container_insights" {
+  for_each = var.enable_container_insights ? module.eks.self_managed_node_groups : {}
+  
+  role       = each.value.iam_role_name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}

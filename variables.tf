@@ -404,3 +404,10 @@ variable "federated_access_role" {
   default     = "ct-ado-batcave-application-admin"
   description = "Federated access role"
 }
+
+# To Enabled container insights
+variable "enable_container_insights" {
+  type        = bool
+  default     = false
+  description = "Enable container insights"
+}
