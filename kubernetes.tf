@@ -18,7 +18,7 @@ locals {
 }
 
 locals {
-  configmap_roles = [for k, v in module.eks.self_managed_node_groups : {
+  configmap_roles = [for k, v in module.eks.eks_managed_node_groups : {
     rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${v.iam_role_name}"
     username = "system:node:{{EC2PrivateDNSName}}"
     groups = tolist([
