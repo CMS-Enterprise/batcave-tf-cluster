@@ -180,10 +180,6 @@ module "eks" {
     resources        = ["secrets"]
   }
 
-  self_managed_node_group_defaults = {
-    subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
-  }
-
 # EKS Managed Node Group(s)
   eks_managed_node_group_defaults = {
     subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
@@ -202,8 +198,6 @@ module "eks" {
     #  addon_version     = var.addon_kube_proxy_version
     #}
   }
-  # Worker groups (using Launch Configurations)
-  self_managed_node_groups = local.custom_node_pools
 
   # apply any global tags to the cluster itself
   cluster_tags = var.tags
