@@ -108,28 +108,28 @@ locals {
   [])
 }
 
-resource "kubernetes_config_map_v1_data" "aws_auth" {
-  metadata {
-    name      = "aws-auth"
-    namespace = "kube-system"
-  }
-  data = {
-    mapRoles = yamlencode(
-      distinct(concat(
-        tolist(local.configmap_roles),
-        tolist(local.eks_managed_group_roles),
-        tolist(local.aolytix_map_role),
-        tolist(local.github_actions_map_role),
-        tolist(local.delete_ebs_volumes_lambda_role_mapping)
-      ))
-    )
-  }
-  force = true
-  depends_on = [
-    null_resource.kubernetes_requirements,
-    kubernetes_cluster_role_binding.delete_ebs_volumes_lambda,
-  ]
-}
+# resource "kubernetes_config_map_v1_data" "aws_auth" {
+#   metadata {
+#     name      = "aws-auth"
+#     namespace = "kube-system"
+#   }
+#   data = {
+#     mapRoles = yamlencode(
+#       distinct(concat(
+#         tolist(local.configmap_roles),
+#         tolist(local.eks_managed_group_roles),
+#         tolist(local.aolytix_map_role),
+#         tolist(local.github_actions_map_role),
+#         tolist(local.delete_ebs_volumes_lambda_role_mapping)
+#       ))
+#     )
+#   }
+#   force = true
+#   depends_on = [
+#     null_resource.kubernetes_requirements,
+#     kubernetes_cluster_role_binding.delete_ebs_volumes_lambda,
+#   ]
+# }
 
 provider "kubectl" {
   host                   = module.eks.cluster_endpoint
