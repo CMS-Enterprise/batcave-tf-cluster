@@ -30,7 +30,7 @@ locals {
     iam_role_path                 = var.iam_role_path
     iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
-    instance_type           = v.instance_type
+    instance_types           = [ v.instance_type ]
     desired_size            = v.desired_size
     max_size                = v.max_size
     min_size                = v.min_size
