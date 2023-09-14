@@ -3,7 +3,7 @@ output "cluster_endpoint" {
   value       = module.eks.cluster_endpoint
 }
 
-variable "cluster_version" {
+output "cluster_version" {
   description = "The version of the cluster being deployed"
   value       = var.cluster_version
 }
