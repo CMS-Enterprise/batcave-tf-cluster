@@ -97,6 +97,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | [aws_security_group_rule.eks_node_ingress_alb_proxy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.eks_node_ingress_alb_shared](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.https-tg-ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.https-vpc-ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_wafv2_web_acl_association.cms_waf_assoc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl_association) | resource |
 | [aws_wafv2_web_acl_association.cms_waf_priv_assoc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl_association) | resource |
 | [kubectl_manifest.batcave_namespace](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs/resources/manifest) | resource |
@@ -150,6 +151,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | n/a | `any` | n/a | yes |
 | <a name="input_cluster_security_group_additional_rules"></a> [cluster\_security\_group\_additional\_rules](#input\_cluster\_security\_group\_additional\_rules) | Map of security group rules to attach to the cluster security group, as you cannot change cluster security groups without replacing the instance | `map(any)` | `{}` | no |
 | <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | n/a | `string` | `"1.25"` | no |
+| <a name="input_configmap_custom_roles"></a> [configmap\_custom\_roles](#input\_configmap\_custom\_roles) | A custom list of IAM role names to include in the aws-auth configmap | `list(string)` | `[]` | no |
 | <a name="input_create_alb_proxy"></a> [create\_alb\_proxy](#input\_create\_alb\_proxy) | Create an Application Load Balancer proxy to live in front of the K8s ALB and act as a proxy from the public Internet | `bool` | `false` | no |
 | <a name="input_create_alb_shared"></a> [create\_alb\_shared](#input\_create\_alb\_shared) | Creaes an ALB in the shared subnet | `bool` | `false` | no |
 | <a name="input_create_cosign_iam_role"></a> [create\_cosign\_iam\_role](#input\_create\_cosign\_iam\_role) | Flag to create Cosign IAM role | `bool` | `false` | no |
@@ -157,8 +159,10 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_enable_hoplimit"></a> [enable\_hoplimit](#input\_enable\_hoplimit) | Enables a IMDSv2 hop limit of 1 on all nodes. Defaults to false | `bool` | `false` | no |
 | <a name="input_enable_irsa"></a> [enable\_irsa](#input\_enable\_irsa) | n/a | `string` | `"true"` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | n/a | `string` | `"dev"` | no |
+| <a name="input_federated_access_role"></a> [federated\_access\_role](#input\_federated\_access\_role) | Federated access role | `string` | `"ct-ado-batcave-application-admin"` | no |
 | <a name="input_general_node_pool"></a> [general\_node\_pool](#input\_general\_node\_pool) | General node pool, required for hosting core services | `any` | <pre>{<br>  "desired_size": 3,<br>  "instance_type": "c5.2xlarge",<br>  "labels": {<br>    "general": "true"<br>  },<br>  "max_size": 5,<br>  "min_size": 2,<br>  "taints": {}<br>}</pre> | no |
 | <a name="input_general_nodepool_tags"></a> [general\_nodepool\_tags](#input\_general\_nodepool\_tags) | General Node Pool tags | `map(any)` | `null` | no |
+| <a name="input_github_actions_role"></a> [github\_actions\_role](#input\_github\_actions\_role) | Github actions role | `string` | `"batcave-github-actions-role"` | no |
 | <a name="input_github_actions_role_access"></a> [github\_actions\_role\_access](#input\_github\_actions\_role\_access) | When set to false, this is not allow kubernetes data to be pulled by the github actions | `bool` | `true` | no |
 | <a name="input_grant_delete_ebs_volumes_lambda_access"></a> [grant\_delete\_ebs\_volumes\_lambda\_access](#input\_grant\_delete\_ebs\_volumes\_lambda\_access) | When set to true, a cluster role and permissions will be created to grant the delete-ebs-volumes Lambda access to the PersistentVolumes API. | `bool` | `false` | no |
 | <a name="input_host_subnets"></a> [host\_subnets](#input\_host\_subnets) | Override the ec2 instance subnets.  By default, they are launche in private\_subnets, just like the EKS control plane. | `list(any)` | `[]` | no |
@@ -186,6 +190,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_transport_proxy_is_internal"></a> [transport\_proxy\_is\_internal](#input\_transport\_proxy\_is\_internal) | Boolean to trigger a public transport proxy ip | `bool` | `true` | no |
 | <a name="input_transport_proxy_static_ip"></a> [transport\_proxy\_static\_ip](#input\_transport\_proxy\_static\_ip) | n/a | `bool` | `true` | no |
 | <a name="input_volume_tag"></a> [volume\_tag](#input\_volume\_tag) | Volume custom tag | `map(any)` | `null` | no |
+| <a name="input_vpc_cidr_blocks"></a> [vpc\_cidr\_blocks](#input\_vpc\_cidr\_blocks) | List of VPC CIDR blocks | `list(string)` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | n/a | `any` | n/a | yes |
 
 ## Outputs
