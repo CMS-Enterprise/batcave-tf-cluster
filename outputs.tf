@@ -3,6 +3,11 @@ output "cluster_endpoint" {
   value       = module.eks.cluster_endpoint
 }
 
+variable "cluster_version" {
+  description = "The version of the cluster being deployed"
+  value       = var.cluster_version
+}
+
 output "cluster_security_group_id" {
   description = "Security group ids attached to the cluster control plane."
   value       = module.eks.cluster_security_group_id
