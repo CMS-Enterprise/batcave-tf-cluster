@@ -7,7 +7,7 @@ variable "environment" {
 }
 
 variable "cluster_version" {
-  default = "1.25"
+  default = "1.26"
 }
 
 variable "ami_date" {
