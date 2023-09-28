@@ -232,7 +232,7 @@ module "eks_managed_node_group" {
     general = {
       key    = "bat_app"
       value  = "utility_belt"
-      effect = "NoSchedule"
+      effect = "NO_SCHEDULE"
     }
   }
 }
