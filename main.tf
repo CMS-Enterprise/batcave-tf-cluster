@@ -199,7 +199,7 @@ module "eks" {
     #}
   }
   # Worker groups (using Launch Configurations)
-  self_managed_node_groups = local.custom_node_pools
+  # self_managed_node_groups = local.custom_node_pools
 
   # apply any global tags to the cluster itself
   cluster_tags = var.tags
