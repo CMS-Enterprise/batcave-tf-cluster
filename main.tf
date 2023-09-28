@@ -204,6 +204,32 @@ module "eks" {
   # apply any global tags to the cluster itself
   cluster_tags = var.tags
 }
+
+module "eks_managed_node_group" {
+  source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+
+  name            = "general-mng"
+  cluster_name    = local.name
+  cluster_version = local.cluster_version
+
+  iam_role_path                  = var.iam_role_path
+  iam_role_permissions_boundary  = var.iam_role_permissions_boundary
+
+  subnet_ids = var.private_subnets
+  
+  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+  vpc_security_group_ids            = [module.eks.node_security_group_id]
+
+  min_size     = 1
+  max_size     = 2
+  desired_size = 1
+
+  instance_types = ["c4.2xlarge"]
+  pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
+  metadata_options = merge(local.hoplimit_metadata, {})
+  tags = merge(var.tags, var.instance_tags)
+}
+
 module "vpc_cni_irsa" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
