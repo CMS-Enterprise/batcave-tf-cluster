@@ -220,11 +220,11 @@ module "eks_managed_node_group" {
   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
   vpc_security_group_ids            = [module.eks.node_security_group_id]
 
-  min_size     = 1
-  max_size     = 2
-  desired_size = 1
+  min_size     = 3
+  max_size     = 5
+  desired_size = 3
 
-  instance_types = ["c4.2xlarge"]
+  instance_types = ["c4.4xlarge"]
   pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
   metadata_options = merge(local.hoplimit_metadata, {})
   tags = merge(var.tags, var.instance_tags)
