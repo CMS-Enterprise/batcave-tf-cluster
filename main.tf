@@ -235,6 +235,9 @@ module "eks_managed_node_group" {
       effect = "NO_SCHEDULE"
     }
   }
+  labels = {
+    general = "true"
+  }
 }
 
 module "vpc_cni_irsa" {
