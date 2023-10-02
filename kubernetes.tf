@@ -98,6 +98,10 @@ resource "kubernetes_config_map" "aws_auth" {
     null_resource.kubernetes_requirements,
     kubernetes_cluster_role_binding.delete_ebs_volumes_lambda,
   ]
+  lifecycle {
+    ignore_changes = [data]
+  }
+  
 }
 
 provider "kubectl" {
