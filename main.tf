@@ -215,7 +215,7 @@ module "eks_managed_node_group" {
   iam_role_path                  = var.iam_role_path
   iam_role_permissions_boundary  = var.iam_role_permissions_boundary
 
-  subnet_ids = var.private_subnets
+  subnet_ids = var.host_subnets
   
   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
   vpc_security_group_ids            = [module.eks.node_security_group_id]
