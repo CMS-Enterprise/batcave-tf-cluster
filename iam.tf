@@ -95,9 +95,10 @@ resource "aws_iam_policy" "node_policy" {
 
 # Attach KMS policy to node IAM role
 resource "aws_iam_role_policy_attachment" "additional" {
-  for_each   = module.eks_managed_node_group
+  # for_each   = module.eks_managed_node_group
   policy_arn = aws_iam_policy.node_policy.arn
-  role       = each.value.iam_role_name
+  # role       = each.value.iam_role_name
+  role       = module.eks_managed_node_group.iam_role_name
 }
 
 # Cloudwatch Logs policy
@@ -126,9 +127,10 @@ resource "aws_iam_policy" "cloudwatch_logs" {
 
 # Attach cloudwatchlogs policy to node IAM role
 resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
-  for_each   = module.eks_managed_node_group
+  # for_each   = module.eks_managed_node_group
   policy_arn = aws_iam_policy.cloudwatch_logs.arn
-  role       = each.value.iam_role_name
+  # role       = each.value.iam_role_name
+  role       = module.eks_managed_node_group.iam_role_name
 }
 # SSM policy
 resource "aws_iam_policy" "ssm_managed_instance" {
@@ -186,14 +188,16 @@ resource "aws_iam_policy" "ssm_managed_instance" {
 
 # policy attachment
 resource "aws_iam_role_policy_attachment" "ssm_managed_instance" {
-  for_each   = module.eks_managed_node_group
-  role       = each.value.iam_role_name
+  #for_each   = module.eks_managed_node_group
+  #role       = each.value.iam_role_name
+  role       = module.eks_managed_node_group.iam_role_name
   policy_arn = aws_iam_policy.ssm_managed_instance.arn
 }
 
 # Policy attachment for the ebs csi driver. Policy provided from AWS for ebs csi driver
 resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
-  for_each   = module.eks_managed_node_group
-  role       = each.value.iam_role_name
+  #for_each   = module.eks_managed_node_group
+  #role       = each.value.iam_role_name
+  role       = module.eks_managed_node_group.iam_role_name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 }
