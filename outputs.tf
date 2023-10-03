@@ -139,10 +139,10 @@ output "fargate_profiles" {
 # EKS Managed Node Group
 ################################################################################
 
-output "eks_managed_node_groups" {
-  description = "Map of attribute maps for all EKS managed node groups created"
-  value       = module.eks_managed_node_group
-}
+# output "eks_managed_node_groups" {
+#   description = "Map of attribute maps for all EKS managed node groups created"
+#   value       = module.eks_managed_node_group
+# }
 
 ################################################################################
 # Self Managed Node Group
