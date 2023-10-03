@@ -98,7 +98,7 @@ resource "aws_iam_role_policy_attachment" "additional" {
   # for_each   = module.eks_managed_node_group
   policy_arn = aws_iam_policy.node_policy.arn
   # role       = each.value.iam_role_name
-  role       = module.eks_managed_node_group.iam_role_name
+  role       = aws_iam_role.eks_node.name
 }
 
 # Cloudwatch Logs policy
@@ -130,7 +130,7 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
   # for_each   = module.eks_managed_node_group
   policy_arn = aws_iam_policy.cloudwatch_logs.arn
   # role       = each.value.iam_role_name
-  role       = module.eks_managed_node_group.iam_role_name
+  role       = aws_iam_role.eks_node.name
 }
 # SSM policy
 resource "aws_iam_policy" "ssm_managed_instance" {
@@ -190,7 +190,7 @@ resource "aws_iam_policy" "ssm_managed_instance" {
 resource "aws_iam_role_policy_attachment" "ssm_managed_instance" {
   #for_each   = module.eks_managed_node_group
   #role       = each.value.iam_role_name
-  role       = module.eks_managed_node_group.iam_role_name
+  role       = aws_iam_role.eks_node.name
   policy_arn = aws_iam_policy.ssm_managed_instance.arn
 }
 
@@ -198,6 +198,39 @@ resource "aws_iam_role_policy_attachment" "ssm_managed_instance" {
 resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
   #for_each   = module.eks_managed_node_group
   #role       = each.value.iam_role_name
-  role       = module.eks_managed_node_group.iam_role_name
+  role       = aws_iam_role.eks_node.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+}
+
+# create node IAM role
+# Need to create because decided to create EKS cluster then deploy EKS fully managed nodes.check "
+
+resource "aws_iam_role" "eks_node" {
+  name = "eks-node-${var.cluster_name}-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EKSNodeAssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "eks_node_policies" {
+  for_each = toset([
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+    "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+    "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+    "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  ])
+
+  policy_arn = each.key
+  role       = aws_iam_role.eks_node.name
 }
