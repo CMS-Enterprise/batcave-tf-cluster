@@ -15,6 +15,16 @@ locals {
     }
     ]) :
   [])
+  eks_managed_node_role = ([
+    {
+      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${aws_iam_role.eks_node.name}"
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups = tolist([
+        "system:bootstrappers",
+        "system:nodes"
+    ])
+    }
+  ])
 }
 
 locals {
@@ -91,6 +101,8 @@ resource "kubernetes_config_map" "aws_auth" {
         tolist(local.configmap_roles),
         tolist(local.delete_ebs_volumes_lambda_role_mapping),
         local.custom_configmap_master_roles,
+        local.eks_managed_node_role,
+        local.eks_managed_node_role
       ))
     )
   }

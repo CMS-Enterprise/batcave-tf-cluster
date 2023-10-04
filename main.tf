@@ -157,7 +157,8 @@ module "eks" {
   iam_role_path                  = var.iam_role_path
   iam_role_permissions_boundary  = var.iam_role_permissions_boundary
   cluster_encryption_policy_path = var.iam_role_path
-
+  create_iam_role = false
+  iam_role_arn = aws_iam_role.eks_node.arn
 
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets
@@ -205,40 +206,43 @@ module "eks" {
   cluster_tags = var.tags
 }
 
-# module "eks_managed_node_group" {
-#   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+module "eks_managed_node_group" {
+  source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
 
-#   name            = "general-mng"
-#   cluster_name    = local.name
-#   cluster_version = local.cluster_version
+  name            = "general-mng"
+  cluster_name    = local.name
+  cluster_version = local.cluster_version
 
-#   iam_role_path                  = var.iam_role_path
-#   iam_role_permissions_boundary  = var.iam_role_permissions_boundary
+  iam_role_path                  = var.iam_role_path
+  iam_role_permissions_boundary  = var.iam_role_permissions_boundary
 
-#   subnet_ids = var.host_subnets
+  subnet_ids = var.host_subnets
   
-#   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
-#   vpc_security_group_ids            = [module.eks.node_security_group_id]
+  create_iam_role = false
+  iam_role_arn = aws_iam_role.eks_node.arn
+  
+  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+  vpc_security_group_ids            = [module.eks.node_security_group_id]
 
-#   min_size     = 3
-#   max_size     = 5
-#   desired_size = 3
+  min_size     = 3
+  max_size     = 5
+  desired_size = 3
 
-#   instance_types = ["c4.4xlarge"]
-#   pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
-#   metadata_options = merge(local.hoplimit_metadata, {})
-#   tags = merge(var.tags, var.instance_tags)
-#   # taints = {
-#   #   general = {
-#   #     key    = "bat_app"
-#   #     value  = "utility_belt"
-#   #     effect = "NO_SCHEDULE"
-#   #   }
-#   # }
-#   labels = {
-#     general = "true"
-#   }
-# }
+  instance_types = ["c4.4xlarge"]
+  pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
+  metadata_options = merge(local.hoplimit_metadata, {})
+  tags = merge(var.tags, var.instance_tags)
+  # taints = {
+  #   general = {
+  #     key    = "bat_app"
+  #     value  = "utility_belt"
+  #     effect = "NO_SCHEDULE"
+  #   }
+  # }
+  labels = {
+    general = "true"
+  }
+}
 
 module "vpc_cni_irsa" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
