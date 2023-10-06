@@ -232,13 +232,13 @@ module "eks_managed_node_group" {
   pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
   metadata_options = merge(local.hoplimit_metadata, {})
   tags = merge(var.tags, var.instance_tags)
-  # taints = {
-  #   general = {
-  #     key    = "bat_app"
-  #     value  = "utility_belt"
-  #     effect = "NO_SCHEDULE"
-  #   }
-  # }
+  taints = {
+    general = {
+      key    = "bat_app"
+      value  = "utility_belt"
+      effect = "NO_SCHEDULE"
+    }
+  }
   labels = {
     general = "true"
   }
