@@ -98,7 +98,7 @@ resource "aws_iam_role_policy_attachment" "additional" {
   # for_each   = module.eks_managed_node_group
   policy_arn = aws_iam_policy.node_policy.arn
   # role       = each.value.iam_role_name
-  role       = aws_iam_role.eks_node.name
+  role = aws_iam_role.eks_node.name
 }
 
 # Cloudwatch Logs policy
@@ -130,7 +130,7 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
   # for_each   = module.eks_managed_node_group
   policy_arn = aws_iam_policy.cloudwatch_logs.arn
   # role       = each.value.iam_role_name
-  role       = aws_iam_role.eks_node.name
+  role = aws_iam_role.eks_node.name
 }
 # SSM policy
 resource "aws_iam_policy" "ssm_managed_instance" {
@@ -206,9 +206,9 @@ resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
 # Need to create because decided to create EKS cluster then deploy EKS fully managed nodes.check "
 
 resource "aws_iam_role" "eks_node" {
-  name = "eks-node-${var.cluster_name}-role"
+  name                 = "eks-node-${var.cluster_name}-role"
   path                 = var.iam_role_path
-  permissions_boundary  = var.iam_role_permissions_boundary  # Using the variable here
+  permissions_boundary = var.iam_role_permissions_boundary # Using the variable here
 
 
   assume_role_policy = jsonencode({
@@ -218,9 +218,9 @@ resource "aws_iam_role" "eks_node" {
         Sid    = "EKSNodeAssumeRole"
         Effect = "Allow"
         Principal = {
-          "Service": [    
-          "eks.amazonaws.com",
-          "ec2.amazonaws.com"
+          "Service" : [
+            "eks.amazonaws.com",
+            "ec2.amazonaws.com"
           ]
         }
         Action = "sts:AssumeRole"

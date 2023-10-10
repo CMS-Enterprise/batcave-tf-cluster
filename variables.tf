@@ -404,3 +404,15 @@ variable "federated_access_role" {
   default     = "ct-ado-batcave-application-admin"
   description = "Federated access role"
 }
+
+variable "create_gitlay_node_group" {
+  default = false
+}
+
+variable "create_runners_node_group" {
+  default = false
+}
+
+variable "create_general_node_group" {
+  default = false
+}

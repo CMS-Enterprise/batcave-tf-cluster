@@ -157,8 +157,8 @@ module "eks" {
   iam_role_path                  = var.iam_role_path
   iam_role_permissions_boundary  = var.iam_role_permissions_boundary
   cluster_encryption_policy_path = var.iam_role_path
-  create_iam_role = false
-  iam_role_arn = aws_iam_role.eks_node.arn
+  create_iam_role                = false
+  iam_role_arn                   = aws_iam_role.eks_node.arn
 
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets
@@ -207,26 +207,26 @@ module "eks" {
 }
 
 module "eks_managed_general_node_group" {
-  source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-
+  source          = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+  count           = var.create_general_node_group ? 1 : 0
   name            = "${local.name}-general"
   cluster_name    = local.name
   cluster_version = local.cluster_version
 
-  iam_role_path                  = var.iam_role_path
-  iam_role_permissions_boundary  = var.iam_role_permissions_boundary
+  iam_role_path                 = var.iam_role_path
+  iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
   subnet_ids = var.host_subnets
-  
+
   create_iam_role = false
-  iam_role_arn = aws_iam_role.eks_node.arn
-  
+  iam_role_arn    = aws_iam_role.eks_node.arn
+
   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
   vpc_security_group_ids            = [module.eks.node_security_group_id]
 
-  min_size     = 3
-  max_size     = 5
-  desired_size = 3
+  min_size     = 1
+  max_size     = 3
+  desired_size = 1
 
   block_device_mappings = [
     {
@@ -239,12 +239,17 @@ module "eks_managed_general_node_group" {
       }
     }
   ]
-  
-  instance_types = ["c4.4xlarge"]
+
+  instance_types          = ["c4.4xlarge"]
   pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
-  metadata_options = merge(local.hoplimit_metadata, {})
-  
-  tags = merge(var.tags, var.instance_tags)
+  metadata_options        = merge(local.hoplimit_metadata, {})
+
+  tags = merge(var.tags, var.instance_tags,
+    {
+      "k8s.io/cluster-autoscaler/enabled"             = "true",
+      "k8s.io/cluster-autoscaler/${var.cluster_name}" = "${var.cluster_name}"
+    }
+  )
   taints = {
     general = {
       key    = "bat_app"
@@ -279,26 +284,26 @@ module "eks_managed_general_node_group" {
 }
 
 module "eks_managed_runners_node_group" {
-  source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-
+  source          = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+  count           = var.create_runners_node_group ? 1 : 0
   name            = "${local.name}-runners"
   cluster_name    = local.name
   cluster_version = local.cluster_version
 
-  iam_role_path                  = var.iam_role_path
-  iam_role_permissions_boundary  = var.iam_role_permissions_boundary
+  iam_role_path                 = var.iam_role_path
+  iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
   subnet_ids = var.host_subnets
-  
+
   create_iam_role = false
-  iam_role_arn = aws_iam_role.eks_node.arn
-  
+  iam_role_arn    = aws_iam_role.eks_node.arn
+
   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
   vpc_security_group_ids            = [module.eks.node_security_group_id]
 
-  min_size     = 3
-  max_size     = 5
-  desired_size = 3
+  min_size     = 1
+  max_size     = 2
+  desired_size = 1
 
   block_device_mappings = [
     {
@@ -311,11 +316,11 @@ module "eks_managed_runners_node_group" {
       }
     }
   ]
-  
-  instance_types = ["c4.4xlarge"]
+
+  instance_types          = ["c4.4xlarge"]
   pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
-  metadata_options = merge(local.hoplimit_metadata, {})
-  
+  metadata_options        = merge(local.hoplimit_metadata, {})
+
   tags = merge(var.tags, var.instance_tags)
   taints = {
     general = {
@@ -352,25 +357,26 @@ module "eks_managed_runners_node_group" {
 
 module "eks_managed_gitlay_node_group" {
   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+  count  = var.create_gitlay_node_group ? 1 : 0
 
   name            = "${local.name}-gitlay"
   cluster_name    = local.name
   cluster_version = local.cluster_version
 
-  iam_role_path                  = var.iam_role_path
-  iam_role_permissions_boundary  = var.iam_role_permissions_boundary
+  iam_role_path                 = var.iam_role_path
+  iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
   subnet_ids = var.host_subnets
-  
+
   create_iam_role = false
-  iam_role_arn = aws_iam_role.eks_node.arn
-  
+  iam_role_arn    = aws_iam_role.eks_node.arn
+
   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
   vpc_security_group_ids            = [module.eks.node_security_group_id]
 
-  min_size     = 3
-  max_size     = 5
-  desired_size = 3
+  min_size     = 1
+  max_size     = 2
+  desired_size = 1
 
   block_device_mappings = [
     {
@@ -383,11 +389,11 @@ module "eks_managed_gitlay_node_group" {
       }
     }
   ]
-  
-  instance_types = ["c4.4xlarge"]
+
+  instance_types          = ["c4.4xlarge"]
   pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
-  metadata_options = merge(local.hoplimit_metadata, {})
-  
+  metadata_options        = merge(local.hoplimit_metadata, {})
+
   tags = merge(var.tags, var.instance_tags)
   taints = {
     general = {

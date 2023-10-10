@@ -22,7 +22,7 @@ locals {
       groups = tolist([
         "system:bootstrappers",
         "system:nodes"
-    ])
+      ])
     }
   ])
 }
@@ -113,7 +113,7 @@ resource "kubernetes_config_map" "aws_auth" {
   lifecycle {
     ignore_changes = [data]
   }
-  
+
 }
 
 provider "kubectl" {
