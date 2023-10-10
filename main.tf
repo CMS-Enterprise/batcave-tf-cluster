@@ -42,7 +42,6 @@ locals {
       ["--kubelet-extra-args '--node-labels=${k}=true", try(v.extra_args, "")],
       [for label_key, label_value in try(v.labels, {}) : "--node-labels=${label_key}=${label_value}"],
       [for taint_key, taint_value in try(v.taints, {}) : "--register-with-taints=${taint_key}=${taint_value}"],
-      ["--node-labels=kubernetes.io/role=${try(v.role, "general")}"],
       ["'"]
     )
     create_security_group = false
