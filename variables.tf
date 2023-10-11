@@ -49,7 +49,7 @@ variable "eks_managed_pools" {
   }))
   default = {
     general = {
-      enabled              = true
+      enabled              = false
       min_size             = 1
       max_size             = 3
       desired_size         = 1
@@ -66,7 +66,7 @@ variable "eks_managed_pools" {
       }
     }
     gitaly = {
-      enabled              = true
+      enabled              = false
       min_size             = 1
       max_size             = 2
       desired_size         = 1
@@ -83,7 +83,7 @@ variable "eks_managed_pools" {
       }
     }
     runners = {
-      enabled              = true
+      enabled              = false
       min_size             = 3
       max_size             = 4
       desired_size         = 3
@@ -468,6 +468,6 @@ variable "federated_access_role" {
 
 variable "enable_self_managed_nodes" {
   type        = bool
-  default     = false
+  default     = true
   description = "Enables self managed nodes"
 }
