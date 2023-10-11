@@ -42,6 +42,59 @@ variable "general_node_pool" {
   }
 }
 
+variable "eks_managed_pools" {
+  type = map(object({
+    enabled              = bool
+    min_size             = number
+    max_size             = number
+    desired_size         = number
+    volume_size          = number
+    volume_type          = string
+    instance_types       = list(string)
+    startup_min_size     = number
+    startup_max_size     = number
+    startup_desired_size = number
+  }))
+  default = {
+    general = {
+      enabled              = true
+      min_size             = 1
+      max_size             = 3
+      desired_size         = 1
+      volume_size          = 300
+      volume_type          = "gp3"
+      instance_types       = ["c5.4xlarge"]
+      startup_min_size     = 1
+      startup_max_size     = 3
+      startup_desired_size = 1
+    }
+    gitlab = {
+      enabled              = true
+      min_size             = 1
+      max_size             = 2
+      desired_size         = 1
+      volume_size          = 300
+      volume_type          = "gp3"
+      instance_types       = ["c5.4xlarge"]
+      startup_min_size     = 1
+      startup_max_size     = 2
+      startup_desired_size = 1
+    }
+    runner = {
+      enabled              = true
+      min_size             = 3
+      max_size             = 4
+      desired_size         = 3
+      volume_size          = 300
+      volume_type          = "gp3"
+      instance_types       = ["c5.4xlarge"]
+      startup_min_size     = 1
+      startup_max_size     = 2
+      startup_desired_size = 1
+    }
+  }
+}
+
 variable "custom_node_pools" {
   type    = any
   default = {}
@@ -403,16 +456,4 @@ variable "federated_access_role" {
   type        = string
   default     = "ct-ado-batcave-application-admin"
   description = "Federated access role"
-}
-
-variable "create_gitlay_node_group" {
-  default = false
-}
-
-variable "create_runners_node_group" {
-  default = false
-}
-
-variable "create_general_node_group" {
-  default = false
 }

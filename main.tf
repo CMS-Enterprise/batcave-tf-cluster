@@ -187,20 +187,12 @@ module "eks" {
   self_managed_node_group_defaults = {
     subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
   }
+
   ## CLUSTER Addons
-  cluster_addons = {
-    #vpc-cni = {
-    #  resolve_conflicts        = "OVERWRITE"
-    #  service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
-    #  addon_version            = var.addon_vpc_cni_version
-    #}
-    #kube-proxy = {
-    #  resolve_conflicts = "OVERWRITE"
-    #  addon_version     = var.addon_kube_proxy_version
-    #}
-  }
+  cluster_addons = {}
+
   # Worker groups (using Launch Configurations)
-  # self_managed_node_groups = local.custom_node_pools
+  self_managed_node_groups = local.custom_node_pools
 
   # apply any global tags to the cluster itself
   cluster_tags = var.tags
@@ -208,7 +200,7 @@ module "eks" {
 
 module "eks_managed_general_node_group" {
   source          = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  count           = var.create_general_node_group ? 1 : 0
+  count           = var.eks_managed_pools["general"].enabled ? 1 : 0
   name            = "${local.name}-general"
   cluster_name    = local.name
   cluster_version = local.cluster_version
@@ -224,23 +216,23 @@ module "eks_managed_general_node_group" {
   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
   vpc_security_group_ids            = [module.eks.node_security_group_id]
 
-  min_size     = 1
-  max_size     = 3
-  desired_size = 1
+  min_size     = var.eks_managed_pools["general"].min_size
+  max_size     = var.eks_managed_pools["general"].max_size
+  desired_size = var.eks_managed_pools["general"].desired_size
 
   block_device_mappings = [
     {
       device_name = "/dev/xvda"
       ebs = {
-        volume_size           = "300"
-        volume_type           = "gp3"
+        volume_size           = var.eks_managed_pools["general"].volume_size
+        volume_type           = var.eks_managed_pools["general"].volume_type
         delete_on_termination = true
         encrypted             = true
       }
     }
   ]
 
-  instance_types          = ["c4.4xlarge"]
+  instance_types          = var.eks_managed_pools["general"].instance_types
   pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
   metadata_options        = merge(local.hoplimit_metadata, {})
 
@@ -272,20 +264,20 @@ module "eks_managed_general_node_group" {
       }
     },
     var.node_schedule_startup_hour < 0 ? {} : {
-      # startup = {
-      #   min_size     = v.min_size
-      #   max_size     = v.max_size
-      #   desired_size = v.desired_size
-      #   time_zone    = var.node_schedule_timezone
-      #   recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
-      # }
+      startup = {
+        min_size     = var.eks_managed_pools["general"].startup_min_size
+        max_size     = var.eks_managed_pools["general"].startup_max_size
+        desired_size = var.eks_managed_pools["general"].startup_desired_size
+        time_zone    = var.node_schedule_timezone
+        recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
+      }
     }
   )
 }
 
 module "eks_managed_runners_node_group" {
   source          = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  count           = var.create_runners_node_group ? 1 : 0
+  count           = var.eks_managed_pools["runners"].enabled ? 1 : 0
   name            = "${local.name}-runners"
   cluster_name    = local.name
   cluster_version = local.cluster_version
@@ -301,23 +293,23 @@ module "eks_managed_runners_node_group" {
   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
   vpc_security_group_ids            = [module.eks.node_security_group_id]
 
-  min_size     = 1
-  max_size     = 2
-  desired_size = 1
+  min_size     = var.eks_managed_pools["runners"].min_size
+  max_size     = var.eks_managed_pools["runners"].max_size
+  desired_size = var.eks_managed_pools["runners"].desired_size
 
   block_device_mappings = [
     {
       device_name = "/dev/xvda"
       ebs = {
-        volume_size           = "300"
-        volume_type           = "gp3"
+        volume_size           = var.eks_managed_pools["runners"].volume_size
+        volume_type           = var.eks_managed_pools["runners"].volume_type
         delete_on_termination = true
         encrypted             = true
       }
     }
   ]
 
-  instance_types          = ["c4.4xlarge"]
+  instance_types          = var.eks_managed_pools["runners"].instance_types
   pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
   metadata_options        = merge(local.hoplimit_metadata, {})
 
@@ -330,7 +322,7 @@ module "eks_managed_runners_node_group" {
     }
   }
   labels = {
-    general = "true"
+    gitlab_runner = "true"
   }
   create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
   schedules = merge(
@@ -344,20 +336,20 @@ module "eks_managed_runners_node_group" {
       }
     },
     var.node_schedule_startup_hour < 0 ? {} : {
-      # startup = {
-      #   min_size     = v.min_size
-      #   max_size     = v.max_size
-      #   desired_size = v.desired_size
-      #   time_zone    = var.node_schedule_timezone
-      #   recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
-      # }
+      startup = {
+        min_size     = var.eks_managed_pools["runners"].startup_min_size
+        max_size     = var.eks_managed_pools["runners"].startup_max_size
+        desired_size = var.eks_managed_pools["runners"].startup_desired_size
+        time_zone    = var.node_schedule_timezone
+        recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
+      }
     }
   )
 }
 
 module "eks_managed_gitlay_node_group" {
   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  count  = var.create_gitlay_node_group ? 1 : 0
+  count  = var.eks_managed_pools["gitaly"].enabled ? 1 : 0
 
   name            = "${local.name}-gitlay"
   cluster_name    = local.name
@@ -374,23 +366,23 @@ module "eks_managed_gitlay_node_group" {
   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
   vpc_security_group_ids            = [module.eks.node_security_group_id]
 
-  min_size     = 1
-  max_size     = 2
-  desired_size = 1
+  min_size     = var.eks_managed_pools["gitlay"].min_size
+  max_size     = var.eks_managed_pools["gitlay"].max_size
+  desired_size = var.eks_managed_pools["gitlay"].desired_size
 
   block_device_mappings = [
     {
       device_name = "/dev/xvda"
       ebs = {
-        volume_size           = "300"
-        volume_type           = "gp3"
+        volume_size           = var.eks_managed_pools["gitlay"].volume_size
+        volume_type           = var.eks_managed_pools["gitlay"].volume_type
         delete_on_termination = true
         encrypted             = true
       }
     }
   ]
 
-  instance_types          = ["c4.4xlarge"]
+  instance_types          = var.eks_managed_pools["gitlay"].instance_types
   pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
   metadata_options        = merge(local.hoplimit_metadata, {})
 
@@ -403,7 +395,7 @@ module "eks_managed_gitlay_node_group" {
     }
   }
   labels = {
-    general = "true"
+    gitaly = "true"
   }
   create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
   schedules = merge(
@@ -417,13 +409,13 @@ module "eks_managed_gitlay_node_group" {
       }
     },
     var.node_schedule_startup_hour < 0 ? {} : {
-      # startup = {
-      #   min_size     = v.min_size
-      #   max_size     = v.max_size
-      #   desired_size = v.desired_size
-      #   time_zone    = var.node_schedule_timezone
-      #   recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
-      # }
+      startup = {
+        min_size     = var.eks_managed_pools["gitlay"].startup_min_size
+        max_size     = var.eks_managed_pools["gitlay"].startup_max_size
+        desired_size = var.eks_managed_pools["gitlay"].startup_desired_size
+        time_zone    = var.node_schedule_timezone
+        recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
+      }
     }
   )
 }
