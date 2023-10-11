@@ -192,7 +192,7 @@ module "eks" {
   cluster_addons = {}
 
   # Worker groups (using Launch Configurations)
-  self_managed_node_groups = local.custom_node_pools
+  self_managed_node_groups = var.enable_self_managed_nodes ? local.custom_node_pools : {}
 
   # apply any global tags to the cluster itself
   cluster_tags = var.tags
