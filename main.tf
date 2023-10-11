@@ -243,11 +243,7 @@ module "eks_managed_general_node_group" {
     }
   )
   taints = {
-    general = {
-      key    = "bat_app"
-      value  = "utility_belt"
-      effect = "NO_SCHEDULE"
-    }
+    general = var.eks_managed_pools["general"].taints
   }
   labels = {
     general = "true"
@@ -315,11 +311,7 @@ module "eks_managed_runners_node_group" {
 
   tags = merge(var.tags, var.instance_tags)
   taints = {
-    general = {
-      key    = "bat_app"
-      value  = "gitlab_runner"
-      effect = "NO_SCHEDULE"
-    }
+    general = var.eks_managed_pools["runners"].taints
   }
   labels = {
     gitlab_runner = "true"
@@ -388,12 +380,9 @@ module "eks_managed_gitlay_node_group" {
 
   tags = merge(var.tags, var.instance_tags)
   taints = {
-    general = {
-      key    = "bat_app"
-      value  = "gitaly"
-      effect = "NO_SCHEDULE"
-    }
+    general = var.eks_managed_pools["gitlay"].taints
   }
+
   labels = {
     gitaly = "true"
   }

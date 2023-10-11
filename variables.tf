@@ -54,6 +54,11 @@ variable "eks_managed_pools" {
     startup_min_size     = number
     startup_max_size     = number
     startup_desired_size = number
+    taints = object({
+      key    = string
+      value  = string
+      effect = string
+    })
   }))
   default = {
     general = {
@@ -67,8 +72,13 @@ variable "eks_managed_pools" {
       startup_min_size     = 1
       startup_max_size     = 3
       startup_desired_size = 1
+      taints = {
+        key    = "bat_app"
+        value  = "general"
+        effect = "NO_SCHEDULE"
+      }
     }
-    gitlab = {
+    gitaly = {
       enabled              = true
       min_size             = 1
       max_size             = 2
@@ -79,6 +89,11 @@ variable "eks_managed_pools" {
       startup_min_size     = 1
       startup_max_size     = 2
       startup_desired_size = 1
+      taints = {
+        key    = "bat_app"
+        value  = "gitaly"
+        effect = "NO_SCHEDULE"
+      }
     }
     runner = {
       enabled              = true
@@ -91,6 +106,11 @@ variable "eks_managed_pools" {
       startup_min_size     = 1
       startup_max_size     = 2
       startup_desired_size = 1
+      taints = {
+        key    = "bat_app"
+        value  = "runner"
+        effect = "NO_SCHEDULE"
+      }
     }
   }
 }
