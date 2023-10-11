@@ -95,7 +95,7 @@ variable "eks_managed_pools" {
         effect = "NO_SCHEDULE"
       }
     }
-    runner = {
+    runners = {
       enabled              = true
       min_size             = 3
       max_size             = 4

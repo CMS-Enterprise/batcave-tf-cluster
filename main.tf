@@ -358,29 +358,29 @@ module "eks_managed_gitlay_node_group" {
   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
   vpc_security_group_ids            = [module.eks.node_security_group_id]
 
-  min_size     = var.eks_managed_pools["gitlay"].min_size
-  max_size     = var.eks_managed_pools["gitlay"].max_size
-  desired_size = var.eks_managed_pools["gitlay"].desired_size
+  min_size     = var.eks_managed_pools["gitaly"].min_size
+  max_size     = var.eks_managed_pools["gitaly"].max_size
+  desired_size = var.eks_managed_pools["gitaly"].desired_size
 
   block_device_mappings = [
     {
       device_name = "/dev/xvda"
       ebs = {
-        volume_size           = var.eks_managed_pools["gitlay"].volume_size
-        volume_type           = var.eks_managed_pools["gitlay"].volume_type
+        volume_size           = var.eks_managed_pools["gitaly"].volume_size
+        volume_type           = var.eks_managed_pools["gitaly"].volume_type
         delete_on_termination = true
         encrypted             = true
       }
     }
   ]
 
-  instance_types          = var.eks_managed_pools["gitlay"].instance_types
+  instance_types          = var.eks_managed_pools["gitaly"].instance_types
   pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
   metadata_options        = merge(local.hoplimit_metadata, {})
 
   tags = merge(var.tags, var.instance_tags)
   taints = {
-    general = var.eks_managed_pools["gitlay"].taints
+    general = var.eks_managed_pools["gitaly"].taints
   }
 
   labels = {
