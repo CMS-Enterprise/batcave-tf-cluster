@@ -102,7 +102,6 @@ resource "kubernetes_config_map" "aws_auth" {
         tolist(local.delete_ebs_volumes_lambda_role_mapping),
         local.custom_configmap_master_roles,
         local.eks_managed_node_role,
-        local.eks_managed_node_role
       ))
     )
   }

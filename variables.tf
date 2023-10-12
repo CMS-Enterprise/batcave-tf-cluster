@@ -46,9 +46,6 @@ variable "eks_managed_pools" {
       value  = string
       effect = string
     })
-    placement = object({
-      availability_zone = string
-    })
   }))
   default = {
     general = {
@@ -67,9 +64,6 @@ variable "eks_managed_pools" {
         value  = "general"
         effect = "NO_SCHEDULE"
       }
-      placement = {
-        availability_zone = "us-east-1a"
-      }
     }
     gitaly = {
       enabled              = false
@@ -87,9 +81,6 @@ variable "eks_managed_pools" {
         value  = "gitaly"
         effect = "NO_SCHEDULE"
       }
-      placement = {
-        availability_zone = "us-east-1a"
-      }
     }
     runners = {
       enabled              = false
@@ -106,9 +97,6 @@ variable "eks_managed_pools" {
         key    = "bat_app"
         value  = "runner"
         effect = "NO_SCHEDULE"
-      }
-      placement = {
-        availability_zone = "us-east-1a"
       }
     }
   }
