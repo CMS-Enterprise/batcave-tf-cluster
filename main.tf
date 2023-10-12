@@ -208,7 +208,7 @@ module "eks_managed_general_node_group" {
   iam_role_path                 = var.iam_role_path
   iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
-  subnet_ids = var.host_subnets
+  subnet_ids = var.general_subnet_ids
   placement  = var.eks_managed_pools["general"].placement
 
   create_iam_role = false
@@ -352,7 +352,7 @@ module "eks_managed_gitlay_node_group" {
   iam_role_path                 = var.iam_role_path
   iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
-  subnet_ids = var.host_subnets
+  subnet_ids = var.gitaly_subnet_ids
   placement  = var.eks_managed_pools["gitaly"].placement
 
   create_iam_role = false

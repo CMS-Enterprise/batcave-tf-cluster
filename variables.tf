@@ -483,3 +483,15 @@ variable "enable_self_managed_nodes" {
   default     = true
   description = "Enables self managed nodes"
 }
+
+variable "gitaly_subnet_ids" {
+  type        = list(string)
+  default     = []
+  description = "Subnet ids for gitaly nodes"
+}
+
+variable "general_subnet_ids" {
+  type        = list(string)
+  default     = []
+  description = "Subnet ids for general nodes"
+}
