@@ -207,6 +207,8 @@ module "eks_managed_general_node_group" {
 
   iam_role_path                 = var.iam_role_path
   iam_role_permissions_boundary = var.iam_role_permissions_boundary
+  
+  ami_id                        = data.aws_ami.eks_ami.id
 
   subnet_ids = var.general_subnet_ids
 
@@ -280,6 +282,8 @@ module "eks_managed_runners_node_group" {
 
   iam_role_path                 = var.iam_role_path
   iam_role_permissions_boundary = var.iam_role_permissions_boundary
+  
+  ami_id                        = data.aws_ami.eks_ami.id
 
   subnet_ids = var.host_subnets
 
@@ -349,6 +353,8 @@ module "eks_managed_gitlay_node_group" {
 
   iam_role_path                 = var.iam_role_path
   iam_role_permissions_boundary = var.iam_role_permissions_boundary
+  
+  ami_id                        = data.aws_ami.eks_ami.id
 
   subnet_ids = var.gitaly_subnet_ids
 
