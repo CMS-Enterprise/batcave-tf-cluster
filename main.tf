@@ -320,7 +320,7 @@ module "eks_managed_runners_node_group" {
     general = var.eks_managed_pools["runners"].taints
   }
   labels = {
-    gitlab_runner = "true"
+    runners = "true"
   }
   create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
   schedules = merge(
