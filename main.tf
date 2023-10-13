@@ -235,6 +235,7 @@ module "eks_managed_general_node_group" {
   ]
 
   instance_types          = var.eks_managed_pools["general"].instance_types
+  enable_bootstrap_user_data = true
   pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
   metadata_options        = merge(local.hoplimit_metadata, {})
 
@@ -310,6 +311,7 @@ module "eks_managed_runners_node_group" {
   ]
 
   instance_types          = var.eks_managed_pools["runners"].instance_types
+  enable_bootstrap_user_data = true
   pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
   metadata_options        = merge(local.hoplimit_metadata, {})
 
@@ -381,6 +383,7 @@ module "eks_managed_gitlay_node_group" {
   ]
 
   instance_types          = var.eks_managed_pools["gitaly"].instance_types
+  enable_bootstrap_user_data = true
   pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
   metadata_options        = merge(local.hoplimit_metadata, {})
 
