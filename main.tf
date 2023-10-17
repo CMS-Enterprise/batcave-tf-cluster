@@ -40,6 +40,7 @@ locals {
     post_bootstrap_user_data = try(v.post_bootstrap_user_data, "")
     bootstrap_extra_args = join(" ",
       ["--kubelet-extra-args '--node-labels=${k}=true", try(v.extra_args, "")],
+      ["--pod-max-pids=1000"],
       [for label_key, label_value in try(v.labels, {}) : "--node-labels=${label_key}=${label_value}"],
       [for taint_key, taint_value in try(v.taints, {}) : "--register-with-taints=${taint_key}=${taint_value}"],
       ["'"]
