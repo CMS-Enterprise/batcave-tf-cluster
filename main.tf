@@ -157,8 +157,8 @@ module "eks" {
   iam_role_path                  = var.iam_role_path
   iam_role_permissions_boundary  = var.iam_role_permissions_boundary
   cluster_encryption_policy_path = var.iam_role_path
-  create_iam_role                = false
-  iam_role_arn                   = aws_iam_role.eks_node.arn
+  # create_iam_role                = false
+  # iam_role_arn                   = aws_iam_role.eks_node.arn
 
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets
