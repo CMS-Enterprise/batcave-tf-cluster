@@ -111,9 +111,9 @@ resource "kubernetes_config_map" "aws_auth" {
   ]
   # EKS managed nodes will update this configmap on their own, so we need to ignore changes to it
   # This will avoid terraform overwriting the configmap with the old values
-  lifecycle {
-    ignore_changes = [data]
-  }
+  # lifecycle {
+  #   ignore_changes = [data]
+  # }
 
 }
 
