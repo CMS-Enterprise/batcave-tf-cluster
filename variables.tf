@@ -46,6 +46,7 @@ variable "eks_managed_pools" {
       value  = string
       effect = string
     })
+    subnet_ids = list(string)
   }))
   default = {
     general = {
@@ -64,6 +65,7 @@ variable "eks_managed_pools" {
         value  = "general"
         effect = "NO_SCHEDULE"
       }
+      subnet_ids = []
     }
     gitaly = {
       enabled              = false
@@ -81,6 +83,7 @@ variable "eks_managed_pools" {
         value  = "gitaly"
         effect = "NO_SCHEDULE"
       }
+      subnet_ids = []
     }
     runners = {
       enabled              = false
@@ -98,6 +101,7 @@ variable "eks_managed_pools" {
         value  = "runner"
         effect = "NO_SCHEDULE"
       }
+      subnet_ids = []
     }
   }
 }
@@ -470,16 +474,4 @@ variable "enable_self_managed_nodes" {
   type        = bool
   default     = true
   description = "Enables self managed nodes"
-}
-
-variable "gitaly_subnet_ids" {
-  type        = list(string)
-  default     = []
-  description = "Subnet ids for gitaly nodes"
-}
-
-variable "general_subnet_ids" {
-  type        = list(string)
-  default     = []
-  description = "Subnet ids for general nodes"
 }

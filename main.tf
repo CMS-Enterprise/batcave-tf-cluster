@@ -207,10 +207,10 @@ module "eks_managed_general_node_group" {
 
   iam_role_path                 = var.iam_role_path
   iam_role_permissions_boundary = var.iam_role_permissions_boundary
-  
-  ami_id                        = data.aws_ami.eks_ami.id
 
-  subnet_ids = var.general_subnet_ids
+  ami_id = data.aws_ami.eks_ami.id
+
+  subnet_ids = var.eks_managed_pools["general"].subnet_ids
 
   create_iam_role = false
   iam_role_arn    = aws_iam_role.eks_node.arn
@@ -234,10 +234,10 @@ module "eks_managed_general_node_group" {
     }
   ]
 
-  instance_types          = var.eks_managed_pools["general"].instance_types
+  instance_types             = var.eks_managed_pools["general"].instance_types
   enable_bootstrap_user_data = true
-  pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
-  metadata_options        = merge(local.hoplimit_metadata, {})
+  pre_bootstrap_user_data    = "sysctl -w net.ipv4.ip_forward=1\n"
+  metadata_options           = merge(local.hoplimit_metadata, {})
 
   tags = merge(var.tags, var.instance_tags,
     {
@@ -283,8 +283,8 @@ module "eks_managed_runners_node_group" {
 
   iam_role_path                 = var.iam_role_path
   iam_role_permissions_boundary = var.iam_role_permissions_boundary
-  
-  ami_id                        = data.aws_ami.eks_ami.id
+
+  ami_id = data.aws_ami.eks_ami.id
 
   subnet_ids = var.host_subnets
 
@@ -310,10 +310,10 @@ module "eks_managed_runners_node_group" {
     }
   ]
 
-  instance_types          = var.eks_managed_pools["runners"].instance_types
+  instance_types             = var.eks_managed_pools["runners"].instance_types
   enable_bootstrap_user_data = true
-  pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
-  metadata_options        = merge(local.hoplimit_metadata, {})
+  pre_bootstrap_user_data    = "sysctl -w net.ipv4.ip_forward=1\n"
+  metadata_options           = merge(local.hoplimit_metadata, {})
 
   tags = merge(var.tags, var.instance_tags)
   taints = {
@@ -355,10 +355,10 @@ module "eks_managed_gitlay_node_group" {
 
   iam_role_path                 = var.iam_role_path
   iam_role_permissions_boundary = var.iam_role_permissions_boundary
-  
-  ami_id                        = data.aws_ami.eks_ami.id
 
-  subnet_ids = var.gitaly_subnet_ids
+  ami_id = data.aws_ami.eks_ami.id
+
+  subnet_ids = var.eks_managed_pools["gitaly"].subnet_ids
 
   create_iam_role = false
   iam_role_arn    = aws_iam_role.eks_node.arn
@@ -382,10 +382,10 @@ module "eks_managed_gitlay_node_group" {
     }
   ]
 
-  instance_types          = var.eks_managed_pools["gitaly"].instance_types
+  instance_types             = var.eks_managed_pools["gitaly"].instance_types
   enable_bootstrap_user_data = true
-  pre_bootstrap_user_data = "sysctl -w net.ipv4.ip_forward=1\n"
-  metadata_options        = merge(local.hoplimit_metadata, {})
+  pre_bootstrap_user_data    = "sysctl -w net.ipv4.ip_forward=1\n"
+  metadata_options           = merge(local.hoplimit_metadata, {})
 
   tags = merge(var.tags, var.instance_tags)
   taints = {

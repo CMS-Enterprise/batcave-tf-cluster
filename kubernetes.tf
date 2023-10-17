@@ -109,6 +109,8 @@ resource "kubernetes_config_map" "aws_auth" {
     null_resource.kubernetes_requirements,
     kubernetes_cluster_role_binding.delete_ebs_volumes_lambda,
   ]
+  # EKS managed nodes will update this configmap on their own, so we need to ignore changes to it
+  # This will avoid terraform overwriting the configmap with the old values
   lifecycle {
     ignore_changes = [data]
   }
