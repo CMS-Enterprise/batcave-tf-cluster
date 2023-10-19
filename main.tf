@@ -146,6 +146,77 @@ locals {
   {})
 }
 
+################################################################################
+# EKS Fully managed nodes
+################################################################################
+locals {
+  eks_node_pools = { for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
+    name                          = "${var.cluster_name}-${k}"
+    cluster_name                  = local.name
+    cluster_version               = local.cluster_version
+    
+    iam_role_path                 = var.iam_role_path
+    iam_role_permissions_boundary = var.iam_role_permissions_boundary
+    
+    ami_id                        = data.aws_ami.eks_ami.id
+    
+    subnet_ids                    = coalescelist(try(v.subnet_ids, []), var.host_subnets, var.private_subnets)
+    
+    min_size      = v.min_size
+    max_size      = v.max_size
+    desired_size  = v.desired_size
+    
+    block_device_mappings = [
+      {
+        device_name = "/dev/xvda"
+        ebs = {
+          volume_size           = try(v.volume_size, "300")
+          volume_type           = try(v.volume_type, "gp3")
+          delete_on_termination = try(v.volume_delete_on_termination, true)
+          encrypted             = true
+        }
+      }
+    ]
+    
+
+
+    ## Define custom lines to the user_data script.  Separate commands with \n
+    instance_type = [v.instance_type]
+    enable_bootstrap_user_data = true
+    pre_bootstrap_user_data  = try(v.pre_bootstrap_user_data, "sysctl -w net.ipv4.ip_forward=1\n")
+    post_bootstrap_user_data = try(v.post_bootstrap_user_data, "")
+    metadata_options = merge(local.hoplimit_metadata, try(v.metadata_options, {}))
+
+    tags = merge(var.tags, var.instance_tags, try(v.tags, null))
+    
+    taints = { for taint_key, taint_value in try(v.taints, {}) : taint_key => "${taint_key}=${taint_value}" }
+    labels = { for label_key, label_value in try(v.labels, {}) : label_key => "${label_key}=${label_value}" }
+
+
+    create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
+    schedules = merge(
+      var.node_schedule_shutdown_hour < 0 ? {} : {
+        shutdown = {
+          min_size     = 0
+          max_size     = 0
+          desired_size = 0
+          time_zone    = var.node_schedule_timezone
+          recurrence   = "0 ${var.node_schedule_shutdown_hour} * * *"
+        }
+      },
+      var.node_schedule_startup_hour < 0 ? {} : {
+        startup = {
+          min_size     = v.min_size
+          max_size     = v.max_size
+          desired_size = v.desired_size
+          time_zone    = var.node_schedule_timezone
+          recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
+        }
+      }
+    )
+  } }
+}
+
 module "eks" {
   ## https://github.com/terraform-aws-modules/terraform-aws-eks
   source  = "terraform-aws-modules/eks/aws"
@@ -198,225 +269,253 @@ module "eks" {
   cluster_tags = var.tags
 }
 
-module "eks_managed_general_node_group" {
-  source          = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  count           = var.eks_managed_pools["general"].enabled ? 1 : 0
-  name            = "${local.name}-general"
-  cluster_name    = local.name
-  cluster_version = local.cluster_version
+module "eks_managed_node_groups" {
+  source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+  for_each = local.eks_node_pools
 
-  iam_role_path                 = var.iam_role_path
-  iam_role_permissions_boundary = var.iam_role_permissions_boundary
+  name                          = each.value.name
+  cluster_name                  = each.value.cluster_name
+  cluster_version               = each.value.cluster_version
+  iam_role_path                 = each.value.iam_role_path
+  iam_role_permissions_boundary = each.value.iam_role_permissions_boundary
+  ami_id                        = each.value.ami_id
+  subnet_ids                    = each.value.subnet_ids
+  min_size                      = each.value.min_size
+  max_size                      = each.value.max_size
+  desired_size                  = each.value.desired_size
+  block_device_mappings         = each.value.block_device_mappings
+  instance_types                = [each.value.instance_type]
+  enable_bootstrap_user_data    = each.value.enable_bootstrap_user_data
+  pre_bootstrap_user_data       = each.value.pre_bootstrap_user_data
+  post_bootstrap_user_data      = each.value.post_bootstrap_user_data
+  metadata_options              = each.value.metadata_options
+  tags                          = each.value.tags
+  taints                        = each.value.taints
+  labels                        = each.value.labels
+  create_schedule               = each.value.create_schedule
+  schedules                     = each.value.schedules
 
-  ami_id = data.aws_ami.eks_ami.id
-
-  subnet_ids = var.eks_managed_pools["general"].subnet_ids
-
-  create_iam_role = false
-  iam_role_arn    = aws_iam_role.eks_node.arn
-
-  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
-  vpc_security_group_ids            = [module.eks.node_security_group_id]
-
-  min_size     = var.eks_managed_pools["general"].min_size
-  max_size     = var.eks_managed_pools["general"].max_size
-  desired_size = var.eks_managed_pools["general"].desired_size
-
-  block_device_mappings = [
-    {
-      device_name = "/dev/xvda"
-      ebs = {
-        volume_size           = var.eks_managed_pools["general"].volume_size
-        volume_type           = var.eks_managed_pools["general"].volume_type
-        delete_on_termination = true
-        encrypted             = true
-      }
-    }
-  ]
-
-  instance_types             = var.eks_managed_pools["general"].instance_types
-  enable_bootstrap_user_data = true
-  pre_bootstrap_user_data    = "sysctl -w net.ipv4.ip_forward=1\n"
-  metadata_options           = merge(local.hoplimit_metadata, {})
-
-  tags = merge(var.tags, var.instance_tags,
-    {
-      "k8s.io/cluster-autoscaler/enabled"             = "true",
-      "k8s.io/cluster-autoscaler/${var.cluster_name}" = "${var.cluster_name}"
-    }
-  )
-  taints = {
-    general = var.eks_managed_pools["general"].taints
-  }
-  labels = {
-    general = "true"
-  }
-  create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
-  schedules = merge(
-    var.node_schedule_shutdown_hour < 0 ? {} : {
-      shutdown = {
-        min_size     = 0
-        max_size     = 0
-        desired_size = 0
-        time_zone    = var.node_schedule_timezone
-        recurrence   = "0 ${var.node_schedule_shutdown_hour} * * *"
-      }
-    },
-    var.node_schedule_startup_hour < 0 ? {} : {
-      startup = {
-        min_size     = var.eks_managed_pools["general"].startup_min_size
-        max_size     = var.eks_managed_pools["general"].startup_max_size
-        desired_size = var.eks_managed_pools["general"].startup_desired_size
-        time_zone    = var.node_schedule_timezone
-        recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
-      }
-    }
-  )
 }
 
-module "eks_managed_runners_node_group" {
-  source          = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  count           = var.eks_managed_pools["runners"].enabled ? 1 : 0
-  name            = "${local.name}-runners"
-  cluster_name    = local.name
-  cluster_version = local.cluster_version
+# module "eks_managed_general_node_group" {
+#   source          = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+#   count           = var.eks_managed_pools["general"].enabled ? 1 : 0
+#   name            = "${local.name}-general"
+#   cluster_name    = local.name
+#   cluster_version = local.cluster_version
 
-  iam_role_path                 = var.iam_role_path
-  iam_role_permissions_boundary = var.iam_role_permissions_boundary
+#   iam_role_path                 = var.iam_role_path
+#   iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
-  ami_id = data.aws_ami.eks_ami.id
+#   ami_id = data.aws_ami.eks_ami.id
 
-  subnet_ids = var.host_subnets
+#   subnet_ids = var.eks_managed_pools["general"].subnet_ids
 
-  create_iam_role = false
-  iam_role_arn    = aws_iam_role.eks_node.arn
+#   create_iam_role = false
+#   iam_role_arn    = aws_iam_role.eks_node.arn
 
-  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
-  vpc_security_group_ids            = [module.eks.node_security_group_id]
+#   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+#   vpc_security_group_ids            = [module.eks.node_security_group_id]
 
-  min_size     = var.eks_managed_pools["runners"].min_size
-  max_size     = var.eks_managed_pools["runners"].max_size
-  desired_size = var.eks_managed_pools["runners"].desired_size
+#   min_size     = var.eks_managed_pools["general"].min_size
+#   max_size     = var.eks_managed_pools["general"].max_size
+#   desired_size = var.eks_managed_pools["general"].desired_size
 
-  block_device_mappings = [
-    {
-      device_name = "/dev/xvda"
-      ebs = {
-        volume_size           = var.eks_managed_pools["runners"].volume_size
-        volume_type           = var.eks_managed_pools["runners"].volume_type
-        delete_on_termination = true
-        encrypted             = true
-      }
-    }
-  ]
+#   block_device_mappings = [
+#     {
+#       device_name = "/dev/xvda"
+#       ebs = {
+#         volume_size           = var.eks_managed_pools["general"].volume_size
+#         volume_type           = var.eks_managed_pools["general"].volume_type
+#         delete_on_termination = true
+#         encrypted             = true
+#       }
+#     }
+#   ]
 
-  instance_types             = var.eks_managed_pools["runners"].instance_types
-  enable_bootstrap_user_data = true
-  pre_bootstrap_user_data    = "sysctl -w net.ipv4.ip_forward=1\n"
-  metadata_options           = merge(local.hoplimit_metadata, {})
+#   instance_types             = var.eks_managed_pools["general"].instance_types
+#   enable_bootstrap_user_data = true
+#   pre_bootstrap_user_data    = "sysctl -w net.ipv4.ip_forward=1\n"
+#   metadata_options           = merge(local.hoplimit_metadata, {})
 
-  tags = merge(var.tags, var.instance_tags)
-  taints = {
-    general = var.eks_managed_pools["runners"].taints
-  }
-  labels = {
-    runners = "true"
-  }
-  create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
-  schedules = merge(
-    var.node_schedule_shutdown_hour < 0 ? {} : {
-      shutdown = {
-        min_size     = 0
-        max_size     = 0
-        desired_size = 0
-        time_zone    = var.node_schedule_timezone
-        recurrence   = "0 ${var.node_schedule_shutdown_hour} * * *"
-      }
-    },
-    var.node_schedule_startup_hour < 0 ? {} : {
-      startup = {
-        min_size     = var.eks_managed_pools["runners"].startup_min_size
-        max_size     = var.eks_managed_pools["runners"].startup_max_size
-        desired_size = var.eks_managed_pools["runners"].startup_desired_size
-        time_zone    = var.node_schedule_timezone
-        recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
-      }
-    }
-  )
-}
+#   tags = merge(var.tags, var.instance_tags,
+#     {
+#       "k8s.io/cluster-autoscaler/enabled"             = "true",
+#       "k8s.io/cluster-autoscaler/${var.cluster_name}" = "${var.cluster_name}"
+#     }
+#   )
+#   taints = {
+#     general = var.eks_managed_pools["general"].taints
+#   }
+#   labels = {
+#     general = "true"
+#   }
+#   create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
+#   schedules = merge(
+#     var.node_schedule_shutdown_hour < 0 ? {} : {
+#       shutdown = {
+#         min_size     = 0
+#         max_size     = 0
+#         desired_size = 0
+#         time_zone    = var.node_schedule_timezone
+#         recurrence   = "0 ${var.node_schedule_shutdown_hour} * * *"
+#       }
+#     },
+#     var.node_schedule_startup_hour < 0 ? {} : {
+#       startup = {
+#         min_size     = var.eks_managed_pools["general"].startup_min_size
+#         max_size     = var.eks_managed_pools["general"].startup_max_size
+#         desired_size = var.eks_managed_pools["general"].startup_desired_size
+#         time_zone    = var.node_schedule_timezone
+#         recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
+#       }
+#     }
+#   )
+# }
 
-module "eks_managed_gitlay_node_group" {
-  source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  count  = var.eks_managed_pools["gitaly"].enabled ? 1 : 0
+# module "eks_managed_runners_node_group" {
+#   source          = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+#   count           = var.eks_managed_pools["runners"].enabled ? 1 : 0
+#   name            = "${local.name}-runners"
+#   cluster_name    = local.name
+#   cluster_version = local.cluster_version
 
-  name            = "${local.name}-gitlay"
-  cluster_name    = local.name
-  cluster_version = local.cluster_version
+#   iam_role_path                 = var.iam_role_path
+#   iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
-  iam_role_path                 = var.iam_role_path
-  iam_role_permissions_boundary = var.iam_role_permissions_boundary
+#   ami_id = data.aws_ami.eks_ami.id
 
-  ami_id = data.aws_ami.eks_ami.id
+#   subnet_ids = var.host_subnets
 
-  subnet_ids = var.eks_managed_pools["gitaly"].subnet_ids
+#   create_iam_role = false
+#   iam_role_arn    = aws_iam_role.eks_node.arn
 
-  create_iam_role = false
-  iam_role_arn    = aws_iam_role.eks_node.arn
+#   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+#   vpc_security_group_ids            = [module.eks.node_security_group_id]
 
-  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
-  vpc_security_group_ids            = [module.eks.node_security_group_id]
+#   min_size     = var.eks_managed_pools["runners"].min_size
+#   max_size     = var.eks_managed_pools["runners"].max_size
+#   desired_size = var.eks_managed_pools["runners"].desired_size
 
-  min_size     = var.eks_managed_pools["gitaly"].min_size
-  max_size     = var.eks_managed_pools["gitaly"].max_size
-  desired_size = var.eks_managed_pools["gitaly"].desired_size
+#   block_device_mappings = [
+#     {
+#       device_name = "/dev/xvda"
+#       ebs = {
+#         volume_size           = var.eks_managed_pools["runners"].volume_size
+#         volume_type           = var.eks_managed_pools["runners"].volume_type
+#         delete_on_termination = true
+#         encrypted             = true
+#       }
+#     }
+#   ]
 
-  block_device_mappings = [
-    {
-      device_name = "/dev/xvda"
-      ebs = {
-        volume_size           = var.eks_managed_pools["gitaly"].volume_size
-        volume_type           = var.eks_managed_pools["gitaly"].volume_type
-        delete_on_termination = true
-        encrypted             = true
-      }
-    }
-  ]
+#   instance_types             = var.eks_managed_pools["runners"].instance_types
+#   enable_bootstrap_user_data = true
+#   pre_bootstrap_user_data    = "sysctl -w net.ipv4.ip_forward=1\n"
+#   metadata_options           = merge(local.hoplimit_metadata, {})
 
-  instance_types             = var.eks_managed_pools["gitaly"].instance_types
-  enable_bootstrap_user_data = true
-  pre_bootstrap_user_data    = "sysctl -w net.ipv4.ip_forward=1\n"
-  metadata_options           = merge(local.hoplimit_metadata, {})
+#   tags = merge(var.tags, var.instance_tags)
+#   taints = {
+#     general = var.eks_managed_pools["runners"].taints
+#   }
+#   labels = {
+#     runners = "true"
+#   }
+#   create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
+#   schedules = merge(
+#     var.node_schedule_shutdown_hour < 0 ? {} : {
+#       shutdown = {
+#         min_size     = 0
+#         max_size     = 0
+#         desired_size = 0
+#         time_zone    = var.node_schedule_timezone
+#         recurrence   = "0 ${var.node_schedule_shutdown_hour} * * *"
+#       }
+#     },
+#     var.node_schedule_startup_hour < 0 ? {} : {
+#       startup = {
+#         min_size     = var.eks_managed_pools["runners"].startup_min_size
+#         max_size     = var.eks_managed_pools["runners"].startup_max_size
+#         desired_size = var.eks_managed_pools["runners"].startup_desired_size
+#         time_zone    = var.node_schedule_timezone
+#         recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
+#       }
+#     }
+#   )
+# }
 
-  tags = merge(var.tags, var.instance_tags)
-  taints = {
-    general = var.eks_managed_pools["gitaly"].taints
-  }
+# module "eks_managed_gitlay_node_group" {
+#   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+#   count  = var.eks_managed_pools["gitaly"].enabled ? 1 : 0
 
-  labels = {
-    gitaly = "true"
-  }
-  create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
-  schedules = merge(
-    var.node_schedule_shutdown_hour < 0 ? {} : {
-      shutdown = {
-        min_size     = 0
-        max_size     = 0
-        desired_size = 0
-        time_zone    = var.node_schedule_timezone
-        recurrence   = "0 ${var.node_schedule_shutdown_hour} * * *"
-      }
-    },
-    var.node_schedule_startup_hour < 0 ? {} : {
-      startup = {
-        min_size     = var.eks_managed_pools["gitlay"].startup_min_size
-        max_size     = var.eks_managed_pools["gitlay"].startup_max_size
-        desired_size = var.eks_managed_pools["gitlay"].startup_desired_size
-        time_zone    = var.node_schedule_timezone
-        recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
-      }
-    }
-  )
-}
+#   name            = "${local.name}-gitlay"
+#   cluster_name    = local.name
+#   cluster_version = local.cluster_version
+
+#   iam_role_path                 = var.iam_role_path
+#   iam_role_permissions_boundary = var.iam_role_permissions_boundary
+
+#   ami_id = data.aws_ami.eks_ami.id
+
+#   subnet_ids = var.eks_managed_pools["gitaly"].subnet_ids
+
+#   create_iam_role = false
+#   iam_role_arn    = aws_iam_role.eks_node.arn
+
+#   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+#   vpc_security_group_ids            = [module.eks.node_security_group_id]
+
+#   min_size     = var.eks_managed_pools["gitaly"].min_size
+#   max_size     = var.eks_managed_pools["gitaly"].max_size
+#   desired_size = var.eks_managed_pools["gitaly"].desired_size
+
+#   block_device_mappings = [
+#     {
+#       device_name = "/dev/xvda"
+#       ebs = {
+#         volume_size           = var.eks_managed_pools["gitaly"].volume_size
+#         volume_type           = var.eks_managed_pools["gitaly"].volume_type
+#         delete_on_termination = true
+#         encrypted             = true
+#       }
+#     }
+#   ]
+
+#   instance_types             = var.eks_managed_pools["gitaly"].instance_types
+#   enable_bootstrap_user_data = true
+#   pre_bootstrap_user_data    = "sysctl -w net.ipv4.ip_forward=1\n"
+#   metadata_options           = merge(local.hoplimit_metadata, {})
+
+#   tags = merge(var.tags, var.instance_tags)
+#   taints = {
+#     general = var.eks_managed_pools["gitaly"].taints
+#   }
+
+#   labels = {
+#     gitaly = "true"
+#   }
+#   create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
+#   schedules = merge(
+#     var.node_schedule_shutdown_hour < 0 ? {} : {
+#       shutdown = {
+#         min_size     = 0
+#         max_size     = 0
+#         desired_size = 0
+#         time_zone    = var.node_schedule_timezone
+#         recurrence   = "0 ${var.node_schedule_shutdown_hour} * * *"
+#       }
+#     },
+#     var.node_schedule_startup_hour < 0 ? {} : {
+#       startup = {
+#         min_size     = var.eks_managed_pools["gitlay"].startup_min_size
+#         max_size     = var.eks_managed_pools["gitlay"].startup_max_size
+#         desired_size = var.eks_managed_pools["gitlay"].startup_desired_size
+#         time_zone    = var.node_schedule_timezone
+#         recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
+#       }
+#     }
+#   )
+# }
 
 
 
