@@ -189,8 +189,20 @@ locals {
 
     tags = merge(var.tags, var.instance_tags, try(v.tags, null))
     
-    taints = { for taint_key, taint_value in try(v.taints, {}) : taint_key => "${taint_key}=${taint_value}" }
-    labels = { for label_key, label_value in try(v.labels, {}) : label_key => "${label_key}=${label_value}" }
+    taints = [
+      for taint_key, taint_string in try(v.taints, {}) : {
+        key    = taint_key
+        value  = element(split(":", taint_string), 0)
+        effect = element(split(":", taint_string), 1)
+      }
+    ]
+    
+    labels = [
+      for label_key, label_value in try(v.labels, {}) : {
+        key   = label_key
+        value = label_value
+      }
+    ]
 
 
     create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
