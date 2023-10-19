@@ -193,7 +193,7 @@ locals {
       for taint_key, taint_string in try(v.taints, {}) : {
         key    = taint_key
         value  = element(split(":", taint_string), 0)
-        effect = element(split(":", taint_string), 1)
+        effect = NO_SCHEDULE
       }
     ]
     
