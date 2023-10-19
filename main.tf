@@ -286,8 +286,8 @@ module "eks_managed_node_groups" {
   name                          = each.value.name
   cluster_name                  = each.value.cluster_name
   cluster_version               = each.value.cluster_version
-  iam_role_path                 = each.value.iam_role_path
-  iam_role_permissions_boundary = each.value.iam_role_permissions_boundary
+  create_iam_role = false
+  iam_role_arn    = aws_iam_role.eks_node.arn
   ami_id                        = each.value.ami_id
   subnet_ids                    = each.value.subnet_ids
   min_size                      = each.value.min_size
