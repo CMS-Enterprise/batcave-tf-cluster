@@ -280,7 +280,8 @@ module "eks" {
 
 module "eks_managed_node_groups" {
   source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  for_each = local.eks_node_pools
+  
+  for_each = var.enable_eks_managed_nodes ? local.eks_node_pools : {}
 
   name                          = each.value.name
   cluster_name                  = each.value.cluster_name
