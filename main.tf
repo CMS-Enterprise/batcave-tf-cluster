@@ -204,7 +204,6 @@ locals {
       }
     ]
 
-
     create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
     schedules = merge(
       var.node_schedule_shutdown_hour < 0 ? {} : {
