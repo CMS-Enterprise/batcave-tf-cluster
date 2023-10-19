@@ -199,8 +199,7 @@ locals {
     
     labels = [
       for label_key, label_value in try(v.labels, {}) : {
-        key   = label_key
-        value = label_value
+        label_key : label_value
       }
     ]
 
