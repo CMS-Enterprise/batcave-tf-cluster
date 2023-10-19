@@ -197,11 +197,10 @@ locals {
       }
     ]
     
-    labels = [
-      for label_key, label_value in try(v.labels, {}) : {
-        label_key : label_value
-      }
-    ]
+    labels = {
+      for label_key, label_value in try(v.labels, {}) : 
+        label_key => label_value
+    }
 
     create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
     schedules = merge(
