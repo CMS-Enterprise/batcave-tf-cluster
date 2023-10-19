@@ -284,7 +284,7 @@ module "eks_managed_node_groups" {
   max_size                      = each.value.max_size
   desired_size                  = each.value.desired_size
   block_device_mappings         = each.value.block_device_mappings
-  instance_types                = [each.value.instance_type]
+  instance_types                = each.value.instance_type
   enable_bootstrap_user_data    = each.value.enable_bootstrap_user_data
   pre_bootstrap_user_data       = each.value.pre_bootstrap_user_data
   post_bootstrap_user_data      = each.value.post_bootstrap_user_data
