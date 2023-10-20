@@ -151,21 +151,21 @@ locals {
 ################################################################################
 locals {
   eks_node_pools = { for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
-    name                          = "${var.cluster_name}-${k}"
-    cluster_name                  = local.name
-    cluster_version               = local.cluster_version
-    
+    name            = "${var.cluster_name}-${k}"
+    cluster_name    = local.name
+    cluster_version = local.cluster_version
+
     iam_role_path                 = var.iam_role_path
     iam_role_permissions_boundary = var.iam_role_permissions_boundary
-    
-    ami_id                        = data.aws_ami.eks_ami.id
-    
-    subnet_ids                    = coalescelist(try(v.subnet_ids, []), var.host_subnets, var.private_subnets)
-    
-    min_size      = v.min_size
-    max_size      = v.max_size
-    desired_size  = v.desired_size
-    
+
+    ami_id = data.aws_ami.eks_ami.id
+
+    subnet_ids = coalescelist(try(v.subnet_ids, []), var.host_subnets, var.private_subnets)
+
+    min_size     = v.min_size
+    max_size     = v.max_size
+    desired_size = v.desired_size
+
     block_device_mappings = [
       {
         device_name = "/dev/xvda"
@@ -177,18 +177,18 @@ locals {
         }
       }
     ]
-    
+
 
 
     ## Define custom lines to the user_data script.  Separate commands with \n
-    instance_type = [v.instance_type]
+    instance_type              = [v.instance_type]
     enable_bootstrap_user_data = true
-    pre_bootstrap_user_data  = try(v.pre_bootstrap_user_data, "sysctl -w net.ipv4.ip_forward=1\n")
-    post_bootstrap_user_data = try(v.post_bootstrap_user_data, "")
-    metadata_options = merge(local.hoplimit_metadata, try(v.metadata_options, {}))
+    pre_bootstrap_user_data    = try(v.pre_bootstrap_user_data, "sysctl -w net.ipv4.ip_forward=1\n")
+    post_bootstrap_user_data   = try(v.post_bootstrap_user_data, "")
+    metadata_options           = merge(local.hoplimit_metadata, try(v.metadata_options, {}))
 
     tags = merge(var.tags, var.instance_tags, try(v.tags, null))
-    
+
     taints = [
       for taint_key, taint_string in try(v.taints, {}) : {
         key    = taint_key
@@ -196,10 +196,10 @@ locals {
         effect = "NO_SCHEDULE"
       }
     ]
-    
+
     labels = {
-      for label_key, label_value in try(v.labels, {}) : 
-        label_key => label_value
+      for label_key, label_value in try(v.labels, {}) :
+      label_key => label_value
     }
 
     create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
@@ -279,31 +279,31 @@ module "eks" {
 }
 
 module "eks_managed_node_groups" {
-  source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  
+  source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+
   for_each = var.enable_eks_managed_nodes ? local.eks_node_pools : {}
 
-  name                          = each.value.name
-  cluster_name                  = each.value.cluster_name
-  cluster_version               = each.value.cluster_version
-  create_iam_role = false
-  iam_role_arn    = aws_iam_role.eks_node.arn
-  ami_id                        = each.value.ami_id
-  subnet_ids                    = each.value.subnet_ids
-  min_size                      = each.value.min_size
-  max_size                      = each.value.max_size
-  desired_size                  = each.value.desired_size
-  block_device_mappings         = each.value.block_device_mappings
-  instance_types                = each.value.instance_type
-  enable_bootstrap_user_data    = each.value.enable_bootstrap_user_data
-  pre_bootstrap_user_data       = each.value.pre_bootstrap_user_data
-  post_bootstrap_user_data      = each.value.post_bootstrap_user_data
-  metadata_options              = each.value.metadata_options
-  tags                          = each.value.tags
-  taints                        = each.value.taints
-  labels                        = each.value.labels
-  create_schedule               = each.value.create_schedule
-  schedules                     = each.value.schedules
+  name                       = each.value.name
+  cluster_name               = each.value.cluster_name
+  cluster_version            = each.value.cluster_version
+  create_iam_role            = false
+  iam_role_arn               = aws_iam_role.eks_node.arn
+  ami_id                     = each.value.ami_id
+  subnet_ids                 = each.value.subnet_ids
+  min_size                   = each.value.min_size
+  max_size                   = each.value.max_size
+  desired_size               = each.value.desired_size
+  block_device_mappings      = each.value.block_device_mappings
+  instance_types             = each.value.instance_type
+  enable_bootstrap_user_data = each.value.enable_bootstrap_user_data
+  pre_bootstrap_user_data    = each.value.pre_bootstrap_user_data
+  post_bootstrap_user_data   = each.value.post_bootstrap_user_data
+  metadata_options           = each.value.metadata_options
+  tags                       = each.value.tags
+  taints                     = each.value.taints
+  labels                     = each.value.labels
+  create_schedule            = each.value.create_schedule
+  schedules                  = each.value.schedules
 
 }
 
