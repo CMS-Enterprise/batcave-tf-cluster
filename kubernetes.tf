@@ -31,8 +31,7 @@ locals {
         "system:bootstrappers",
         "system:nodes"
       ])
-    },
-    
+    }
   ])
 }
 
