@@ -23,7 +23,16 @@ locals {
         "system:bootstrappers",
         "system:nodes"
       ])
-    }
+    },
+    {
+      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/${var.iam_role_path}eks-node-${var.cluster_name}-role"
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups = tolist([
+        "system:bootstrappers",
+        "system:nodes"
+      ])
+    },
+    
   ])
 }
 
