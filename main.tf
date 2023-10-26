@@ -304,6 +304,7 @@ module "eks_managed_node_groups" {
   labels                     = each.value.labels
   create_schedule            = each.value.create_schedule
   schedules                  = each.value.schedules
+  force_update_version       = var.force_update_version
 
 }
 

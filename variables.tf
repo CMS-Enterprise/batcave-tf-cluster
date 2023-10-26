@@ -404,3 +404,9 @@ variable "enable_eks_managed_nodes" {
   default     = false
   description = "Enables eks managed nodes"
 }
+
+variable "force_update_version" {
+  type        = bool
+  default     = true
+  description = "Force update version"
+}
