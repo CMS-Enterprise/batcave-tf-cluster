@@ -197,3 +197,43 @@ resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
   role       = each.value.iam_role_name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
 }
+
+# create node IAM role
+# Need to create because decided to create EKS cluster then deploy EKS fully managed nodes.check "
+
+resource "aws_iam_role" "eks_node" {
+  name                 = "eks-node-${var.cluster_name}-role"
+  path                 = var.iam_role_path
+  permissions_boundary = var.iam_role_permissions_boundary # Using the variable here
+
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EKSNodeAssumeRole"
+        Effect = "Allow"
+        Principal = {
+          "Service" : [
+            "eks.amazonaws.com",
+            "ec2.amazonaws.com"
+          ]
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "eks_node_policies" {
+  for_each = toset([
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+    "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+    "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+    "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy",
+    "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  ])
+
+  policy_arn = each.key
+  role       = aws_iam_role.eks_node.name
+}

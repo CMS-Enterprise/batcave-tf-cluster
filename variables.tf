@@ -25,20 +25,7 @@ variable "general_node_pool" {
     min_size      = 2
     # Map of label flags for kubelets.
     labels = { general = "true" }
-    # Map of taint flags for kubelets.
-    # Ex: `{MyTaint = "true:NoSchedule"}`
     taints = {}
-    #tags = {}
-
-    # Extra args for kubelet in form of: "--node-labels=general=true <...>'.  Will be in _addition_ to any
-    # other args added by the labels and taints values
-    #extra_args = "--node-labels=general=true"
-
-    #volume_size                  = "300"
-    #volume_type                  = "gp3"
-    #volume_delete_on_termination = true
-
-    #subnet_ids = [ "list","of","subnet","ids" ]
   }
 }
 
@@ -403,4 +390,23 @@ variable "federated_access_role" {
   type        = string
   default     = "ct-ado-batcave-application-admin"
   description = "Federated access role"
+}
+
+
+variable "enable_self_managed_nodes" {
+  type        = bool
+  default     = true
+  description = "Enables self managed nodes"
+}
+
+variable "enable_eks_managed_nodes" {
+  type        = bool
+  default     = false
+  description = "Enables eks managed nodes"
+}
+
+variable "force_update_version" {
+  type        = bool
+  default     = true
+  description = "Force update version"
 }

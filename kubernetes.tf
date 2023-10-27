@@ -15,6 +15,24 @@ locals {
     }
     ]) :
   [])
+  eks_managed_node_role = ([
+    {
+      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/eks-node-${var.cluster_name}-role"
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups = tolist([
+        "system:bootstrappers",
+        "system:nodes"
+      ])
+    },
+    {
+      rolearn  = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role${var.iam_role_path}eks-node-${var.cluster_name}-role"
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups = tolist([
+        "system:bootstrappers",
+        "system:nodes"
+      ])
+    }
+  ])
 }
 
 locals {
@@ -91,6 +109,7 @@ resource "kubernetes_config_map" "aws_auth" {
         tolist(local.configmap_roles),
         tolist(local.delete_ebs_volumes_lambda_role_mapping),
         local.custom_configmap_master_roles,
+        local.eks_managed_node_role,
       ))
     )
   }
@@ -98,6 +117,12 @@ resource "kubernetes_config_map" "aws_auth" {
     null_resource.kubernetes_requirements,
     kubernetes_cluster_role_binding.delete_ebs_volumes_lambda,
   ]
+  # EKS managed nodes will update this configmap on their own, so we need to ignore changes to it
+  # This will avoid terraform overwriting the configmap with the old values
+  # lifecycle {
+  #   ignore_changes = [data]
+  # }
+
 }
 
 provider "kubectl" {

@@ -147,6 +147,86 @@ locals {
   {})
 }
 
+################################################################################
+# EKS Fully managed nodes
+################################################################################
+locals {
+  eks_node_pools = { for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
+    name            = "${var.cluster_name}-${k}"
+    cluster_name    = local.name
+    cluster_version = local.cluster_version
+
+    iam_role_path                 = var.iam_role_path
+    iam_role_permissions_boundary = var.iam_role_permissions_boundary
+
+    ami_id = data.aws_ami.eks_ami.id
+
+    subnet_ids = coalescelist(try(v.subnet_ids, []), var.host_subnets, var.private_subnets)
+
+    min_size     = v.min_size
+    max_size     = v.max_size
+    desired_size = v.desired_size
+
+    block_device_mappings = [
+      {
+        device_name = "/dev/xvda"
+        ebs = {
+          volume_size           = try(v.volume_size, "300")
+          volume_type           = try(v.volume_type, "gp3")
+          delete_on_termination = try(v.volume_delete_on_termination, true)
+          encrypted             = true
+        }
+      }
+    ]
+
+
+
+    ## Define custom lines to the user_data script.  Separate commands with \n
+    instance_type              = [v.instance_type]
+    enable_bootstrap_user_data = true
+    pre_bootstrap_user_data    = try(v.pre_bootstrap_user_data, "sysctl -w net.ipv4.ip_forward=1\n")
+    post_bootstrap_user_data   = try(v.post_bootstrap_user_data, "")
+    metadata_options           = merge(local.hoplimit_metadata, try(v.metadata_options, {}))
+
+    tags = merge(var.tags, var.instance_tags, try(v.tags, null))
+
+    taints = [
+      for taint_key, taint_string in try(v.taints, {}) : {
+        key    = taint_key
+        value  = element(split(":", taint_string), 0)
+        effect = "NO_SCHEDULE"
+      }
+    ]
+
+    labels = {
+      for label_key, label_value in try(v.labels, {}) :
+      label_key => label_value
+    }
+
+    create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
+    schedules = merge(
+      var.node_schedule_shutdown_hour < 0 ? {} : {
+        shutdown = {
+          min_size     = 0
+          max_size     = 0
+          desired_size = 0
+          time_zone    = var.node_schedule_timezone
+          recurrence   = "0 ${var.node_schedule_shutdown_hour} * * *"
+        }
+      },
+      var.node_schedule_startup_hour < 0 ? {} : {
+        startup = {
+          min_size     = v.min_size
+          max_size     = v.max_size
+          desired_size = v.desired_size
+          time_zone    = var.node_schedule_timezone
+          recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
+        }
+      }
+    )
+  } }
+}
+
 module "eks" {
   ## https://github.com/terraform-aws-modules/terraform-aws-eks
   source  = "terraform-aws-modules/eks/aws"
@@ -158,7 +238,8 @@ module "eks" {
   iam_role_path                  = var.iam_role_path
   iam_role_permissions_boundary  = var.iam_role_permissions_boundary
   cluster_encryption_policy_path = var.iam_role_path
-
+  # create_iam_role                = false
+  # iam_role_arn                   = aws_iam_role.eks_node.arn
 
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets
@@ -187,24 +268,47 @@ module "eks" {
   self_managed_node_group_defaults = {
     subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
   }
+
   ## CLUSTER Addons
-  cluster_addons = {
-    #vpc-cni = {
-    #  resolve_conflicts        = "OVERWRITE"
-    #  service_account_role_arn = module.vpc_cni_irsa.iam_role_arn
-    #  addon_version            = var.addon_vpc_cni_version
-    #}
-    #kube-proxy = {
-    #  resolve_conflicts = "OVERWRITE"
-    #  addon_version     = var.addon_kube_proxy_version
-    #}
-  }
+  cluster_addons = {}
+
   # Worker groups (using Launch Configurations)
-  self_managed_node_groups = local.custom_node_pools
+  self_managed_node_groups = var.enable_self_managed_nodes ? local.custom_node_pools : {}
 
   # apply any global tags to the cluster itself
   cluster_tags = var.tags
 }
+
+module "eks_managed_node_groups" {
+  source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+
+  for_each = var.enable_eks_managed_nodes ? local.eks_node_pools : {}
+
+  name                       = each.value.name
+  cluster_name               = each.value.cluster_name
+  cluster_version            = each.value.cluster_version
+  create_iam_role            = false
+  iam_role_arn               = aws_iam_role.eks_node.arn
+  ami_id                     = each.value.ami_id
+  subnet_ids                 = each.value.subnet_ids
+  min_size                   = each.value.min_size
+  max_size                   = each.value.max_size
+  desired_size               = each.value.desired_size
+  block_device_mappings      = each.value.block_device_mappings
+  instance_types             = each.value.instance_type
+  enable_bootstrap_user_data = each.value.enable_bootstrap_user_data
+  pre_bootstrap_user_data    = each.value.pre_bootstrap_user_data
+  post_bootstrap_user_data   = each.value.post_bootstrap_user_data
+  metadata_options           = each.value.metadata_options
+  tags                       = each.value.tags
+  taints                     = each.value.taints
+  labels                     = each.value.labels
+  create_schedule            = each.value.create_schedule
+  schedules                  = each.value.schedules
+  force_update_version       = var.force_update_version
+
+}
+
 module "vpc_cni_irsa" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
