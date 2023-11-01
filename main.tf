@@ -284,28 +284,30 @@ module "eks_managed_node_groups" {
 
   for_each = var.enable_eks_managed_nodes ? local.eks_node_pools : {}
 
-  name                       = each.value.name
-  cluster_name               = each.value.cluster_name
-  cluster_version            = each.value.cluster_version
-  create_iam_role            = false
-  iam_role_arn               = aws_iam_role.eks_node.arn
-  ami_id                     = each.value.ami_id
-  subnet_ids                 = each.value.subnet_ids
-  min_size                   = each.value.min_size
-  max_size                   = each.value.max_size
-  desired_size               = each.value.desired_size
-  block_device_mappings      = each.value.block_device_mappings
-  instance_types             = each.value.instance_type
-  enable_bootstrap_user_data = each.value.enable_bootstrap_user_data
-  pre_bootstrap_user_data    = each.value.pre_bootstrap_user_data
-  post_bootstrap_user_data   = each.value.post_bootstrap_user_data
-  metadata_options           = each.value.metadata_options
-  tags                       = each.value.tags
-  taints                     = each.value.taints
-  labels                     = each.value.labels
-  create_schedule            = each.value.create_schedule
-  schedules                  = each.value.schedules
-  force_update_version       = var.force_update_version
+  name                              = each.value.name
+  cluster_name                      = each.value.cluster_name
+  cluster_version                   = each.value.cluster_version
+  create_iam_role                   = false
+  iam_role_arn                      = aws_iam_role.eks_node.arn
+  ami_id                            = each.value.ami_id
+  subnet_ids                        = each.value.subnet_ids
+  min_size                          = each.value.min_size
+  max_size                          = each.value.max_size
+  desired_size                      = each.value.desired_size
+  block_device_mappings             = each.value.block_device_mappings
+  instance_types                    = each.value.instance_type
+  enable_bootstrap_user_data        = each.value.enable_bootstrap_user_data
+  pre_bootstrap_user_data           = each.value.pre_bootstrap_user_data
+  post_bootstrap_user_data          = each.value.post_bootstrap_user_data
+  metadata_options                  = each.value.metadata_options
+  tags                              = each.value.tags
+  taints                            = each.value.taints
+  labels                            = each.value.labels
+  create_schedule                   = each.value.create_schedule
+  schedules                         = each.value.schedules
+  force_update_version              = var.force_update_version
+  cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
+  vpc_security_group_ids            = [module.eks.node_security_group_id]
 
 }
 
