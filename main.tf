@@ -499,11 +499,11 @@ resource "aws_iam_role" "cosign" {
 #}
 
 locals {
-  autoscaling_groups = try(toset(flatten([for group in module.eks_managed_node_groups : group.node_group_autoscaling_group_names])), [])
+  autoscaling_groups = try(length(module.eks_managed_node_groups.node_group_autoscaling_group_names) > 0 ? module.eks_managed_node_groups.node_group_autoscaling_group_names : [], [])
 }
 
 resource "aws_autoscaling_attachment" "eks_managed_node_groups_alb_attachment" {
-  count = length(local.autoscaling_groups)
+  count                     = length(local.autoscaling_groups)
   autoscaling_group_name = local.autoscaling_groups[count.index]
   lb_target_group_arn = aws_lb_target_group.batcave_alb_https.arn
 
