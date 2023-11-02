@@ -187,5 +187,5 @@ output "batcave_alb_shared_dns" {
 
 
 output "local-test" {
-  value = local.eks_node_pools.group_name
+  value = local.eks_node_pools
 }
