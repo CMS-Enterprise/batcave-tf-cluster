@@ -507,7 +507,7 @@ resource "aws_autoscaling_attachment" "eks_managed_node_groups_alb_attachment" {
   for_each = local.autoscaling_groups
   autoscaling_group_name = each.value
   lb_target_group_arn    = aws_lb_target_group.batcave_alb_https.arn
- depends_on = [  
+  depends_on = [  
     module.eks_managed_node_groups
   ]
 }
