@@ -144,9 +144,9 @@ output "self_managed_node_groups" {
   value       = module.eks.self_managed_node_groups
 }
 
-output "eks_managed_node_group_arns" {
+output "eks_managed_node_group" {
   description = "ARNs of all self managed node groups created"
-  value       = module.eks_managed_node_groups
+  value       = module.eks_managed_node_groups.*.node_group_autoscaling_group_names
 }
 
 ################################################################################
