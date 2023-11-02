@@ -501,6 +501,7 @@ resource "aws_iam_role" "cosign" {
 
 resource "aws_autoscaling_attachment" "eks_managed_node_groups_alb_attachment" {
 <<<<<<< HEAD
+<<<<<<< HEAD
   for_each               = var.enable_eks_managed_nodes ? { for np in local.eks_node_pools : np.name => np } : {}
   autoscaling_group_name = try(module.eks_managed_node_groups[each.value.group_name].node_group_autoscaling_group_names, "")
 =======
@@ -513,6 +514,9 @@ resource "aws_autoscaling_attachment" "eks_managed_node_groups_alb_attachment" {
   autoscaling_group_name  = module.eks_managed_node_groups[each.value.name].node_group_autoscaling_group_names
 >>>>>>> ef9d888 (updated code with foreach)
 =======
+=======
+  for_each                = var.var.enable_eks_managed_nodes ? { for np in local.eks_node_pools : np.name => np } : {}
+>>>>>>> 9e62f6e (updated code with foreach)
   autoscaling_group_name  = try(module.eks_managed_node_groups[each.value.name].node_group_autoscaling_group_names, "")
 >>>>>>> b2a2e33 (updated code with foreach)
 
@@ -546,7 +550,7 @@ resource "aws_autoscaling_attachment" "eks_managed_node_groups_shared_attachment
 }
 
 resource "aws_autoscaling_attachment" "eks_managed_node_groups_proxy_attachment" {
-  for_each                = var.create_alb_proxy ? { for np in local.eks_node_pools : np.name => np } : {}
+  for_each                = var.create_alb_proxy && var.enable_eks_managed_nodes ? { for np in local.eks_node_pools : np.name => np } : {}
   autoscaling_group_name  = try(module.eks_managed_node_groups[each.value.name].node_group_autoscaling_group_names, "")
 
   lb_target_group_arn     = var.create_alb_proxy ? aws_lb_target_group.batcave_alb_proxy_https[0].arn : null
@@ -557,7 +561,7 @@ resource "aws_autoscaling_attachment" "eks_managed_node_groups_proxy_attachment"
 }
 
 resource "aws_autoscaling_attachment" "eks_managed_node_groups_shared_attachment" {
-  for_each                = var.create_alb_shared ? { for np in local.eks_node_pools : np.name => np } : {}
+  for_each                = var.create_alb_shared && var.enable_eks_managed_nodes ? { for np in local.eks_node_pools : np.name => np } : {}
   autoscaling_group_name  = try(module.eks_managed_node_groups[each.value.name].node_group_autoscaling_group_names, "")
 
   lb_target_group_arn     = var.create_alb_shared ? aws_lb_target_group.batcave_alb_shared_https[0].arn : null
