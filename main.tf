@@ -503,20 +503,11 @@ locals{
 }
     
 # EKS fully managed nodes ASG's Association with target groups.
-# resource "aws_autoscaling_attachment" "eks_managed_node_groups_alb_attachment" {
-#  for_each = toset(compact(flatten([for group in module.eks_managed_node_groups : group.node_group_autoscaling_group_names])))
-#  autoscaling_group_name = each.value
-#  lb_target_group_arn = aws_lb_target_group.batcave_alb_https.arn
-#  depends_on = [  
-#     module.eks_managed_node_groups
-#   ]
-# }
-
 resource "aws_autoscaling_attachment" "eks_managed_node_groups_alb_attachment" {
-  for_each = length(local.autoscaling_groups) > 0 ? toset(local.autoscaling_groups) : toset([])
+  for_each = local.autoscaling_groups
   autoscaling_group_name = each.value
-  lb_target_group_arn = aws_lb_target_group.batcave_alb_https.arn
-  depends_on = [  
+  lb_target_group_arn    = aws_lb_target_group.batcave_alb_https.arn
+ depends_on = [  
     module.eks_managed_node_groups
   ]
 }
