@@ -152,7 +152,7 @@ locals {
 ################################################################################
 locals {
   eks_node_pools = { for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
-    group_name      = "${k}"
+    group_name      = k
     name            = "${var.cluster_name}-${k}"
     cluster_name    = local.name
     cluster_version = local.cluster_version
