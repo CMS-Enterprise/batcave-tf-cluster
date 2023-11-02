@@ -501,7 +501,7 @@ resource "aws_iam_role" "cosign" {
     
 # EKS fully managed nodes ASG's Association with target groups.
 resource "aws_autoscaling_attachment" "eks_managed_node_groups_alb_attachment" {
- for_each = compact(flatten([for group in module.eks_managed_node_groups : group.node_group_autoscaling_group_names]))
+ for_each = toset(compact(flatten([for group in module.eks_managed_node_groups : group.node_group_autoscaling_group_names])))
  autoscaling_group_name = each.value
  lb_target_group_arn = aws_lb_target_group.batcave_alb_https.arn
 }
