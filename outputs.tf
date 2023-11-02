@@ -146,7 +146,7 @@ output "self_managed_node_groups" {
 
 output "eks_managed_node_group" {
   description = "ARNs of all self managed node groups created"
-  value       = compact(flatten([for group in module.eks_managed_node_group : group.node_group_autoscaling_group_names]))
+  value       = compact(flatten([for group in module.eks_managed_node_groups : group.node_group_autoscaling_group_names]))
 }
 
 ################################################################################
