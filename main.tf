@@ -499,7 +499,7 @@ resource "aws_iam_role" "cosign" {
 #}
 
 locals{
-  autoscaling_groups = flatten([for group in module.eks_managed_node_groups : group.node_group_autoscaling_group_names])
+  autoscaling_groups = try(toset(flatten([for group in module.eks_managed_node_groups : group.node_group_autoscaling_group_names])), [])
 }
     
 # EKS fully managed nodes ASG's Association with target groups.
