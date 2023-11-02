@@ -503,9 +503,9 @@ locals {
 }
 
 resource "aws_autoscaling_attachment" "eks_managed_node_groups_alb_attachment" {
-  count                     = length(local.autoscaling_groups)
+  count                  = length(local.autoscaling_groups)
   autoscaling_group_name = local.autoscaling_groups[count.index]
-  lb_target_group_arn = aws_lb_target_group.batcave_alb_https.arn
+  lb_target_group_arn    = aws_lb_target_group.batcave_alb_https.arn
 
   depends_on = [
     module.eks_managed_node_groups
@@ -517,8 +517,8 @@ resource "aws_autoscaling_attachment" "eks_managed_node_groups_shared_attachment
   for_each = var.create_alb_shared ? toset(compact(flatten([for group in module.eks_managed_node_groups : group.node_group_autoscaling_group_names]))) : []
 
   autoscaling_group_name = each.value
-  lb_target_group_arn = aws_lb_target_group.batcave_alb_shared_https[0].arn
-  depends_on = [  
+  lb_target_group_arn    = aws_lb_target_group.batcave_alb_shared_https[0].arn
+  depends_on = [
     module.eks_managed_node_groups
   ]
 }
@@ -527,8 +527,8 @@ resource "aws_autoscaling_attachment" "eks_managed_node_groups_proxy_attachment"
   for_each = var.create_alb_proxy ? toset(compact(flatten([for group in module.eks_managed_node_groups : group.node_group_autoscaling_group_names]))) : []
 
   autoscaling_group_name = each.value
-  lb_target_group_arn = aws_lb_target_group.batcave_alb_proxy_https[0].arn
-  depends_on = [  
+  lb_target_group_arn    = aws_lb_target_group.batcave_alb_proxy_https[0].arn
+  depends_on = [
     module.eks_managed_node_groups
   ]
 }
