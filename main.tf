@@ -505,8 +505,12 @@ resource "aws_autoscaling_attachment" "eks_managed_node_groups_alb_attachment" {
   autoscaling_group_name = try(module.eks_managed_node_groups[each.value.group_name].node_group_autoscaling_group_names, "")
 =======
   for_each                = { for np in local.eks_node_pools : np.name => np }
+<<<<<<< HEAD
   autoscaling_group_name  = module.eks_managed_node_groups[each.value].node_group_autoscaling_group_names
 >>>>>>> bcfbfe1 (updated code with foreach)
+=======
+  autoscaling_group_name  = module.eks_managed_node_groups[each.value.name].node_group_autoscaling_group_names
+>>>>>>> ef9d888 (updated code with foreach)
 
   lb_target_group_arn = aws_lb_target_group.batcave_alb_https.arn
 
