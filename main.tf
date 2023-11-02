@@ -497,3 +497,15 @@ resource "aws_iam_role" "cosign" {
 #
 #  depends_on = [null_resource.kubernetes_requirements]
 #}
+
+    # target_group_arns = (k == "general" || contains(keys(try(v.labels, {})), "general")) ? concat(
+    #   [aws_lb_target_group.batcave_alb_https.arn],
+    #   var.create_alb_proxy ? [aws_lb_target_group.batcave_alb_proxy_https[0].arn] : [],
+    #   var.create_alb_shared ? [aws_lb_target_group.batcave_alb_shared_https[0].arn] : []
+    # ) : null
+    
+# EKS fully managed nodes ASG's Association with target groups.
+# resource "aws_autoscaling_attachment" "eks_managed_node_groups" {
+#   autoscaling_group_name = module.eks_managed_node_groups[each.key].id
+#   alb_target_group_arn   = each.value.target_group_arns[0]
+# }
