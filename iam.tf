@@ -100,6 +100,7 @@ resource "aws_iam_role_policy_attachment" "additional" {
   role       = each.value.iam_role_name
 }
 
+
 # Cloudwatch Logs policy
 data "aws_iam_policy_document" "cloudwatch_logs" {
   statement {
@@ -236,4 +237,22 @@ resource "aws_iam_role_policy_attachment" "eks_node_policies" {
 
   policy_arn = each.key
   role       = aws_iam_role.eks_node.name
+}
+
+# Attach KMS policy to node IAM role
+resource "aws_iam_role_policy_attachment" "eks_additional" {
+  policy_arn = aws_iam_policy.node_policy.arn
+  role       = aws_iam_role.eks_node.name
+}
+
+# policy attachment
+resource "aws_iam_role_policy_attachment" "eks_ssm_managed_instance" {
+  role       = aws_iam_role.eks_node.name
+  policy_arn = aws_iam_policy.ssm_managed_instance.arn
+}
+
+# policy attachment
+resource "aws_iam_role_policy_attachment" "eks_cloudwatch_plolicy_attachment" {
+  role       = aws_iam_role.eks_node.name
+  policy_arn = aws_iam_policy.cloudwatch_logs.arn
 }
