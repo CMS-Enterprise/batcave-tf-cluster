@@ -502,6 +502,7 @@ resource "aws_iam_role" "cosign" {
 resource "aws_autoscaling_attachment" "eks_managed_node_groups_alb_attachment" {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   for_each               = var.enable_eks_managed_nodes ? { for np in local.eks_node_pools : np.name => np } : {}
   autoscaling_group_name = try(module.eks_managed_node_groups[each.value.group_name].node_group_autoscaling_group_names, "")
 =======
@@ -517,6 +518,9 @@ resource "aws_autoscaling_attachment" "eks_managed_node_groups_alb_attachment" {
 =======
   for_each                = var.var.enable_eks_managed_nodes ? { for np in local.eks_node_pools : np.name => np } : {}
 >>>>>>> 9e62f6e (updated code with foreach)
+=======
+  for_each                = var.enable_eks_managed_nodes ? { for np in local.eks_node_pools : np.name => np } : {}
+>>>>>>> 51b3c0a (updated code with foreach)
   autoscaling_group_name  = try(module.eks_managed_node_groups[each.value.name].node_group_autoscaling_group_names, "")
 >>>>>>> b2a2e33 (updated code with foreach)
 
