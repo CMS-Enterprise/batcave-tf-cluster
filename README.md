@@ -35,10 +35,10 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.5.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.28.0 |
 | <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | 1.14.0 |
-| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | 2.21.1 |
-| <a name="provider_null"></a> [null](#provider\_null) | 3.2.1 |
+| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | 2.24.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.2 |
 
 ## Modules
 
@@ -52,6 +52,9 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Type |
 |------|------|
+| [aws_autoscaling_attachment.eks_managed_node_groups_alb_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_attachment) | resource |
+| [aws_autoscaling_attachment.eks_managed_node_groups_proxy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_attachment) | resource |
+| [aws_autoscaling_attachment.eks_managed_node_groups_shared_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_attachment) | resource |
 | [aws_iam_policy.cloudwatch_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.node_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.ssm_managed_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
@@ -60,7 +63,10 @@ Note that this example may create resources which cost money. Run `terraform des
 | [aws_iam_role_policy_attachment.additional](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.cloudwatch_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.ebs_csi_driver](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.eks_additional](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.eks_cloudwatch_plolicy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.eks_node_policies](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.eks_ssm_managed_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.ssm_managed_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_service_linked_role.autoscaling](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_service_linked_role) | resource |
 | [aws_kms_key.eks](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
@@ -139,6 +145,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_alb_shared_ingress_prefix_lists"></a> [alb\_shared\_ingress\_prefix\_lists](#input\_alb\_shared\_ingress\_prefix\_lists) | List of Prefix List IDs allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs | `list(string)` | `[]` | no |
 | <a name="input_alb_shared_is_internal"></a> [alb\_shared\_is\_internal](#input\_alb\_shared\_is\_internal) | If the ALB in the shared subnet should be using internal ips. Defaults to false, because the reason for this ALB existing is to make it accessible over the Internet | `bool` | `false` | no |
 | <a name="input_alb_shared_subnets"></a> [alb\_shared\_subnets](#input\_alb\_shared\_subnets) | List of subnet ids for the ALB in the shared subnet | `list(string)` | `[]` | no |
+| <a name="input_alb_ssl_security_policy"></a> [alb\_ssl\_security\_policy](#input\_alb\_ssl\_security\_policy) | ALB SSL Security Policy | `string` | `"ELBSecurityPolicy-TLS13-1-2-Res-2021-06"` | no |
 | <a name="input_alb_subnets_by_zone"></a> [alb\_subnets\_by\_zone](#input\_alb\_subnets\_by\_zone) | n/a | `map(string)` | n/a | yes |
 | <a name="input_ami_date"></a> [ami\_date](#input\_ami\_date) | n/a | `string` | `""` | no |
 | <a name="input_ami_regex_override"></a> [ami\_regex\_override](#input\_ami\_regex\_override) | Overrides default AMI lookup regex, which grabs latest AMI matching cluster\_version by default | `string` | `""` | no |
@@ -159,13 +166,13 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_create_alb_shared"></a> [create\_alb\_shared](#input\_create\_alb\_shared) | Creaes an ALB in the shared subnet | `bool` | `false` | no |
 | <a name="input_create_cosign_iam_role"></a> [create\_cosign\_iam\_role](#input\_create\_cosign\_iam\_role) | Flag to create Cosign IAM role | `bool` | `false` | no |
 | <a name="input_custom_node_pools"></a> [custom\_node\_pools](#input\_custom\_node\_pools) | n/a | `any` | `{}` | no |
-| <a name="input_eks_managed_pools"></a> [eks\_managed\_pools](#input\_eks\_managed\_pools) | n/a | <pre>map(object({<br>    enabled              = bool<br>    min_size             = number<br>    max_size             = number<br>    desired_size         = number<br>    volume_size          = number<br>    volume_type          = string<br>    instance_types       = list(string)<br>    startup_min_size     = number<br>    startup_max_size     = number<br>    startup_desired_size = number<br>    taints = object({<br>      key    = string<br>      value  = string<br>      effect = string<br>    })<br>    subnet_ids = list(string)<br>  }))</pre> | <pre>{<br>  "general": {<br>    "desired_size": 1,<br>    "enabled": false,<br>    "instance_types": [<br>      "c5.4xlarge"<br>    ],<br>    "max_size": 3,<br>    "min_size": 1,<br>    "startup_desired_size": 1,<br>    "startup_max_size": 3,<br>    "startup_min_size": 1,<br>    "subnet_ids": [],<br>    "taints": {<br>      "effect": "NO_SCHEDULE",<br>      "key": "bat_app",<br>      "value": "general"<br>    },<br>    "volume_size": 300,<br>    "volume_type": "gp3"<br>  },<br>  "gitaly": {<br>    "desired_size": 1,<br>    "enabled": false,<br>    "instance_types": [<br>      "c5.4xlarge"<br>    ],<br>    "max_size": 3,<br>    "min_size": 1,<br>    "startup_desired_size": 1,<br>    "startup_max_size": 2,<br>    "startup_min_size": 1,<br>    "subnet_ids": [],<br>    "taints": {<br>      "effect": "NO_SCHEDULE",<br>      "key": "bat_app",<br>      "value": "gitaly"<br>    },<br>    "volume_size": 300,<br>    "volume_type": "gp3"<br>  },<br>  "runners": {<br>    "desired_size": 1,<br>    "enabled": false,<br>    "instance_types": [<br>      "c5.4xlarge"<br>    ],<br>    "max_size": 4,<br>    "min_size": 1,<br>    "startup_desired_size": 1,<br>    "startup_max_size": 2,<br>    "startup_min_size": 1,<br>    "subnet_ids": [],<br>    "taints": {<br>      "effect": "NO_SCHEDULE",<br>      "key": "bat_app",<br>      "value": "runner"<br>    },<br>    "volume_size": 300,<br>    "volume_type": "gp3"<br>  }<br>}</pre> | no |
 | <a name="input_enable_eks_managed_nodes"></a> [enable\_eks\_managed\_nodes](#input\_enable\_eks\_managed\_nodes) | Enables eks managed nodes | `bool` | `false` | no |
 | <a name="input_enable_hoplimit"></a> [enable\_hoplimit](#input\_enable\_hoplimit) | Enables a IMDSv2 hop limit of 1 on all nodes. Defaults to false | `bool` | `false` | no |
 | <a name="input_enable_irsa"></a> [enable\_irsa](#input\_enable\_irsa) | n/a | `string` | `"true"` | no |
 | <a name="input_enable_self_managed_nodes"></a> [enable\_self\_managed\_nodes](#input\_enable\_self\_managed\_nodes) | Enables self managed nodes | `bool` | `true` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | n/a | `string` | `"dev"` | no |
 | <a name="input_federated_access_role"></a> [federated\_access\_role](#input\_federated\_access\_role) | Federated access role | `string` | `"ct-ado-batcave-application-admin"` | no |
+| <a name="input_force_update_version"></a> [force\_update\_version](#input\_force\_update\_version) | Force update version | `bool` | `true` | no |
 | <a name="input_general_node_pool"></a> [general\_node\_pool](#input\_general\_node\_pool) | General node pool, required for hosting core services | `any` | <pre>{<br>  "desired_size": 3,<br>  "instance_type": "c5.2xlarge",<br>  "labels": {<br>    "general": "true"<br>  },<br>  "max_size": 5,<br>  "min_size": 2,<br>  "taints": {}<br>}</pre> | no |
 | <a name="input_general_nodepool_tags"></a> [general\_nodepool\_tags](#input\_general\_nodepool\_tags) | General Node Pool tags | `map(any)` | `null` | no |
 | <a name="input_github_actions_role"></a> [github\_actions\_role](#input\_github\_actions\_role) | Github actions role | `string` | `"batcave-github-actions-role"` | no |
@@ -225,6 +232,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="output_cluster_status"></a> [cluster\_status](#output\_cluster\_status) | Status of the EKS cluster. One of `CREATING`, `ACTIVE`, `DELETING`, `FAILED` |
 | <a name="output_cluster_version"></a> [cluster\_version](#output\_cluster\_version) | The version of the cluster being deployed |
 | <a name="output_cosign_iam_role_arn"></a> [cosign\_iam\_role\_arn](#output\_cosign\_iam\_role\_arn) | n/a |
+| <a name="output_eks_managed_node_group"></a> [eks\_managed\_node\_group](#output\_eks\_managed\_node\_group) | ARNs of all self managed node groups created |
 | <a name="output_fargate_profiles"></a> [fargate\_profiles](#output\_fargate\_profiles) | Map of attribute maps for all EKS Fargate Profiles created |
 | <a name="output_node_security_group_arn"></a> [node\_security\_group\_arn](#output\_node\_security\_group\_arn) | Amazon Resource Name (ARN) of the node shared security group |
 | <a name="output_node_security_group_id"></a> [node\_security\_group\_id](#output\_node\_security\_group\_id) | ID of the node shared security group |

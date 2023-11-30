@@ -291,6 +291,12 @@ variable "alb_private_tags" {
   type        = map(any)
 }
 
+variable "alb_ssl_security_policy" {
+  description = "ALB SSL Security Policy"
+  default     = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
+  type        = string
+}
+
 variable "s3_bucket_access_grants" {
   description = "A list of s3 bucket names to grant the cluster roles R/W access to"
   default     = null
