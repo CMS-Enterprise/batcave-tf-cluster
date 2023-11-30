@@ -32,7 +32,7 @@ resource "aws_lb_listener" "batcave_alb_https" {
   load_balancer_arn = aws_lb.batcave_alb.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  ssl_policy        = var.alb_ssl_security_policy
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.batcave_alb_https.arn
