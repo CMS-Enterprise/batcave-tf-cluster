@@ -199,6 +199,11 @@ variable "node_https_ingress_cidr_blocks" {
   type        = list(string)
 }
 
+variable "alb_restricted_hosts" {
+  type        = string
+  description = "A list of allowable host for private alb"
+  # default     = []
+}
 variable "create_alb_proxy" {
   type        = bool
   description = "Create an Application Load Balancer proxy to live in front of the K8s ALB and act as a proxy from the public Internet"

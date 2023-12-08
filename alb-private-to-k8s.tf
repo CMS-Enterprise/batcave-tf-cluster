@@ -27,22 +27,55 @@ resource "aws_lb" "batcave_alb" {
   )
 }
 
+locals{
+  alb_restricted_hosts= toset([var.alb_restricted_hosts])
+}
 # Listener HTTPS
 resource "aws_lb_listener" "batcave_alb_https" {
   load_balancer_arn = aws_lb.batcave_alb.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = var.alb_ssl_security_policy
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.batcave_alb_https.arn
+  dynamic "default_action" {
+    for_each=length(local.alb_restricted_hosts) == 0 ?["forward all request"] : []
+    content{
+      type             = "forward"
+      target_group_arn = aws_lb_target_group.batcave_alb_https.arn
+    }
   }
-  certificate_arn = data.aws_acm_certificate.acm_certificate[0].arn
+  dynamic "default_action" {
+    for_each=length(local.alb_restricted_hosts) > 0 ?["deny all request"] : []
+    content{
+      type             = "fixed-response"
+      fixed_response {
+      content_type = "text/plain"
+      message_body = "Unacceptable Host"
+      status_code  = "403"
+      }
+    }
+  }
+ certificate_arn = data.aws_acm_certificate.acm_certificate[0].arn
   tags = {
     Name        = "${var.cluster_name}-https-tg"
     Environment = var.environment
   }
 }
+# Listener Rule
+resource "aws_lb_listener_rule" "batcave_alb_https" {
+  for_each=length(local.alb_restricted_hosts) > 0 ?["create rule"] : toset([])
+  listener_arn = aws_lb_listener.batcave_alb_https.arn
+  priority     = 100
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.batcave_alb_https.arn
+  }
+  condition {
+    host_header {
+      values = local.alb_restricted_hosts
+    }
+  }
+}
+
 
 # Redirect from HTTP to HTTPS
 resource "aws_lb_listener" "batcave_alb_http" {
