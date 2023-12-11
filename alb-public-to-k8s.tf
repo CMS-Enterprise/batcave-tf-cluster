@@ -39,14 +39,42 @@ resource "aws_lb_listener" "batcave_alb_proxy_https" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = var.alb_ssl_security_policy
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.batcave_alb_proxy_https[0].arn
+  dynamic "default_action" {
+    for_each=length(var.alb_proxy_restricted_hosts) == 0 ?["forward all request"] : []
+    content{
+      type             = "forward"
+      target_group_arn = aws_lb_target_group.batcave_alb_proxy_https[0].arn
+    }
+  }
+  dynamic "default_action" {
+    for_each=length(var.alb_proxy_restricted_hosts) > 0 ?["deny all request"] : []
+    content{
+      type             = "fixed-response"
+      fixed_response {
+      content_type = "text/plain"
+      message_body = "Unacceptable Host"
+      status_code  = "403"
+      }
+    }
   }
   certificate_arn = data.aws_acm_certificate.acm_certificate[0].arn
   tags = {
     Name        = "${var.cluster_name}_alb_proxy_https"
     Environment = var.environment
+  }
+}
+# Listener Rule 
+resource "aws_lb_listener_rule" "batcave_alb__proxy_https" {
+  for_each=var.alb_proxy_restricted_hosts
+  listener_arn = aws_lb_listener.batcave_alb_proxy_https[0].arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.batcave_alb_proxy_https[0].arn
+  }
+  condition {
+    host_header {
+      values = [each.value]
+    }
   }
 }
 

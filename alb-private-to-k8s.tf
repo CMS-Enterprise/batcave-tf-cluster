@@ -27,9 +27,9 @@ resource "aws_lb" "batcave_alb" {
   )
 }
 
-locals{
-  alb_restricted_hosts= toset([var.alb_restricted_hosts])
-}
+# locals{
+#   alb_restricted_hosts=var.alb_restricted_hosts
+# }
 # Listener HTTPS
 resource "aws_lb_listener" "batcave_alb_https" {
   load_balancer_arn = aws_lb.batcave_alb.arn
@@ -37,14 +37,14 @@ resource "aws_lb_listener" "batcave_alb_https" {
   protocol          = "HTTPS"
   ssl_policy        = var.alb_ssl_security_policy
   dynamic "default_action" {
-    for_each=length(local.alb_restricted_hosts) == 0 ?["forward all request"] : []
+    for_each=length(var.alb_restricted_hosts) == 0 ?["forward all request"] : []
     content{
       type             = "forward"
       target_group_arn = aws_lb_target_group.batcave_alb_https.arn
     }
   }
   dynamic "default_action" {
-    for_each=length(local.alb_restricted_hosts) > 0 ?["deny all request"] : []
+    for_each=length(var.alb_restricted_hosts) > 0 ?["deny all request"] : []
     content{
       type             = "fixed-response"
       fixed_response {
@@ -60,18 +60,17 @@ resource "aws_lb_listener" "batcave_alb_https" {
     Environment = var.environment
   }
 }
-# Listener Rule
+# Listener Rule 
 resource "aws_lb_listener_rule" "batcave_alb_https" {
-  for_each=length(local.alb_restricted_hosts) > 0 ?["create rule"] : toset([])
+  for_each=var.alb_restricted_hosts
   listener_arn = aws_lb_listener.batcave_alb_https.arn
-  priority     = 100
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.batcave_alb_https.arn
   }
   condition {
     host_header {
-      values = local.alb_restricted_hosts
+      values = [each.value]
     }
   }
 }

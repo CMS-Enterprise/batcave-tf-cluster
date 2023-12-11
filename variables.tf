@@ -200,9 +200,20 @@ variable "node_https_ingress_cidr_blocks" {
 }
 
 variable "alb_restricted_hosts" {
-  type        = string
+  type        = set(string)
   description = "A list of allowable host for private alb"
-  # default     = []
+  default     = []
+}
+
+variable "alb_proxy_restricted_hosts" {
+  type        = set(string)
+  description = "A list of allowable host for proxy alb"
+  default     = []
+}
+variable "alb_shared_restricted_hosts" {
+  type        = set(string)
+  description = "A list of allowable host for shared alb"
+  default     = []
 }
 variable "create_alb_proxy" {
   type        = bool
