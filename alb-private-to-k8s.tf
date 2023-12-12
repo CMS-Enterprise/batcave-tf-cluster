@@ -34,32 +34,32 @@ resource "aws_lb_listener" "batcave_alb_https" {
   protocol          = "HTTPS"
   ssl_policy        = var.alb_ssl_security_policy
   dynamic "default_action" {
-    for_each=length(var.alb_restricted_hosts) == 0 ?["forward all request"] : []
-    content{
+    for_each = length(var.alb_restricted_hosts) == 0 ? ["forward all request"] : []
+    content {
       type             = "forward"
       target_group_arn = aws_lb_target_group.batcave_alb_https.arn
     }
   }
   dynamic "default_action" {
-    for_each=length(var.alb_restricted_hosts) > 0 ?["deny all request"] : []
-    content{
-      type             = "fixed-response"
+    for_each = length(var.alb_restricted_hosts) > 0 ? ["deny all request"] : []
+    content {
+      type = "fixed-response"
       fixed_response {
-      content_type = "text/plain"
-      message_body = "Unacceptable Host"
-      status_code  = "403"
+        content_type = "text/plain"
+        message_body = "Unacceptable Host"
+        status_code  = "403"
       }
     }
   }
- certificate_arn = data.aws_acm_certificate.acm_certificate[0].arn
+  certificate_arn = data.aws_acm_certificate.acm_certificate[0].arn
   tags = {
     Name        = "${var.cluster_name}-https-tg"
     Environment = var.environment
   }
 }
-# Listener Rule 
+# Listener Rule
 resource "aws_lb_listener_rule" "batcave_alb_https" {
-  for_each=var.alb_restricted_hosts
+  for_each     = var.alb_restricted_hosts
   listener_arn = aws_lb_listener.batcave_alb_https.arn
   action {
     type             = "forward"
