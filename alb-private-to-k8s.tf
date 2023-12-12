@@ -27,9 +27,6 @@ resource "aws_lb" "batcave_alb" {
   )
 }
 
-# locals{
-#   alb_restricted_hosts=var.alb_restricted_hosts
-# }
 # Listener HTTPS
 resource "aws_lb_listener" "batcave_alb_https" {
   load_balancer_arn = aws_lb.batcave_alb.arn
