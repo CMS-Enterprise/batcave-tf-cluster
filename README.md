@@ -35,10 +35,10 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.28.0 |
-| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | 1.14.0 |
-| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | 2.24.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | 3.2.2 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.0 |
+| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | ~> 1.14.0 |
+| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | >= 1.11.1 |
+| <a name="provider_null"></a> [null](#provider\_null) | n/a |
 
 ## Modules
 
@@ -79,6 +79,9 @@ Note that this example may create resources which cost money. Run `terraform des
 | [aws_lb_listener.batcave_alb_proxy_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
 | [aws_lb_listener.batcave_alb_shared_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
 | [aws_lb_listener.batcave_alb_shared_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
+| [aws_lb_listener_rule.batcave_alb__proxy_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule) | resource |
+| [aws_lb_listener_rule.batcave_alb_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule) | resource |
+| [aws_lb_listener_rule.batcave_alb_shared_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule) | resource |
 | [aws_lb_target_group.batcave_alb_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
 | [aws_lb_target_group.batcave_alb_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
 | [aws_lb_target_group.batcave_alb_proxy_https](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
@@ -139,11 +142,14 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_alb_proxy_ingress_cidrs"></a> [alb\_proxy\_ingress\_cidrs](#input\_alb\_proxy\_ingress\_cidrs) | List of CIDR blocks allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs | `list(string)` | `[]` | no |
 | <a name="input_alb_proxy_ingress_prefix_lists"></a> [alb\_proxy\_ingress\_prefix\_lists](#input\_alb\_proxy\_ingress\_prefix\_lists) | List of Prefix List IDs allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs | `list(string)` | `[]` | no |
 | <a name="input_alb_proxy_is_internal"></a> [alb\_proxy\_is\_internal](#input\_alb\_proxy\_is\_internal) | If the ALB Proxy should be using internal ips. Defaults to false, because the reason for ALB proxy existing is typically to make it accessible over the Internet | `bool` | `false` | no |
+| <a name="input_alb_proxy_restricted_hosts"></a> [alb\_proxy\_restricted\_hosts](#input\_alb\_proxy\_restricted\_hosts) | A list of allowable host for proxy alb | `set(string)` | `[]` | no |
 | <a name="input_alb_proxy_subnets"></a> [alb\_proxy\_subnets](#input\_alb\_proxy\_subnets) | List of subnet ids for the ALB Proxy to be deployed into | `list(string)` | `[]` | no |
 | <a name="input_alb_public_tags"></a> [alb\_public\_tags](#input\_alb\_public\_tags) | Additional public ALB tags | `map(any)` | `null` | no |
+| <a name="input_alb_restricted_hosts"></a> [alb\_restricted\_hosts](#input\_alb\_restricted\_hosts) | A list of allowable host for private alb | `set(string)` | `[]` | no |
 | <a name="input_alb_shared_ingress_cidrs"></a> [alb\_shared\_ingress\_cidrs](#input\_alb\_shared\_ingress\_cidrs) | List of CIDR blocks allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs | `list(string)` | `[]` | no |
 | <a name="input_alb_shared_ingress_prefix_lists"></a> [alb\_shared\_ingress\_prefix\_lists](#input\_alb\_shared\_ingress\_prefix\_lists) | List of Prefix List IDs allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs | `list(string)` | `[]` | no |
 | <a name="input_alb_shared_is_internal"></a> [alb\_shared\_is\_internal](#input\_alb\_shared\_is\_internal) | If the ALB in the shared subnet should be using internal ips. Defaults to false, because the reason for this ALB existing is to make it accessible over the Internet | `bool` | `false` | no |
+| <a name="input_alb_shared_restricted_hosts"></a> [alb\_shared\_restricted\_hosts](#input\_alb\_shared\_restricted\_hosts) | A list of allowable host for shared alb | `set(string)` | `[]` | no |
 | <a name="input_alb_shared_subnets"></a> [alb\_shared\_subnets](#input\_alb\_shared\_subnets) | List of subnet ids for the ALB in the shared subnet | `list(string)` | `[]` | no |
 | <a name="input_alb_ssl_security_policy"></a> [alb\_ssl\_security\_policy](#input\_alb\_ssl\_security\_policy) | ALB SSL Security Policy | `string` | `"ELBSecurityPolicy-TLS13-1-2-Res-2021-06"` | no |
 | <a name="input_alb_subnets_by_zone"></a> [alb\_subnets\_by\_zone](#input\_alb\_subnets\_by\_zone) | n/a | `map(string)` | n/a | yes |
