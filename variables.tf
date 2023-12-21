@@ -432,3 +432,9 @@ variable "force_update_version" {
   default     = true
   description = "Force update version"
 }
+
+variable "custom_node_policy_arns" {
+  type        = set(string)
+  default     = []
+  description = "Custom node policy arns"
+}
