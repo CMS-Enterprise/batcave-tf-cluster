@@ -256,3 +256,10 @@ resource "aws_iam_role_policy_attachment" "eks_cloudwatch_plolicy_attachment" {
   role       = aws_iam_role.eks_node.name
   policy_arn = aws_iam_policy.cloudwatch_logs.arn
 }
+
+# custom policy attachment
+resource "aws_iam_role_policy_attachment" "eks_custom_node_policy_attachment" {
+  for_each   = var.custom_node_policy_arns
+  role       = aws_iam_role.eks_node.name
+  policy_arn = each.value
+}
