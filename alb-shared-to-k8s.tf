@@ -175,3 +175,9 @@ resource "aws_security_group_rule" "batcave_alb_shared_egress" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.batcave_alb_shared[0].id
 }
+
+resource "aws_wafv2_web_acl_association" "batcave_alb_shared_cms_waf_assoc" {
+  count        = var.create_alb_shared ? 1 : 0
+  resource_arn = aws_lb.batcave_alb_shared[0].arn
+  web_acl_arn  = data.aws_wafv2_web_acl.cms_waf.arn
+}
