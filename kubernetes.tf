@@ -5,7 +5,7 @@ provider "kubernetes" {
 }
 
 locals {
-  static_master_roles = ["aolytix-role", "${var.github_actions_role}", "${var.federated_access_role}"]
+  static_master_roles = ["aolytix-role", var.github_actions_role, var.federated_access_role]
   merged_master_roles = concat(local.static_master_roles, var.configmap_custom_roles)
   custom_configmap_master_roles = (length(local.merged_master_roles) > 0 ? ([
     for custom_iam_role_name in local.merged_master_roles : {

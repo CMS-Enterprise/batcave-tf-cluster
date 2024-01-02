@@ -1,8 +1,6 @@
 locals {
   name              = var.cluster_name
   cluster_version   = var.cluster_version
-  region            = var.region
-  alb_idle_timeout  = var.alb_idle_timeout
   hoplimit_metadata = var.enable_hoplimit ? { http_put_response_hop_limit = 1 } : {}
 }
 
@@ -74,7 +72,7 @@ locals {
     autoscaling_group_tags = merge(
       {
         "k8s.io/cluster-autoscaler/enabled"             = "true",
-        "k8s.io/cluster-autoscaler/${var.cluster_name}" = "${var.cluster_name}"
+        "k8s.io/cluster-autoscaler/${var.cluster_name}" = var.cluster_name
       },
       # Taint tags for Cluster Autoscaler hints
       try({ for taint_key, taint_value in v.taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint_key}" => taint_value }, {}),
@@ -281,7 +279,8 @@ module "eks" {
 }
 
 module "eks_managed_node_groups" {
-  source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+  source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
+  version = "19.0.4"
 
   for_each = var.enable_eks_managed_nodes ? local.eks_node_pools : {}
 
@@ -313,7 +312,8 @@ module "eks_managed_node_groups" {
 }
 
 module "vpc_cni_irsa" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "~> 5.33"
 
   role_name                     = "${var.cluster_name}-vpc_cni"
   attach_vpc_cni_policy         = true
@@ -358,21 +358,27 @@ data "aws_partition" "current" {}
 data "aws_caller_identity" "current" {}
 
 locals {
-  cluster_security_groups_created = {
-    "node" : module.eks.node_security_group_id,
-    "cluster" : module.eks.cluster_security_group_id,
-  }
+  cluster_security_groups_created = toset([
+    { node = module.eks.node_security_group_id },
+    { cluster = module.eks.cluster_security_group_id },
+  ])
 
-  cluster_security_groups_all = {
-    "node" : module.eks.node_security_group_id,
-    "cluster" : module.eks.cluster_security_group_id,
-    "cluster_primary" : module.eks.cluster_primary_security_group_id,
+  cluster_security_groups_all = toset([
+    { node = module.eks.node_security_group_id },
+    { cluster = module.eks.cluster_security_group_id },
+    { cluster_primary = module.eks.cluster_primary_security_group_id },
+  ])
+
+  cluster_security_groups_all_map = {
+    node            = module.eks.node_security_group_id
+    cluster         = module.eks.cluster_security_group_id
+    cluster_primary = module.eks.cluster_primary_security_group_id
   }
 
   # List of all combinations of security_groups_created and security_groups_all
   node_security_group_setproduct = setproduct(
-    [for k, v in local.cluster_security_groups_created : { "${k}" : v }],
-    [for k, v in local.cluster_security_groups_all : { "${k}" : v }],
+    local.cluster_security_groups_created,
+    local.cluster_security_groups_all,
   )
   # Map of type: {"node_allow_cluster": {sg: "sg-1234", source_sg: "sg-2345"}, ...}
   node_security_group_src_dst = { for sg_pair in local.node_security_group_setproduct :
@@ -383,7 +389,7 @@ locals {
 
 # Ingress for provided prefix lists
 resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists" {
-  for_each          = local.cluster_security_groups_all
+  for_each          = local.cluster_security_groups_all_map
   type              = "ingress"
   description       = "allow_ingress_additional_prefix_lists"
   to_port           = 0

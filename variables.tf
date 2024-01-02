@@ -1,17 +1,17 @@
-variable "region" {
-  default = "us-east-1"
-}
 
 variable "environment" {
   default = "dev"
+  type    = string
 }
 
 variable "cluster_version" {
   default = "1.26"
+  type    = string
 }
 
 variable "ami_date" {
   default = ""
+  type    = string
 }
 
 ## Default node group
@@ -43,17 +43,23 @@ variable "custom_node_pools" {
   #  }
 }
 
-variable "cluster_name" {}
+variable "cluster_name" {
+  type = string
+}
 
 variable "iam_role_path" {
   default = "/delegatedadmin/developer/"
+  type    = string
 }
 
 variable "iam_role_permissions_boundary" {
   default = "arn:aws:iam::373346310182:policy/cms-cloud-admin/developer-boundary-policy"
+  type    = string
 }
 
-variable "vpc_id" {}
+variable "vpc_id" {
+  type = string
+}
 
 variable "private_subnets" {
   type = list(any)
@@ -75,59 +81,7 @@ variable "cluster_enabled_log_types" {
   default     = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 }
 
-variable "enable_irsa" {
-  default = "true"
-}
-
-### AWS Launch Template variables
-
-variable "lt_name_prefix" {
-  default = "eks-lt-"
-}
-variable "lt_description" {
-  default = "Default Launch-Template"
-}
-variable "lt_update_default_version" {
-  default = "true"
-}
-
-### Block device mappings
-
-variable "block_device_name" {
-  default = "/dev/xvda"
-}
-variable "block_volume_size" {
-  type    = number
-  default = 100
-}
-variable "block_volume_type" {
-  default = "gp2"
-}
-variable "block_delete_on_termination" {
-  default = "true"
-}
-variable "block_encrypted" {
-  default = "true"
-}
-
-
-### Monitoring
-variable "lt_monitoring_enabled" {
-  default = "true"
-}
-
-
-### Network Interfaces
-variable "network_int_associate_public_ip_address" {
-  default = "false"
-}
-variable "network_int_delete_on_termination" {
-  default = "true"
-}
-
-
 ### Resource tags
-
 variable "tags" {
   default     = null
   description = "Global resource tags to apply to all resources"
@@ -137,44 +91,6 @@ variable "instance_tags" {
   default     = null
   description = "Instance custom tags"
   type        = map(any)
-}
-variable "volume_tag" {
-  default     = null
-  description = "Volume custom tag"
-  type        = map(any)
-}
-variable "network_interface_tag" {
-  default     = null
-  description = "Network Interface custom tag"
-  type        = map(any)
-}
-
-variable "general_nodepool_tags" {
-  default     = null
-  description = "General Node Pool tags"
-  type        = map(any)
-}
-### Launch template tags
-
-variable "lt_CustomTag" {
-  default     = null
-  description = "Launch template custom tag"
-  type        = map(any)
-}
-
-
-# ## KMS Key ARN from KMS module
-# variable "kms_key_arn" {}
-
-variable "transport_proxy_static_ip" {
-  type    = bool
-  default = true
-}
-
-variable "transport_proxy_is_internal" {
-  type        = bool
-  default     = true
-  description = "Boolean to trigger a public transport proxy ip"
 }
 
 variable "cluster_additional_sg_prefix_lists" {
@@ -334,6 +250,7 @@ variable "openid_connect_audiences" {
 variable "create_cosign_iam_role" {
   description = "Flag to create Cosign IAM role"
   default     = false
+  type        = bool
 }
 
 variable "autoscaling_group_tags" {
@@ -346,26 +263,6 @@ variable "ami_regex_override" {
   description = "Overrides default AMI lookup regex, which grabs latest AMI matching cluster_version by default"
   default     = ""
   type        = string
-}
-variable "addon_vpc_cni_version" {
-  description = "This is the image of the CNI pod used in the vpc-cni addon.  For other options, run: aws eks describe-addon-versions --add"
-  default     = "v1.12.6-eksbuild.1"
-  type        = string
-}
-variable "addon_kube_proxy_version" {
-  description = " This is the image of the kube_proxy used as addon"
-  default     = "v1.24.10-eksbuild.2 "
-  type        = string
-}
-variable "aolytix_role_access" {
-  type        = bool
-  default     = true
-  description = "When set to false, this is not allow kubernetes data to be pulled by the aolytix application"
-}
-variable "github_actions_role_access" {
-  type        = bool
-  default     = true
-  description = "When set to false, this is not allow kubernetes data to be pulled by the github actions"
 }
 variable "node_schedule_shutdown_hour" {
   type        = number
