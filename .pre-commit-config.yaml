@@ -18,6 +18,11 @@ repos:
           - "--args=--fix"
       - id: terragrunt_fmt
       - id: terraform_docs
+      - id: terraform_validate
+        args:
+          - --tf-init-args=-upgrade
+          - --tf-init-args=-backend=false
+          - --tf-init-args=-lockfile=readonly
 ci:
     autofix_commit_msg: |
         [pre-commit.ci] auto fixes from pre-commit.com hooks

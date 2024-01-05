@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add precommit ci
 * Apply fixes from pre-commit
 * Fix fixes from pre-commit
+* Fix fix for fixes from pre-commit
 
 ## 13.3.1
 
