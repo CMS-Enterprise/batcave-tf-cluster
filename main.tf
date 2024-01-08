@@ -369,6 +369,9 @@ locals {
     { cluster_primary = module.eks.cluster_primary_security_group_id },
   ])
 
+  # Hardcoding a list of x_allow_y to avoid terraform race conditions
+  node_security_group_src_dst_keys = toset([for k in setproduct(["node", "cluster"], ["node", "cluster", "cluster_primary"]) : "${k[0]}_allow_${k[1]}"])
+
   cluster_security_groups_all_map = {
     node            = module.eks.node_security_group_id
     cluster         = module.eks.cluster_security_group_id
@@ -401,14 +404,14 @@ resource "aws_security_group_rule" "allow_ingress_additional_prefix_lists" {
 
 ## ingress between the cluster security groups
 resource "aws_security_group_rule" "allow_all_nodes_to_other_nodes" {
-  for_each                 = local.node_security_group_src_dst
+  for_each                 = local.node_security_group_src_dst_keys
   description              = "allow all cluster nodes to other nodes"
   type                     = "ingress"
   to_port                  = 0
   from_port                = 0
   protocol                 = "-1"
-  security_group_id        = each.value.sg
-  source_security_group_id = each.value.source_sg
+  security_group_id        = local.node_security_group_src_dst[each.key].sg
+  source_security_group_id = local.node_security_group_src_dst[each.key].source_sg
 }
 
 resource "aws_security_group_rule" "eks_node_ingress_alb_proxy" {
