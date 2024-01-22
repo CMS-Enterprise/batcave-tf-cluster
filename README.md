@@ -70,6 +70,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | [aws_iam_role_policy_attachment.eks_node_policies](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.eks_ssm_managed_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.ssm_managed_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.ssm_patching_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_service_linked_role.autoscaling](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_service_linked_role) | resource |
 | [aws_kms_key.eks](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_lb.batcave_alb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
@@ -124,6 +125,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | [aws_ami.eks_ami](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_eks_cluster_auth.cluster](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_cluster_auth) | data source |
+| [aws_iam_policy.ssm_patching_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy) | data source |
 | [aws_iam_policy_document.cloudwatch_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.node_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_kms_alias.sops](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/kms_alias) | data source |
@@ -171,6 +173,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_enable_eks_managed_nodes"></a> [enable\_eks\_managed\_nodes](#input\_enable\_eks\_managed\_nodes) | Enables eks managed nodes | `bool` | `false` | no |
 | <a name="input_enable_hoplimit"></a> [enable\_hoplimit](#input\_enable\_hoplimit) | Enables a IMDSv2 hop limit of 1 on all nodes. Defaults to false | `bool` | `false` | no |
 | <a name="input_enable_self_managed_nodes"></a> [enable\_self\_managed\_nodes](#input\_enable\_self\_managed\_nodes) | Enables self managed nodes | `bool` | `true` | no |
+| <a name="input_enable_ssm_patching"></a> [enable\_ssm\_patching](#input\_enable\_ssm\_patching) | Enables Systems Manager to patch nodes | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | n/a | `string` | `"dev"` | no |
 | <a name="input_federated_access_role"></a> [federated\_access\_role](#input\_federated\_access\_role) | Federated access role | `string` | `"ct-ado-batcave-application-admin"` | no |
 | <a name="input_force_update_version"></a> [force\_update\_version](#input\_force\_update\_version) | Force update version | `bool` | `true` | no |
@@ -189,6 +192,9 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_openid_connect_audiences"></a> [openid\_connect\_audiences](#input\_openid\_connect\_audiences) | OpenID Connect Audiences | `list(string)` | `[]` | no |
 | <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | n/a | `list(any)` | n/a | yes |
 | <a name="input_s3_bucket_access_grants"></a> [s3\_bucket\_access\_grants](#input\_s3\_bucket\_access\_grants) | A list of s3 bucket names to grant the cluster roles R/W access to | `list(string)` | `null` | no |
+| <a name="input_ssm_iam_patching_policy"></a> [ssm\_iam\_patching\_policy](#input\_ssm\_iam\_patching\_policy) | SSM IAM policy for patching | `string` | `"cms-cloud-ssm-iam-policy-v3"` | no |
+| <a name="input_ssm_tag_patch_group"></a> [ssm\_tag\_patch\_group](#input\_ssm\_tag\_patch\_group) | SSM Patching group for instances. For more information: https://cloud.cms.gov/patching-prerequisites | `string` | `"AL2"` | no |
+| <a name="input_ssm_tag_patch_window"></a> [ssm\_tag\_patch\_window](#input\_ssm\_tag\_patch\_window) | SSM Patching window for instances. For more information: https://cloud.cms.gov/patching-prerequisites | `string` | `"ITOPS-Wave1-Non-Mktplc-DevTestImpl-MW"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Global resource tags to apply to all resources | `map(any)` | `null` | no |
 | <a name="input_vpc_cidr_blocks"></a> [vpc\_cidr\_blocks](#input\_vpc\_cidr\_blocks) | List of VPC CIDR blocks | `list(string)` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | n/a | `string` | n/a | yes |

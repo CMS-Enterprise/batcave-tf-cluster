@@ -186,8 +186,8 @@ resource "aws_iam_policy" "ssm_managed_instance" {
 }
 
 data "aws_iam_policy" "ssm_patching_policy" {
-  count      = var.enable_ssm_patching ? 1 : 0
-  name       = var.ssm_iam_patching_policy
+  count = var.enable_ssm_patching ? 1 : 0
+  name  = var.ssm_iam_patching_policy
 }
 
 # ssm patching policy attachment
@@ -276,4 +276,3 @@ resource "aws_iam_role_policy_attachment" "eks_custom_node_policy_attachment" {
   role       = aws_iam_role.eks_node.name
   policy_arn = each.value
 }
-
