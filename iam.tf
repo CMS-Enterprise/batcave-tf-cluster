@@ -185,6 +185,19 @@ resource "aws_iam_policy" "ssm_managed_instance" {
   })
 }
 
+data "aws_iam_policy" "ssm_patching_policy" {
+  count = var.enable_ssm_patching ? 1 : 0
+  name  = var.ssm_iam_patching_policy
+}
+
+# ssm patching policy attachment
+resource "aws_iam_role_policy_attachment" "ssm_patching_policy_attachment" {
+  count      = var.enable_ssm_patching ? 1 : 0
+  role       = aws_iam_role.eks_node.name
+  policy_arn = data.aws_iam_policy.ssm_patching_policy[0].arn
+}
+
+
 # policy attachment
 resource "aws_iam_role_policy_attachment" "ssm_managed_instance" {
   for_each   = module.eks.self_managed_node_groups
