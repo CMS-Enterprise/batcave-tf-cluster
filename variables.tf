@@ -349,14 +349,14 @@ variable "ssm_iam_patching_policy" {
   description = "SSM IAM policy for patching"
 }
 
-variable "patch_group" {
+variable "ssm_tag_patch_group" {
   type        = string
   default     = "AL2"
-  description = "SSM Patching group for instances"
+  description = "SSM Patching group for instances. For more information: https://cloud.cms.gov/patching-prerequisites"
 }
 
-variable "patch_window" {
+variable "ssm_tag_patch_window" {
   type        = string
   default     = "ITOPS-Wave1-Non-Mktplc-DevTestImpl-MW"
-  description = "SSM Patching window for instances"
+  description = "SSM Patching window for instances. For more information: https://cloud.cms.gov/patching-prerequisites"
 }
