@@ -229,6 +229,7 @@ variable "alb_ssl_security_policy" {
   type        = string
 }
 
+
 variable "s3_bucket_access_grants" {
   description = "A list of s3 bucket names to grant the cluster roles R/W access to"
   default     = null
@@ -334,4 +335,10 @@ variable "custom_node_policy_arns" {
   type        = set(string)
   default     = []
   description = "Custom node policy arns"
+}
+
+variable "enable_ssm_patching" {
+  type        = bool
+  default     = false
+  description = "Enables Systems Manager to patch nodes"
 }

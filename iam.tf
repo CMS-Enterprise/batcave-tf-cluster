@@ -185,6 +185,110 @@ resource "aws_iam_policy" "ssm_managed_instance" {
   })
 }
 
+data "aws_iam_policy_document" "ssm_iam_policy" {
+  statement {
+    sid = "AllowGetPatches"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "arn:aws:s3:::aws-central-continuous-compliance-chef-inspec-code",
+      "arn:aws:s3:::aws-central-continuous-compliance-chef-inspec-code/*",
+      "arn:aws:s3:::aws-central-continuous-compliance-chef-inspec-code-east",
+      "arn:aws:s3:::aws-central-continuous-compliance-chef-inspec-code-east/*",
+      "arn:aws:s3:::ssm-patching-oc",
+      "arn:aws:s3:::ssm-patching-oc/*"
+    ]
+    effect = "Allow"
+  }
+  statement {
+    sid = "AllowInstanceStatus"
+    actions = [
+      "ec2:DescribeInstanceStatus"
+    ]
+    resources = [
+      "*"
+    ]
+    effect = "Allow"
+  }
+  statement {
+    sid = "AllowSSMPatching"
+    actions = [
+      "ssm:DescribeAssociation",
+      "ssm:GetDeployablePatchSnapshotForInstance",
+      "ssm:DescribeDocument",
+      "ssm:GetDocument",
+      "ssm:GetManifest",
+      "ssm:GetParameter",
+      "ssm:GetParameters",
+      "ssm:ListAssociations",
+      "ssm:ListInstanceAssociations",
+      "ssm:PutInventory",
+      "ssm:PutComplianceItems",
+      "ssm:PutConfigurePackageResult",
+      "ssm:UpdateAssociationStatus",
+      "ssm:UpdateInstanceAssociationStatus",
+      "ssm:UpdateInstanceInformation",
+      "ec2messages:AcknowledgeMessage",
+      "ec2messages:DeleteMessage",
+      "ec2messages:FailMessage",
+      "ec2messages:GetEndpoint",
+      "ec2messages:GetMessages",
+      "ec2messages:SendReply",
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel"
+    ]
+    resources = [
+      "*"
+    ]
+    effect = "Allow"
+  }
+  statement {
+    sid = "AllowAddCloudWatchLogs"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:DescribeLogStreams",
+      "logs:DescribeLogGroups"
+    ]
+    resources = [
+      "arn:aws:logs:*:373346310182:*"
+    ]
+    effect = "Allow"
+  }
+  statement {
+    sid = "AllowAddS3Logs"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl"
+    ]
+    resources = [
+      "arn:aws:s3:::ccs-patch-logs",
+      "arn:aws:s3:::ccs-patch-logs/*",
+      "arn:aws:s3:::cms-cloud-373346310182-us-east-1",
+      "arn:aws:s3:::cms-cloud-373346310182-us-east-1/*",
+      "arn:aws:s3:::cms-cloud-373346310182-us-west-2",
+      "arn:aws:s3:::cms-cloud-373346310182-us-west-2/*"
+    ]
+    effect = "Allow"
+  }
+}
+
+data "aws_iam_policy" "ssm_patching_policy" {
+  name       = "cms-cloud-ssm-iam-policy-v3"
+}
+
+# ssm patching policy attachment
+resource "aws_iam_role_policy_attachment" "ssm_patching_policy_attachment" {
+  role       = aws_iam_role.eks_node.name
+  policy_arn = data.aws_iam_policy.ssm_patching_policy.arn
+}
+
+
 # policy attachment
 resource "aws_iam_role_policy_attachment" "ssm_managed_instance" {
   for_each   = module.eks.self_managed_node_groups
@@ -263,3 +367,4 @@ resource "aws_iam_role_policy_attachment" "eks_custom_node_policy_attachment" {
   role       = aws_iam_role.eks_node.name
   policy_arn = each.value
 }
+
