@@ -63,7 +63,7 @@ locals {
       var.create_alb_shared ? [aws_lb_target_group.batcave_alb_shared_https[0].arn] : []
     ) : null
 
-    tags = merge(var.tags, var.instance_tags, try(v.tags, null))
+    tags = merge(var.tags, local.instance_tags, try(v.tags, null))
 
     metadata_options = merge(local.hoplimit_metadata, try(v.metadata_options, {}))
 
@@ -129,6 +129,9 @@ locals {
     ## https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group#instance_refresh
     instance_refresh = lookup(v, "instance_refresh", {})
   } }
+  instance_policy_tags = var.enable_ssm_patching ? {"Patch Group" = var.patch_group, "Patch Window" = var.patch_window} : {}
+  instance_tags = merge(local.instance_policy_tags, var.instance_tags)
+
   # Allow ingress to the control plane from the delete_ebs_volumes lambda (if it exists)
   delete_ebs_volumes_lambda_sg_id = one(data.aws_security_groups.delete_ebs_volumes_lambda_security_group.ids)
   default_security_group_additional_rules = (var.grant_delete_ebs_volumes_lambda_access && local.delete_ebs_volumes_lambda_sg_id != null ?
@@ -187,7 +190,7 @@ locals {
     post_bootstrap_user_data   = try(v.post_bootstrap_user_data, "")
     metadata_options           = merge(local.hoplimit_metadata, try(v.metadata_options, {}))
 
-    tags = merge(var.tags, var.instance_tags, try(v.tags, null))
+    tags = merge(var.tags, local.instance_tags, try(v.tags, null))
 
     taints = [
       for taint_key, taint_string in try(v.taints, {}) : {

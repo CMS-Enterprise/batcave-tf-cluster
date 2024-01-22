@@ -342,3 +342,21 @@ variable "enable_ssm_patching" {
   default     = false
   description = "Enables Systems Manager to patch nodes"
 }
+
+variable "ssm_iam_patching_policy" {
+  type        = string
+  default     = "cms-cloud-ssm-iam-policy-v3"
+  description = "SSM IAM policy for patching"
+}
+
+variable "patch_group" {
+  type        = string
+  default     = "AL2"
+  description = "SSM Patching group for instances"
+}
+
+variable "patch_window" {
+  type        = string
+  default     = "ITOPS-Wave1-Non-Mktplc-DevTestImpl-MW"
+  description = "SSM Patching window for instances"
+}
