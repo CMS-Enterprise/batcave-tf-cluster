@@ -131,7 +131,7 @@ locals {
   } }
 
   # Applying necessary tags for SSM OS patching
-  patch_group_tags = (var.enable_ssm_patching || var.enable_cms_cloud_ssm_policy) ? { "Patch Group" = var.ssm_tag_patch_group } : {}
+  patch_group_tags = var.enable_ssm_patching ? { "Patch Group" = var.ssm_tag_patch_group } : {}
   patch_window_tags = (var.ssm_override_patch_window == "" ?
     (var.environment == "prod" ? { "Patch Window" = var.ssm_prod_patch_window } : { "Patch Window" = var.ssm_DevTestImpl_patch_window }) :
   { "Patch Window" = var.ssm_override_patch_window })
