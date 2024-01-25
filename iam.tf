@@ -186,8 +186,8 @@ resource "aws_iam_policy" "ssm_managed_instance" {
 }
 
 data "aws_iam_policy" "ssm_patching_policy" {
-  count      = (var.enable_ssm_patching || var.enable_cms_cloud_ssm_policy) ? 1 : 0
-  name       = var.ssm_iam_patching_policy
+  count = (var.enable_ssm_patching || var.enable_cms_cloud_ssm_policy) ? 1 : 0
+  name  = var.ssm_iam_patching_policy
 }
 
 # ssm patching policy attachment

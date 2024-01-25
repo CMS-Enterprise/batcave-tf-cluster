@@ -186,5 +186,5 @@ output "batcave_alb_shared_dns" {
 }
 
 output "instance_tags" {
-  value       = var.instance_tags
+  value = var.instance_tags
 }

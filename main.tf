@@ -130,12 +130,12 @@ locals {
     instance_refresh = lookup(v, "instance_refresh", {})
   } }
 
-  # Applying necessary tags for SSM OS patching 
-  patch_group_tags  = (var.enable_ssm_patching || var.enable_cms_cloud_ssm_policy) ? { "Patch Group" = var.ssm_tag_patch_group} : {}
-  patch_window_tags = (var.ssm_override_patch_window == "" ? 
-    (var.environment == "prod" ? {"Patch Window" = var.ssm_prod_patch_window} : {"Patch Window" = var.ssm_DevTestImpl_patch_window}) : 
-    {"Patch Window" = var.ssm_override_patch_window})
-  instance_tags        = merge(local.patch_group_tags, local.patch_window_tags, var.instance_tags)
+  # Applying necessary tags for SSM OS patching
+  patch_group_tags = (var.enable_ssm_patching || var.enable_cms_cloud_ssm_policy) ? { "Patch Group" = var.ssm_tag_patch_group } : {}
+  patch_window_tags = (var.ssm_override_patch_window == "" ?
+    (var.environment == "prod" ? { "Patch Window" = var.ssm_prod_patch_window } : { "Patch Window" = var.ssm_DevTestImpl_patch_window }) :
+  { "Patch Window" = var.ssm_override_patch_window })
+  instance_tags = merge(local.patch_group_tags, local.patch_window_tags, var.instance_tags)
 
   # Allow ingress to the control plane from the delete_ebs_volumes lambda (if it exists)
   delete_ebs_volumes_lambda_sg_id = one(data.aws_security_groups.delete_ebs_volumes_lambda_security_group.ids)
