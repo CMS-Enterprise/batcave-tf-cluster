@@ -364,13 +364,13 @@ variable "ssm_tag_patch_group" {
 variable "ssm_DevTestImpl_patch_window" {
   type        = string
   default     = "ITOPS-Wave1-Non-Mktplc-DevTestImpl-MW"
-  description = "SSM Patching window for instances. For more information: https://cloud.cms.gov/patching-prerequisites"
+  description = "SSM Patching window for Dev, Test, and Impl env instances. For more information: https://cloud.cms.gov/patching-prerequisites"
 }
 
 variable "ssm_prod_patch_window" {
   type        = string
   default     = "ITOPS-Wave1-Non-Mktplc-Prod-MW"
-  description = "SSM Patching window for instances. For more information: https://cloud.cms.gov/patching-prerequisites"
+  description = "SSM Patching window for Prod env instances. For more information: https://cloud.cms.gov/patching-prerequisites"
 }
 
 variable "ssm_override_patch_window" {
