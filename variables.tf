@@ -15,14 +15,21 @@ variable "ami_date" {
 }
 
 ## Default node group
+variable "platform" {
+  default = "bottlerocket"
+  type    = string
+}
+
 variable "general_node_pool" {
   type        = any
   description = "General node pool, required for hosting core services"
   default = {
     instance_type = "c5.2xlarge"
+    # ami_type      = "BOTTLEROCKET_x86_64"
     desired_size  = 3
     max_size      = 5
     min_size      = 2
+    use_custom_launch_template = false
     # Map of label flags for kubelets.
     labels = { general = "true" }
     taints = {}

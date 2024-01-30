@@ -6,8 +6,8 @@ locals {
 
 data "aws_ami" "eks_ami" {
   most_recent = true
-  name_regex  = var.ami_regex_override == "" ? "^amzn2-eks-${var.cluster_version}-gi-${var.ami_date}" : var.ami_regex_override
-  owners      = ["743302140042"]
+  name_regex  = var.ami_regex_override == "" ? "^bottlerocket-aws-k8s-1.27-x86_64-v1.17.0" : var.ami_regex_override
+  owners      = ["092701018921"]
 }
 
 data "aws_security_groups" "delete_ebs_volumes_lambda_security_group" {
@@ -162,6 +162,38 @@ locals {
     iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
     ami_id = data.aws_ami.eks_ami.id
+    
+    # Added for Bottlerocket
+    use_custom_launch_template = try(v.use_custom_launch_template, true)
+    ami_type                   = var.platform == "bottlerocket" ? "BOTTLEROCKET_x86_64" : "AL2_x86_64" 
+    platform                   = try(var.platform, "linux") 
+    bootstrap_extra_args = <<-EOT
+      # settings.kubernetes section from bootstrap_extra_args in default template
+      pod-pids-limit = 1000
+      
+      # The admin host container provides SSH access and runs with "superpowers".
+      # It is disabled by default, but can be disabled explicitly.
+      [settings.host-containers.admin]
+      enabled = false
+
+      # The control host container provides out-of-band access via SSM.
+      # It is enabled by default, and can be disabled if you do not expect to use SSM.
+      # This could leave you with no way to access the API and change settings on an existing node!
+      [settings.host-containers.control]
+      enabled = true
+
+      # extra args added
+      [settings.kernel]
+      lockdown = "integrity"
+
+      [settings.kubernetes.node-labels]
+      # label1 = "foo"
+      # label2 = "bar"
+
+      [settings.kubernetes.node-taints]
+      # dedicated = "experimental:PreferNoSchedule"
+      # special = "true:NoSchedule"
+    EOT
 
     subnet_ids = coalescelist(try(v.subnet_ids, []), var.host_subnets, var.private_subnets)
 
@@ -172,6 +204,15 @@ locals {
     block_device_mappings = [
       {
         device_name = "/dev/xvda"
+        ebs = {
+          volume_size           = "5"
+          volume_type           = "gp3"
+          delete_on_termination = true
+          encrypted             = true
+        }
+      },
+      {
+        device_name = "/dev/xvdb"
         ebs = {
           volume_size           = try(v.volume_size, "300")
           volume_type           = try(v.volume_type, "gp3")
@@ -186,7 +227,7 @@ locals {
     ## Define custom lines to the user_data script.  Separate commands with \n
     instance_type              = [v.instance_type]
     enable_bootstrap_user_data = true
-    pre_bootstrap_user_data    = try(v.pre_bootstrap_user_data, "sysctl -w net.ipv4.ip_forward=1\n")
+    pre_bootstrap_user_data    = try(v.pre_bootstrap_user_data, "")
     post_bootstrap_user_data   = try(v.post_bootstrap_user_data, "")
     metadata_options           = merge(local.hoplimit_metadata, try(v.metadata_options, {}))
 
@@ -290,6 +331,8 @@ module "eks_managed_node_groups" {
   name                              = each.value.name
   cluster_name                      = each.value.cluster_name
   cluster_version                   = each.value.cluster_version
+  cluster_endpoint                  = module.eks.cluster_endpoint
+  cluster_auth_base64               = module.eks.cluster_certificate_authority_data
   create_iam_role                   = false
   iam_role_arn                      = aws_iam_role.eks_node.arn
   ami_id                            = each.value.ami_id
@@ -301,7 +344,10 @@ module "eks_managed_node_groups" {
   instance_types                    = each.value.instance_type
   enable_bootstrap_user_data        = each.value.enable_bootstrap_user_data
   pre_bootstrap_user_data           = each.value.pre_bootstrap_user_data
+  bootstrap_extra_args              = each.value.bootstrap_extra_args
   post_bootstrap_user_data          = each.value.post_bootstrap_user_data
+  platform                          = each.value.platform
+  ami_type                          = each.value.ami_type
   metadata_options                  = each.value.metadata_options
   tags                              = each.value.tags
   taints                            = each.value.taints
