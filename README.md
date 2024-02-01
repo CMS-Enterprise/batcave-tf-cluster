@@ -1,4 +1,4 @@
-# Launch template with managed groups example
+# Launch template with managed groups example  
 
 This is EKS example using workers custom launch template with managed groups feature in two different ways:
 
