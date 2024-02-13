@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 14.1.0
 
 * security: Change the default Shared ALB configuration to deny access by default until the allowed hostnames are configured
+* feat: allow cron overrides for startup/shutdown schedules
 
 ## 14.0.1
 
@@ -20,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix fixes from pre-commit
 * Fix fix for fixes from pre-commit
 * Upgrade to EKS 1.27
+
+## 13.4.0
+
+* feat: allow cron overrides for startup/shutdown schedules
 
 ## 13.3.4
 
