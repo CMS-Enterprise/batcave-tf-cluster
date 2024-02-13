@@ -36,10 +36,10 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0 |
-| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | ~> 1.14.0 |
-| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | >= 2.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | >= 3.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.31.0 |
+| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | 1.14.0 |
+| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | 2.25.1 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.2 |
 
 ## Modules
 
@@ -152,7 +152,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_alb_shared_ingress_cidrs"></a> [alb\_shared\_ingress\_cidrs](#input\_alb\_shared\_ingress\_cidrs) | List of CIDR blocks allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs | `list(string)` | `[]` | no |
 | <a name="input_alb_shared_ingress_prefix_lists"></a> [alb\_shared\_ingress\_prefix\_lists](#input\_alb\_shared\_ingress\_prefix\_lists) | List of Prefix List IDs allowed to access the ALB Proxy; used to restrict public access to a certain set of IPs | `list(string)` | `[]` | no |
 | <a name="input_alb_shared_is_internal"></a> [alb\_shared\_is\_internal](#input\_alb\_shared\_is\_internal) | If the ALB in the shared subnet should be using internal ips. Defaults to false, because the reason for this ALB existing is to make it accessible over the Internet | `bool` | `false` | no |
-| <a name="input_alb_shared_restricted_hosts"></a> [alb\_shared\_restricted\_hosts](#input\_alb\_shared\_restricted\_hosts) | A list of allowable host for shared alb | `set(string)` | `[]` | no |
+| <a name="input_alb_shared_restricted_hosts"></a> [alb\_shared\_restricted\_hosts](#input\_alb\_shared\_restricted\_hosts) | A list of allowable host for shared alb. Defaults to deny to ensure this load balancer is configured correctly. | `set(string)` | <pre>[<br>  "deny-by-default.example.com"<br>]</pre> | no |
 | <a name="input_alb_shared_subnets"></a> [alb\_shared\_subnets](#input\_alb\_shared\_subnets) | List of subnet ids for the ALB in the shared subnet | `list(string)` | `[]` | no |
 | <a name="input_alb_ssl_security_policy"></a> [alb\_ssl\_security\_policy](#input\_alb\_ssl\_security\_policy) | ALB SSL Security Policy | `string` | `"ELBSecurityPolicy-TLS13-1-2-Res-2021-06"` | no |
 | <a name="input_alb_subnets_by_zone"></a> [alb\_subnets\_by\_zone](#input\_alb\_subnets\_by\_zone) | n/a | `map(string)` | n/a | yes |
