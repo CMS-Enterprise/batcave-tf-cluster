@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 14.1.1
+* bugfix: only create shared alb listener rule when shared alb is created
+
 ## 14.1.0
 
 * security: Change the default Shared ALB configuration to deny access by default until the allowed hostnames are configured

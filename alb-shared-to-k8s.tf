@@ -61,7 +61,7 @@ resource "aws_lb_listener" "batcave_alb_shared_https" {
 }
 # Listener Rule
 resource "aws_lb_listener_rule" "batcave_alb_shared_https" {
-  for_each     = var.alb_shared_restricted_hosts
+  for_each     = var.create_alb_shared ? var.alb_shared_restricted_hosts : toset([])
   listener_arn = aws_lb_listener.batcave_alb_shared_https[0].arn
   action {
     type             = "forward"
