@@ -45,7 +45,10 @@ resource "aws_lb_listener" "batcave_alb_shared_https" {
       type = "fixed-response"
       fixed_response {
         content_type = "text/plain"
-        message_body = "Unacceptable Host"
+        # This load balancer is configured to deny all access by default.
+        # In this default configuration, the error message will indicate they
+        # need to come to the infrastructure team for help.
+        message_body = var.alb_shared_restricted_hosts[0] == "deny-by-default.example.com" ? "Misconfigured load balancer.  Contact infrstructure team for assistance." : "Unacceptable Host"
         status_code  = "403"
       }
     }

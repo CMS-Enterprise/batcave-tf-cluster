@@ -128,8 +128,8 @@ variable "alb_proxy_restricted_hosts" {
 }
 variable "alb_shared_restricted_hosts" {
   type        = set(string)
-  description = "A list of allowable host for shared alb"
-  default     = []
+  description = "A list of allowable host for shared alb. Defaults to deny to ensure this load balancer is configured correctly."
+  default     = ["deny-by-default.example.com"]
 }
 variable "create_alb_proxy" {
   type        = bool

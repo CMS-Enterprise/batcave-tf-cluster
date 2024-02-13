@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 14.1.0
+
+* security: Change the default Shared ALB configuration to deny access by default until the allowed hostnames are configured
+
 ## 14.0.1
 
 * bugfix: Pin vpc_cni_irsa module to 5.33 to avoid breaking aws provider change
