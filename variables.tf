@@ -275,6 +275,17 @@ variable "node_schedule_startup_hour" {
   default     = -1
   description = "The hour of the day (0-23) the cluster should be restarted.  If left empty, the cluster will not be restarted after shutdown. Will run every weekday otherwise."
 }
+
+variable "node_schedule_shutdown_cron" {
+  type        = string
+  default     = ""
+  description = "The cron expression for the shutdown schedule.  If left empty, the cluster will not be stopped.  Overrides node_schedule_shutdown_hour"
+}
+variable "node_schedule_startup_cron" {
+  type        = string
+  default     = ""
+  description = "The cron expression for the startup schedule.  If left empty, the cluster will not be restarted after shutdown.  Overrides node_schedule_startup_hour"
+}
 variable "node_schedule_timezone" {
   type        = string
   default     = "America/New_York"

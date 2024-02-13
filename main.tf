@@ -21,6 +21,13 @@ data "aws_security_groups" "delete_ebs_volumes_lambda_security_group" {
 # EKS Module
 ################################################################################
 locals {
+  # Schedule config
+  create_schedule_startup     = var.node_schedule_startup_hour >= 0 || var.node_schedule_startup_cron != ""
+  create_schedule_shutdown    = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_shutdown_cron != ""
+  create_schedule             = local.create_schedule_startup || local.create_schedule_shutdown
+  node_schedule_shutdown_cron = var.node_schedule_shutdown_cron != "" ? var.node_schedule_shutdown_cron : "0 ${var.node_schedule_shutdown_hour} * * *"
+  node_schedule_startup_cron  = var.node_schedule_startup_cron != "" ? var.node_schedule_startup_cron : "0 ${var.node_schedule_startup_hour} * * 1-5"
+
   custom_node_pools = { for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
     name                          = "${var.cluster_name}-${k}"
     subnet_ids                    = coalescelist(try(v.subnet_ids, []), var.host_subnets, var.private_subnets)
@@ -104,26 +111,26 @@ locals {
       "WarmPoolTotalCapacity",
       "WarmPoolWarmedCapacity",
     ]
-    create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
+    create_schedule = local.create_schedule
     schedules = merge(
-      var.node_schedule_shutdown_hour < 0 ? {} : {
+      local.create_schedule_shutdown ? {
         shutdown = {
           min_size     = 0
           max_size     = 0
           desired_size = 0
           time_zone    = var.node_schedule_timezone
-          recurrence   = "0 ${var.node_schedule_shutdown_hour} * * *"
+          recurrence   = local.node_schedule_shutdown_cron
         }
-      },
-      var.node_schedule_startup_hour < 0 ? {} : {
+      } : {},
+      local.create_schedule_startup ? {
         startup = {
           min_size     = v.min_size
           max_size     = v.max_size
           desired_size = v.desired_size
           time_zone    = var.node_schedule_timezone
-          recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
+          recurrence   = local.node_schedule_startup_cron
         }
-      }
+      } : {}
     )
 
     ## https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group#instance_refresh
@@ -205,26 +212,26 @@ locals {
       label_key => label_value
     }
 
-    create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
+    create_schedule = local.create_schedule
     schedules = merge(
-      var.node_schedule_shutdown_hour < 0 ? {} : {
+      local.create_schedule_shutdown ? {
         shutdown = {
           min_size     = 0
           max_size     = 0
           desired_size = 0
           time_zone    = var.node_schedule_timezone
-          recurrence   = "0 ${var.node_schedule_shutdown_hour} * * *"
+          recurrence   = local.node_schedule_shutdown_cron
         }
-      },
-      var.node_schedule_startup_hour < 0 ? {} : {
+      } : {},
+      local.create_schedule_startup ? {
         startup = {
           min_size     = v.min_size
           max_size     = v.max_size
           desired_size = v.desired_size
           time_zone    = var.node_schedule_timezone
-          recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
+          recurrence   = local.node_schedule_startup_cron
         }
-      }
+      } : {}
     )
   } }
 }

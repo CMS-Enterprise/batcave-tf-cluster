@@ -36,10 +36,10 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0 |
-| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | ~> 1.14.0 |
-| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | >= 2.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | >= 3.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.31.0 |
+| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | 1.14.0 |
+| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | 2.25.1 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.2 |
 
 ## Modules
 
@@ -186,7 +186,9 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_instance_tags"></a> [instance\_tags](#input\_instance\_tags) | Instance custom tags | `map(any)` | `null` | no |
 | <a name="input_logging_bucket"></a> [logging\_bucket](#input\_logging\_bucket) | Name of the S3 bucket to send load balancer access logs. | `string` | `null` | no |
 | <a name="input_node_https_ingress_cidr_blocks"></a> [node\_https\_ingress\_cidr\_blocks](#input\_node\_https\_ingress\_cidr\_blocks) | List of CIDR blocks to allow into the node over the HTTPs port | `list(string)` | <pre>[<br>  "10.0.0.0/8",<br>  "100.0.0.0/8"<br>]</pre> | no |
+| <a name="input_node_schedule_shutdown_cron"></a> [node\_schedule\_shutdown\_cron](#input\_node\_schedule\_shutdown\_cron) | The cron expression for the shutdown schedule.  If left empty, the cluster will not be stopped.  Overrides node\_schedule\_shutdown\_hour | `string` | `""` | no |
 | <a name="input_node_schedule_shutdown_hour"></a> [node\_schedule\_shutdown\_hour](#input\_node\_schedule\_shutdown\_hour) | The hour of the day (0-23) the cluster should be shutdown.  If left empty, the cluster will not be stopped. Will run every day otherwise. | `number` | `-1` | no |
+| <a name="input_node_schedule_startup_cron"></a> [node\_schedule\_startup\_cron](#input\_node\_schedule\_startup\_cron) | The cron expression for the startup schedule.  If left empty, the cluster will not be restarted after shutdown.  Overrides node\_schedule\_startup\_hour | `string` | `""` | no |
 | <a name="input_node_schedule_startup_hour"></a> [node\_schedule\_startup\_hour](#input\_node\_schedule\_startup\_hour) | The hour of the day (0-23) the cluster should be restarted.  If left empty, the cluster will not be restarted after shutdown. Will run every weekday otherwise. | `number` | `-1` | no |
 | <a name="input_node_schedule_timezone"></a> [node\_schedule\_timezone](#input\_node\_schedule\_timezone) | The timezone of the schedule. Ex: 'America/New\_York', 'America/Chicago', 'America/Denver', 'America/Los\_Angeles', 'Pacific/Honolulu'  See: https://www.joda.org/joda-time/timezones.html | `string` | `"America/New_York"` | no |
 | <a name="input_openid_connect_audiences"></a> [openid\_connect\_audiences](#input\_openid\_connect\_audiences) | OpenID Connect Audiences | `list(string)` | `[]` | no |
