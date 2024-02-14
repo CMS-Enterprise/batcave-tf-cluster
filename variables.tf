@@ -230,11 +230,6 @@ variable "alb_ssl_security_policy" {
 }
 
 
-variable "s3_bucket_access_grants" {
-  description = "A list of s3 bucket names to grant the cluster roles R/W access to"
-  default     = null
-  type        = list(string)
-}
 
 variable "logging_bucket" {
   description = "Name of the S3 bucket to send load balancer access logs."

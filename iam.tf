@@ -35,54 +35,6 @@ data "aws_iam_policy_document" "node_policy" {
     ]
     resources = ["*"]
   }
-  statement {
-    sid    = "stsassumerole"
-    effect = "Allow"
-    actions = [
-      "sts:AssumeRole"
-    ]
-    # self-referential ARN used by Rapidfort to allow the pod to assume a role
-    resources = [
-      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/delegatedadmin/developer/*general-node-group*"
-    ]
-
-  }
-  statement {
-    actions = [
-      "s3:ListBucket"
-    ]
-    resources = (var.s3_bucket_access_grants == null ?
-      # Use legacy default
-      [
-        "arn:aws:s3:::${var.cluster_name}*velero-storage",
-        "arn:aws:s3:::batcave*runner-cache",
-        "arn:aws:s3:::batcave*gitlab*",
-        "arn:aws:s3:::rapidfort*storage"
-      ] :
-      [
-        for bucket in var.s3_bucket_access_grants : "arn:aws:s3:::${bucket}"
-    ])
-  }
-  statement {
-    actions = [
-      "s3:GetObject",
-      "s3:DeleteObject",
-      "s3:PutObject",
-      "s3:AbortMultipartUpload",
-      "s3:List*"
-    ]
-    resources = (var.s3_bucket_access_grants == null ?
-      # Use legacy default
-      [
-        "arn:aws:s3:::${var.cluster_name}*velero-storage/*",
-        "arn:aws:s3:::batcave*runner-cache/*",
-        "arn:aws:s3:::batcave*gitlab*/*",
-        "arn:aws:s3:::rapidfort*storage/*"
-      ] :
-      [
-        for bucket in var.s3_bucket_access_grants : "arn:aws:s3:::${bucket}/*"
-    ])
-  }
 }
 
 # KMS policy to allow sops key only
