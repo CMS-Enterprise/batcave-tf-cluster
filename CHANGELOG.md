@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 14.1.2
+* bugfix: correct issue when no hosts are provided
+
 ## 14.1.1
 * bugfix: only create shared alb listener rule when shared alb is created
 
