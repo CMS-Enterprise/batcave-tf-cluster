@@ -184,3 +184,7 @@ output "batcave_alb_shared_dns" {
   description = "DNS value of ALB created for proxying requests through an ALB in the shared subnet"
   value       = var.create_alb_shared ? aws_lb.batcave_alb_shared[0].dns_name : ""
 }
+
+output "instance_tags" {
+  value = var.instance_tags
+}

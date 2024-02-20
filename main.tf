@@ -136,8 +136,18 @@ locals {
     ## https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group#instance_refresh
     instance_refresh = lookup(v, "instance_refresh", {})
   } }
-  instance_policy_tags = var.enable_ssm_patching ? { "Patch Group" = var.ssm_tag_patch_group, "Patch Window" = var.ssm_tag_patch_window } : {}
-  instance_tags        = merge(local.instance_policy_tags, var.instance_tags)
+
+  # Applying necessary tags for SSM OS patching
+  patch_group_tags = var.enable_ssm_patching ? { "Patch Group" = var.ssm_tag_patch_group } : {}
+  patch_window_map = {
+    prod    = var.ssm_prod_patch_window
+    dev     = var.ssm_DevTestImpl_patch_window
+    test    = var.ssm_DevTestImpl_patch_window
+    nonprod = var.ssm_DevTestImpl_patch_window
+    impl    = var.ssm_DevTestImpl_patch_window
+  }
+  patch_window_tags = var.enable_ssm_patching ? { "Patch Window" = var.ssm_override_patch_window != "" ? var.ssm_prod_patch_window : lookup(local.patch_window_map, var.environment, local.patch_window_map["dev"]) } : {}
+  instance_tags     = merge(local.patch_group_tags, local.patch_window_tags, var.instance_tags)
 
   # Allow ingress to the control plane from the delete_ebs_volumes lambda (if it exists)
   delete_ebs_volumes_lambda_sg_id = one(data.aws_security_groups.delete_ebs_volumes_lambda_security_group.ids)

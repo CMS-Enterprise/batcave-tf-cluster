@@ -170,6 +170,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_create_cosign_iam_role"></a> [create\_cosign\_iam\_role](#input\_create\_cosign\_iam\_role) | Flag to create Cosign IAM role | `bool` | `false` | no |
 | <a name="input_custom_node_policy_arns"></a> [custom\_node\_policy\_arns](#input\_custom\_node\_policy\_arns) | Custom node policy arns | `set(string)` | `[]` | no |
 | <a name="input_custom_node_pools"></a> [custom\_node\_pools](#input\_custom\_node\_pools) | n/a | `any` | `{}` | no |
+| <a name="input_enable_cms_cloud_ssm_policy"></a> [enable\_cms\_cloud\_ssm\_policy](#input\_enable\_cms\_cloud\_ssm\_policy) | Enables SSM cloud policy for patching OS on instances | `bool` | `false` | no |
 | <a name="input_enable_eks_managed_nodes"></a> [enable\_eks\_managed\_nodes](#input\_enable\_eks\_managed\_nodes) | Enables eks managed nodes | `bool` | `false` | no |
 | <a name="input_enable_hoplimit"></a> [enable\_hoplimit](#input\_enable\_hoplimit) | Enables a IMDSv2 hop limit of 1 on all nodes. Defaults to false | `bool` | `false` | no |
 | <a name="input_enable_self_managed_nodes"></a> [enable\_self\_managed\_nodes](#input\_enable\_self\_managed\_nodes) | Enables self managed nodes | `bool` | `true` | no |
@@ -194,9 +195,11 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_openid_connect_audiences"></a> [openid\_connect\_audiences](#input\_openid\_connect\_audiences) | OpenID Connect Audiences | `list(string)` | `[]` | no |
 | <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | n/a | `list(any)` | n/a | yes |
 | <a name="input_s3_bucket_access_grants"></a> [s3\_bucket\_access\_grants](#input\_s3\_bucket\_access\_grants) | A list of s3 bucket names to grant the cluster roles R/W access to | `list(string)` | `null` | no |
+| <a name="input_ssm_DevTestImpl_patch_window"></a> [ssm\_DevTestImpl\_patch\_window](#input\_ssm\_DevTestImpl\_patch\_window) | SSM Patching window for Dev, Test, and Impl env instances. For more information: https://cloud.cms.gov/patching-prerequisites | `string` | `"ITOPS-Wave1-Non-Mktplc-DevTestImpl-MW"` | no |
 | <a name="input_ssm_iam_patching_policy"></a> [ssm\_iam\_patching\_policy](#input\_ssm\_iam\_patching\_policy) | SSM IAM policy for patching | `string` | `"cms-cloud-ssm-iam-policy-v3"` | no |
+| <a name="input_ssm_override_patch_window"></a> [ssm\_override\_patch\_window](#input\_ssm\_override\_patch\_window) | Patching window override variable | `string` | `""` | no |
+| <a name="input_ssm_prod_patch_window"></a> [ssm\_prod\_patch\_window](#input\_ssm\_prod\_patch\_window) | SSM Patching window for Prod env instances. For more information: https://cloud.cms.gov/patching-prerequisites | `string` | `"ITOPS-Wave1-Non-Mktplc-Prod-MW"` | no |
 | <a name="input_ssm_tag_patch_group"></a> [ssm\_tag\_patch\_group](#input\_ssm\_tag\_patch\_group) | SSM Patching group for instances. For more information: https://cloud.cms.gov/patching-prerequisites | `string` | `"AL2"` | no |
-| <a name="input_ssm_tag_patch_window"></a> [ssm\_tag\_patch\_window](#input\_ssm\_tag\_patch\_window) | SSM Patching window for instances. For more information: https://cloud.cms.gov/patching-prerequisites | `string` | `"ITOPS-Wave1-Non-Mktplc-DevTestImpl-MW"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Global resource tags to apply to all resources | `map(any)` | `null` | no |
 | <a name="input_vpc_cidr_blocks"></a> [vpc\_cidr\_blocks](#input\_vpc\_cidr\_blocks) | List of VPC CIDR blocks | `list(string)` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | n/a | `string` | n/a | yes |
@@ -229,6 +232,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="output_cosign_iam_role_arn"></a> [cosign\_iam\_role\_arn](#output\_cosign\_iam\_role\_arn) | n/a |
 | <a name="output_eks_managed_node_group"></a> [eks\_managed\_node\_group](#output\_eks\_managed\_node\_group) | ARNs of all self managed node groups created |
 | <a name="output_fargate_profiles"></a> [fargate\_profiles](#output\_fargate\_profiles) | Map of attribute maps for all EKS Fargate Profiles created |
+| <a name="output_instance_tags"></a> [instance\_tags](#output\_instance\_tags) | n/a |
 | <a name="output_node_security_group_arn"></a> [node\_security\_group\_arn](#output\_node\_security\_group\_arn) | Amazon Resource Name (ARN) of the node shared security group |
 | <a name="output_node_security_group_id"></a> [node\_security\_group\_id](#output\_node\_security\_group\_id) | ID of the node shared security group |
 | <a name="output_oidc_provider_arn"></a> [oidc\_provider\_arn](#output\_oidc\_provider\_arn) | The ARN of the OIDC Provider if `enable_irsa = true` |

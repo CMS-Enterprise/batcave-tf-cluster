@@ -354,6 +354,12 @@ variable "enable_ssm_patching" {
   description = "Enables Systems Manager to patch nodes"
 }
 
+variable "enable_cms_cloud_ssm_policy" {
+  type        = bool
+  default     = false
+  description = "Enables SSM cloud policy for patching OS on instances"
+}
+
 variable "ssm_iam_patching_policy" {
   type        = string
   default     = "cms-cloud-ssm-iam-policy-v3"
@@ -366,8 +372,20 @@ variable "ssm_tag_patch_group" {
   description = "SSM Patching group for instances. For more information: https://cloud.cms.gov/patching-prerequisites"
 }
 
-variable "ssm_tag_patch_window" {
+variable "ssm_DevTestImpl_patch_window" {
   type        = string
   default     = "ITOPS-Wave1-Non-Mktplc-DevTestImpl-MW"
-  description = "SSM Patching window for instances. For more information: https://cloud.cms.gov/patching-prerequisites"
+  description = "SSM Patching window for Dev, Test, and Impl env instances. For more information: https://cloud.cms.gov/patching-prerequisites"
+}
+
+variable "ssm_prod_patch_window" {
+  type        = string
+  default     = "ITOPS-Wave1-Non-Mktplc-Prod-MW"
+  description = "SSM Patching window for Prod env instances. For more information: https://cloud.cms.gov/patching-prerequisites"
+}
+
+variable "ssm_override_patch_window" {
+  type        = string
+  default     = ""
+  description = "Patching window override variable"
 }
