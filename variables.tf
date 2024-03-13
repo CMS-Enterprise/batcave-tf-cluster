@@ -326,12 +326,6 @@ variable "enable_self_managed_nodes" {
   description = "Enables self managed nodes"
 }
 
-variable "enable_eks_managed_nodes" {
-  type        = bool
-  default     = false
-  description = "Enables eks managed nodes"
-}
-
 variable "force_update_version" {
   type        = bool
   default     = true
