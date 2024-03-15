@@ -272,16 +272,31 @@ variable "ami_regex_override" {
   default     = ""
   type        = string
 }
+
+variable "node_schedule_shutdown_cron" {
+  type        = string
+  default     = ""
+  description = "The cron schedule for the cluster to be shutdown.  If left empty, the cluster will not be stopped. Will run every day otherwise."
+}
+
+variable "node_schedule_startup_cron" {
+  type        = string
+  default     = ""
+  description = "The cron schedule for the cluster to be restarted.  If left empty, the cluster will not be restarted after shutdown. Will run every weekday otherwise."
+}
+
 variable "node_schedule_shutdown_hour" {
   type        = number
   default     = -1
   description = "The hour of the day (0-23) the cluster should be shutdown.  If left empty, the cluster will not be stopped. Will run every day otherwise."
 }
+
 variable "node_schedule_startup_hour" {
   type        = number
   default     = -1
   description = "The hour of the day (0-23) the cluster should be restarted.  If left empty, the cluster will not be restarted after shutdown. Will run every weekday otherwise."
 }
+
 variable "node_schedule_timezone" {
   type        = string
   default     = "America/New_York"
