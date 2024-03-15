@@ -26,10 +26,10 @@ variable "general_node_pool" {
   default = {
     instance_type = "c5.2xlarge"
     # ami_type      = "BOTTLEROCKET_x86_64"
-    desired_size  = 3
-    max_size      = 5
-    min_size      = 2
-    use_custom_launch_template = false
+    desired_size                 = 3
+    max_size                     = 5
+    min_size                     = 2
+    use_custom_launch_template   = false
     # Map of label flags for kubelets.
     labels = { general = "true" }
     taints = {}

@@ -52,6 +52,31 @@ locals {
 # EKS Fully managed nodes
 ################################################################################
 locals {
+  volume_size                  = try(var.node_volume_size, 300)
+  volume_type                  = try(var.node_volume_type, "gp3")
+  volume_delete_on_termination = try(var.node_volume_delete_on_termination, true)
+
+  base_block_device_mappings = [
+    {
+      device_name = "/dev/xvda"
+      ebs = {
+        volume_size           = "5"
+        volume_type           = "gp3"
+        delete_on_termination = true
+        encrypted             = true
+      }
+    },
+    {
+      device_name = "/dev/xvdb"
+      ebs = {
+        volume_size           = try(local.volume_size, "300")
+        volume_type           = try(local.volume_type, "gp3")
+        delete_on_termination = try(local.volume_delete_on_termination, true)
+        encrypted             = true
+      }
+    }
+  ]
+
   eks_node_pools = { for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
     group_name      = k
     name            = "${var.cluster_name}-${k}"
@@ -102,34 +127,13 @@ locals {
     max_size     = v.max_size
     desired_size = v.desired_size
 
-    base_block_device_mappings = [
-      {
-        device_name = "/dev/xvda"
-        ebs = {
-          volume_size           = "5"
-          volume_type           = "gp3"
-          delete_on_termination = true
-          encrypted             = true
-        }
-      },
-      {
-        device_name = "/dev/xvdb"
-        ebs = {
-          volume_size           = try(v.volume_size, "300")
-          volume_type           = try(v.volume_type, "gp3")
-          delete_on_termination = try(v.volume_delete_on_termination, true)
-          encrypted             = true
-        }
-      }
-    ]
-
     block_device_mappings = local.is_bottlerocket_ami ? [
-      for index, block_device in v.base_block_device_mappings :
+      for index, block_device in local.base_block_device_mappings :
         index > 0 ? {
           device_name = index == 1 ? "/dev/xvda" : block_device.device_name
           ebs = block_device.ebs
         } : null
-    ] : v.base_block_device_mappings
+    ] : local.base_block_device_mappings
 
 
 
