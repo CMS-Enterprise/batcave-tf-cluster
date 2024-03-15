@@ -52,10 +52,6 @@ locals {
 # EKS Fully managed nodes
 ################################################################################
 locals {
-  volume_size                  = try(var.node_volume_size, 300)
-  volume_type                  = try(var.node_volume_type, "gp3")
-  volume_delete_on_termination = try(var.node_volume_delete_on_termination, true)
-
   base_block_device_mappings = [
     {
       device_name = "/dev/xvda"
@@ -69,9 +65,9 @@ locals {
     {
       device_name = "/dev/xvdb"
       ebs = {
-        volume_size           = try(local.volume_size, "300")
-        volume_type           = try(local.volume_type, "gp3")
-        delete_on_termination = try(local.volume_delete_on_termination, true)
+        volume_size           = var.node_volume_size
+        volume_type           = var.node_volume_type
+        delete_on_termination = var.node_volume_delete_on_termination
         encrypted             = true
       }
     }

@@ -122,6 +122,24 @@ variable "node_https_ingress_cidr_blocks" {
   type        = list(string)
 }
 
+variable "node_volume_size" {
+  description = "The size of the volume to use for the nodes.  Defaults to 20"
+  default     = 300
+  type        = number
+}
+
+variable "node_volume_type" {
+  description = "The type of volume to use for the nodes.  Defaults to gp2"
+  default     = "gp3"
+  type        = string
+}
+
+variable "node_volume_delete_on_termination" {
+  description = "Whether the volume should be deleted when the node is terminated.  Defaults to true"
+  default     = true
+  type        = bool
+}
+
 variable "alb_restricted_hosts" {
   type        = set(string)
   description = "A list of allowable host for private alb"
