@@ -126,7 +126,7 @@ locals {
     block_device_mappings = local.is_bottlerocket_ami ? [
       for index, block_device in v.base_block_device_mappings :
         index > 0 ? {
-          device_name = idx == 1 ? "/dev/xvda" : block_device.device_name
+          device_name = index == 1 ? "/dev/xvda" : block_device.device_name
           ebs = block_device.ebs
         } : null
     ] : v.base_block_device_mappings
