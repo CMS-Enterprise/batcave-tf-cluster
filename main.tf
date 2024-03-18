@@ -56,7 +56,7 @@ locals {
     {
       device_name = "/dev/xvda"
       ebs = {
-        volume_size           = "5"
+        volume_size           = "8"
         volume_type           = "gp3"
         delete_on_termination = true
         encrypted             = true
@@ -123,13 +123,18 @@ locals {
     max_size     = v.max_size
     desired_size = v.desired_size
 
+    # This is dynamically creating the block device mappings based on the AMI type
     block_device_mappings = local.is_bottlerocket_ami ? [
-      for index, block_device in local.base_block_device_mappings :
-        index > 0 ? {
-          device_name = index == 1 ? "/dev/xvda" : block_device.device_name
-          ebs = block_device.ebs
-        } : null
-    ] : local.base_block_device_mappings
+    {
+      device_name = "/dev/xvda"
+      ebs = {
+        volume_size           = var.node_volume_size
+        volume_type           = var.node_volume_type
+        delete_on_termination = var.node_volume_delete_on_termination
+        encrypted             = true
+      }
+    }
+  ] : local.base_block_device_mappings
 
 
 
