@@ -239,7 +239,7 @@ locals {
 module "eks" {
   ## https://github.com/terraform-aws-modules/terraform-aws-eks
   source  = "terraform-aws-modules/eks/aws"
-  version = "19.0.4"
+  version = "20.8.3"
 
   cluster_name    = local.name
   cluster_version = local.cluster_version
@@ -290,7 +290,7 @@ module "eks" {
 
 module "eks_managed_node_groups" {
   source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  version = "19.21.0"
+  version = "20.8.3"
 
   for_each = var.enable_eks_managed_nodes ? local.eks_node_pools : {}
 
