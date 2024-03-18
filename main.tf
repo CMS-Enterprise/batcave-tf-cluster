@@ -124,11 +124,12 @@ locals {
     desired_size = v.desired_size
 
     # This is dynamically creating the block device mappings based on the AMI type
-    block_device_mappings = local.is_bottlerocket_ami ? local.base_block_device_mappings :
-    {
-      device_name = "/dev/xvda"
-      ebs = local.base_block_device_mappings[1].ebs
-    }
+    block_device_mappings = local.is_bottlerocket_ami ? local.base_block_device_mappings : [
+      {
+        device_name = "/dev/xvda"
+        ebs = local.base_block_device_mappings[1].ebs
+      }
+    ]
 
 
 
