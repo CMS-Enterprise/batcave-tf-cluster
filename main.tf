@@ -279,7 +279,11 @@ module "eks" {
   }
 
   ## CLUSTER Addons
-  cluster_addons = {}
+  cluster_addons = {
+    eks-pod-identity-agent     = {
+      enabled = true
+    }
+  }
 
   # Worker groups (using Launch Configurations)
   self_managed_node_groups = var.enable_self_managed_nodes ? local.custom_node_pools : {}
