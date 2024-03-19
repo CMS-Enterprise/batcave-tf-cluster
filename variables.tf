@@ -394,3 +394,15 @@ variable "ssm_tag_patch_window" {
   default     = "ITOPS-Wave1-Non-Mktplc-DevTestImpl-MW"
   description = "SSM Patching window for instances. For more information: https://cloud.cms.gov/patching-prerequisites"
 }
+
+variable "ami_owner_override" {
+  type        = list(string)
+  default     = [""]
+  description = "AMI owner override"
+}
+
+variable "use_bottlerocket" {
+  type        = bool
+  default     = false
+  description = "Use Bottlerocket"
+}
