@@ -75,9 +75,9 @@ locals {
 
   eks_node_pools = { for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
     group_name      = k
-    name            = "${var.cluster_name}-${k}"
-    cluster_name    = local.name
-    cluster_version = local.cluster_version
+    name            = "${module.eks.cluster_name}-${k}"
+    cluster_name    = module.eks.cluster_name
+    cluster_version = module.eks.cluster_version
 
     iam_role_path                 = var.iam_role_path
     iam_role_permissions_boundary = var.iam_role_permissions_boundary
@@ -89,6 +89,16 @@ locals {
     ami_type                   = var.platform == "bottlerocket" ? "BOTTLEROCKET_x86_64" : "AL2_x86_64"
     platform                   = try(var.platform, "linux")
     bootstrap_extra_args       = <<-EOT
+      # Base settings for bottlerocket
+      [settings.kubernetes]
+      cluster-name = "${module.eks.cluster_name}"
+      api-server = "${module.eks.cluster_endpoint}"
+      cluster-certificate = "${module.eks.cluster_certificate_authority_data}"
+
+      # Set autoscaling wait
+      [settings.autoscaling]
+      should-wait = true
+
       # settings.kubernetes section from bootstrap_extra_args in default template
       pod-pids-limit = 1000
 
