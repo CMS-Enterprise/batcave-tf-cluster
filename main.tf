@@ -185,6 +185,8 @@ locals {
       # extra args added
       [settings.kernel]
       lockdown = "integrity"
+      
+      [settings.kernel.sysctl]
       user.max_user_namespaces = "10000"
 
       [settings.kubernetes.node-labels]
