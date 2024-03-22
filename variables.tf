@@ -406,3 +406,15 @@ variable "use_bottlerocket" {
   default     = false
   description = "Use Bottlerocket"
 }
+
+variable "node_labels" {
+  description = "The labels to apply to the EKS nodes"
+  type        = map(string)
+  default     = {}
+}
+
+variable "node_taints" {
+  description = "The taints to apply to the EKS nodes"
+  type        = map(string)
+  default     = {}
+}

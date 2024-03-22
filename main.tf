@@ -73,6 +73,19 @@ locals {
     }
   ]
 
+  node_labels = merge(
+    var.node_labels
+  )
+
+  bottlerocket_bootstrap_template = templatefile("${path.module}/templates/bottlerocket.toml.tpl", {
+    cluster_name     = var.cluster_name
+    cluster_endpoint = module.eks.cluster_endpoint
+    cluster_ca_data  = module.eks.cluster_certificate_authority_data
+    max_namespaces   = 10000
+    node_labels      = join("\n", [for label, value in local.node_labels : "\"${label}\" = \"${value}\""])
+    node_taints      = join("\n", [for taint, value in var.node_taints : "\"${taint}\" = \"${value}\""])
+  })
+
   eks_node_pools = { for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
     group_name      = k
     name            = "${module.eks.cluster_name}-${k}"
@@ -88,46 +101,7 @@ locals {
     use_custom_launch_template = try(v.use_custom_launch_template, true)
     ami_type                   = var.platform == "bottlerocket" ? "BOTTLEROCKET_x86_64" : "AL2_x86_64"
     platform                   = try(var.platform, "linux")
-    bootstrap_extra_args       = <<-EOT
-      # Base settings for bottlerocket
-      [settings.kubernetes]
-      cluster-name = "${module.eks.cluster_name}"
-      api-server = "${module.eks.cluster_endpoint}"
-      cluster-certificate = "${module.eks.cluster_certificate_authority_data}"
-
-      # Set autoscaling wait
-      [settings.autoscaling]
-      should-wait = true
-
-      # settings.kubernetes section from bootstrap_extra_args in default template
-      pod-pids-limit = 1000
-
-      # The admin host container provides SSH access and runs with "superpowers".
-      # It is disabled by default, but can be disabled explicitly.
-      [settings.host-containers.admin]
-      enabled = false
-
-      # The control host container provides out-of-band access via SSM.
-      # It is enabled by default, and can be disabled if you do not expect to use SSM.
-      # This could leave you with no way to access the API and change settings on an existing node!
-      [settings.host-containers.control]
-      enabled = true
-
-      # extra args added
-      [settings.kernel]
-      lockdown = "integrity"
-      
-      [settings.kernel.sysctl]
-      "user.max_user_namespaces" = "10000"
-
-      [settings.kubernetes.node-labels]
-      # label1 = "foo"
-      # label2 = "bar"
-
-      [settings.kubernetes.node-taints]
-      # dedicated = "experimental:PreferNoSchedule"
-      # special = "true:NoSchedule"
-    EOT
+    bootstrap_extra_args       = local.bottlerocket_bootstrap_template
 
     subnet_ids = coalescelist(try(v.subnet_ids, []), var.host_subnets, var.private_subnets)
 
@@ -139,7 +113,7 @@ locals {
     block_device_mappings = local.is_bottlerocket_ami ? local.base_block_device_mappings : [
       {
         device_name = "/dev/xvda"
-        ebs = local.base_block_device_mappings[1].ebs
+        ebs         = local.base_block_device_mappings[1].ebs
       }
     ]
 
