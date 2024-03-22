@@ -2,7 +2,6 @@ locals {
   name                = var.cluster_name
   cluster_version     = var.cluster_version
   hoplimit_metadata   = var.enable_hoplimit ? { http_put_response_hop_limit = 1 } : {}
-  is_bottlerocket_ami = contains(split("-", data.aws_ami.eks_ami.name), "bottlerocket")
 }
 
 data "aws_ami" "eks_ami" {
@@ -110,7 +109,7 @@ locals {
     desired_size = v.desired_size
 
     # This is dynamically creating the block device mappings based on the AMI type
-    block_device_mappings = local.is_bottlerocket_ami ? local.base_block_device_mappings : [
+    block_device_mappings = var.use_bottlerocket ? local.base_block_device_mappings : [
       {
         device_name = "/dev/xvda"
         ebs         = local.base_block_device_mappings[1].ebs
@@ -217,8 +216,8 @@ module "eks_managed_node_groups" {
   for_each = local.eks_node_pools
 
   name                              = each.value.name
-  cluster_name                      = each.value.cluster_name
-  cluster_version                   = each.value.cluster_version
+  cluster_name                      = module.eks.cluster_name
+  cluster_version                   = module.eks.cluster_version
   cluster_endpoint                  = module.eks.cluster_endpoint
   cluster_auth_base64               = module.eks.cluster_certificate_authority_data
   create_iam_role                   = false
