@@ -99,8 +99,8 @@ locals {
 
     # Added for Bottlerocket
     use_custom_launch_template = try(v.use_custom_launch_template, true)
-    ami_type                   = var.platform == "bottlerocket" ? "BOTTLEROCKET_x86_64" : "AL2_x86_64"
-    platform                   = try(var.platform, "linux")
+    ami_type                   = var.use_bottlerocket ? "BOTTLEROCKET_x86_64" : "AL2_x86_64"
+    platform                   = var.use_bottlerocket ? "bottlerocket" : "linux"
     bootstrap_extra_args       = local.bottlerocket_bootstrap_template
 
     subnet_ids = coalescelist(try(v.subnet_ids, []), var.host_subnets, var.private_subnets)
@@ -201,10 +201,6 @@ module "eks" {
   cluster_encryption_config = {
     provider_key_arn = aws_kms_key.eks.arn
     resources        = ["secrets"]
-  }
-
-  self_managed_node_group_defaults = {
-    subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
   }
 
   ## CLUSTER Addons

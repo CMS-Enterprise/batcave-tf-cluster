@@ -14,12 +14,6 @@ variable "ami_date" {
   type    = string
 }
 
-## Default node group
-variable "platform" {
-  default = "bottlerocket"
-  type    = string
-}
-
 variable "general_node_pool" {
   type        = any
   description = "General node pool, required for hosting core services"
