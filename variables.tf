@@ -20,10 +20,10 @@ variable "general_node_pool" {
   default = {
     instance_type = "c5.2xlarge"
     # ami_type      = "BOTTLEROCKET_x86_64"
-    desired_size                 = 3
-    max_size                     = 5
-    min_size                     = 2
-    use_custom_launch_template   = false
+    desired_size               = 3
+    max_size                   = 5
+    min_size                   = 2
+    use_custom_launch_template = false
     # Map of label flags for kubelets.
     labels = { general = "true" }
     taints = {}
@@ -273,28 +273,10 @@ variable "create_cosign_iam_role" {
   type        = bool
 }
 
-variable "autoscaling_group_tags" {
-  description = "Tags to apply to all autoscaling groups created"
-  default     = {}
-  type        = map(any)
-}
-
 variable "ami_regex_override" {
   description = "Overrides default AMI lookup regex, which grabs latest AMI matching cluster_version by default"
   default     = ""
   type        = string
-}
-
-variable "node_schedule_shutdown_cron" {
-  type        = string
-  default     = ""
-  description = "The cron schedule for the cluster to be shutdown.  If left empty, the cluster will not be stopped. Will run every day otherwise."
-}
-
-variable "node_schedule_startup_cron" {
-  type        = string
-  default     = ""
-  description = "The cron schedule for the cluster to be restarted.  If left empty, the cluster will not be restarted after shutdown. Will run every weekday otherwise."
 }
 
 variable "node_schedule_shutdown_hour" {
@@ -347,11 +329,6 @@ variable "federated_access_role" {
 }
 
 
-variable "enable_self_managed_nodes" {
-  type        = bool
-  default     = true
-  description = "Enables self managed nodes"
-}
 
 variable "force_update_version" {
   type        = bool

@@ -1,7 +1,7 @@
 locals {
-  name                = var.cluster_name
-  cluster_version     = var.cluster_version
-  hoplimit_metadata   = var.enable_hoplimit ? { http_put_response_hop_limit = 1 } : {}
+  name              = var.cluster_name
+  cluster_version   = var.cluster_version
+  hoplimit_metadata = var.enable_hoplimit ? { http_put_response_hop_limit = 1 } : {}
 }
 
 data "aws_ami" "eks_ami" {
@@ -21,12 +21,6 @@ data "aws_security_groups" "delete_ebs_volumes_lambda_security_group" {
 # EKS Module
 ################################################################################
 locals {
-  # Schedule config
-  create_schedule_startup     = var.node_schedule_startup_hour >= 0 || var.node_schedule_startup_cron != ""
-  create_schedule_shutdown    = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_shutdown_cron != ""
-  create_schedule             = local.create_schedule_startup || local.create_schedule_shutdown
-  node_schedule_shutdown_cron = var.node_schedule_shutdown_cron != "" ? var.node_schedule_shutdown_cron : "0 ${var.node_schedule_shutdown_hour} * * *"
-  node_schedule_startup_cron  = var.node_schedule_startup_cron != "" ? var.node_schedule_startup_cron : "0 ${var.node_schedule_startup_hour} * * 1-5"
 
   instance_policy_tags = var.enable_ssm_patching ? { "Patch Group" = var.ssm_tag_patch_group, "Patch Window" = var.ssm_tag_patch_window } : {}
   instance_tags        = merge(local.instance_policy_tags, var.instance_tags)
