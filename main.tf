@@ -94,7 +94,7 @@ locals {
         }
       },
       {
-        device_name = "dev/xvdb"
+        device_name = "/dev/xvdb"
         ebs = {
           volume_size           = try(v.volume_size, "300")
           volume_type           = try(v.volume_type, "gp3")
