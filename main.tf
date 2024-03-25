@@ -90,6 +90,7 @@ locals {
           volume_size           = 8
           volume_type           = "gp3"
           delete_on_termination = true
+          encrypted             = true
         }
       },
       {
@@ -98,6 +99,7 @@ locals {
           volume_size           = try(v.volume_size, "300")
           volume_type           = try(v.volume_type, "gp3")
           delete_on_termination = try(v.delete_on_termination, true)
+          encrypted             = true
         }
       }
       ] : [
@@ -107,6 +109,7 @@ locals {
           volume_size           = try(v.volume_size, "300")
           volume_type           = try(v.volume_type, "gp3")
           delete_on_termination = try(v.delete_on_termination, true)
+          encrypted             = true
         }
       }
     ]
