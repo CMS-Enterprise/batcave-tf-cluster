@@ -159,6 +159,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_ami_date"></a> [ami\_date](#input\_ami\_date) | n/a | `string` | `""` | no |
 | <a name="input_ami_owner_override"></a> [ami\_owner\_override](#input\_ami\_owner\_override) | AMI owner override | `list(string)` | <pre>[<br>  ""<br>]</pre> | no |
 | <a name="input_ami_regex_override"></a> [ami\_regex\_override](#input\_ami\_regex\_override) | Overrides default AMI lookup regex, which grabs latest AMI matching cluster\_version by default | `string` | `""` | no |
+| <a name="input_bottlerocket_pod_pids_limit"></a> [bottlerocket\_pod\_pids\_limit](#input\_bottlerocket\_pod\_pids\_limit) | The maximum number of processes that can be created in a pod | `number` | `1000` | no |
 | <a name="input_cluster_additional_sg_prefix_lists"></a> [cluster\_additional\_sg\_prefix\_lists](#input\_cluster\_additional\_sg\_prefix\_lists) | n/a | `list(string)` | n/a | yes |
 | <a name="input_cluster_enabled_log_types"></a> [cluster\_enabled\_log\_types](#input\_cluster\_enabled\_log\_types) | A list of the desired control plane logging to enable. For more information, see Amazon EKS Control Plane Logging documentation (https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html) | `list(string)` | <pre>[<br>  "api",<br>  "audit",<br>  "authenticator",<br>  "controllerManager",<br>  "scheduler"<br>]</pre> | no |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | n/a | `string` | n/a | yes |
@@ -189,9 +190,6 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_node_schedule_startup_hour"></a> [node\_schedule\_startup\_hour](#input\_node\_schedule\_startup\_hour) | The hour of the day (0-23) the cluster should be restarted.  If left empty, the cluster will not be restarted after shutdown. Will run every weekday otherwise. | `number` | `-1` | no |
 | <a name="input_node_schedule_timezone"></a> [node\_schedule\_timezone](#input\_node\_schedule\_timezone) | The timezone of the schedule. Ex: 'America/New\_York', 'America/Chicago', 'America/Denver', 'America/Los\_Angeles', 'Pacific/Honolulu'  See: https://www.joda.org/joda-time/timezones.html | `string` | `"America/New_York"` | no |
 | <a name="input_node_taints"></a> [node\_taints](#input\_node\_taints) | The taints to apply to the EKS nodes | `map(string)` | `{}` | no |
-| <a name="input_node_volume_delete_on_termination"></a> [node\_volume\_delete\_on\_termination](#input\_node\_volume\_delete\_on\_termination) | Whether the volume should be deleted when the node is terminated.  Defaults to true | `bool` | `true` | no |
-| <a name="input_node_volume_size"></a> [node\_volume\_size](#input\_node\_volume\_size) | The size of the volume to use for the nodes.  Defaults to 20 | `number` | `300` | no |
-| <a name="input_node_volume_type"></a> [node\_volume\_type](#input\_node\_volume\_type) | The type of volume to use for the nodes.  Defaults to gp2 | `string` | `"gp3"` | no |
 | <a name="input_openid_connect_audiences"></a> [openid\_connect\_audiences](#input\_openid\_connect\_audiences) | OpenID Connect Audiences | `list(string)` | `[]` | no |
 | <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | n/a | `list(any)` | n/a | yes |
 | <a name="input_s3_bucket_access_grants"></a> [s3\_bucket\_access\_grants](#input\_s3\_bucket\_access\_grants) | A list of s3 bucket names to grant the cluster roles R/W access to | `list(string)` | `null` | no |
