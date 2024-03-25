@@ -1,7 +1,7 @@
 locals {
-  name                = var.cluster_name
-  cluster_version     = var.cluster_version
-  hoplimit_metadata   = var.enable_hoplimit ? { http_put_response_hop_limit = 1 } : {}
+  name              = var.cluster_name
+  cluster_version   = var.cluster_version
+  hoplimit_metadata = var.enable_hoplimit ? { http_put_response_hop_limit = 1 } : {}
 }
 
 data "aws_ami" "eks_ami" {
@@ -51,27 +51,6 @@ locals {
 # EKS Fully managed nodes
 ################################################################################
 locals {
-  base_block_device_mappings = [
-    {
-      device_name = "/dev/xvda"
-      ebs = {
-        volume_size           = "8"
-        volume_type           = "gp3"
-        delete_on_termination = true
-        encrypted             = true
-      }
-    },
-    {
-      device_name = "/dev/xvdb"
-      ebs = {
-        volume_size           = var.node_volume_size
-        volume_type           = var.node_volume_type
-        delete_on_termination = var.node_volume_delete_on_termination
-        encrypted             = true
-      }
-    }
-  ]
-
   node_labels = merge(
     var.node_labels
   )
@@ -80,6 +59,7 @@ locals {
     cluster_name     = var.cluster_name
     cluster_endpoint = module.eks.cluster_endpoint
     cluster_ca_data  = module.eks.cluster_certificate_authority_data
+    pod_pids_limit   = var.bottlerocket_pod_pids_limit
     max_namespaces   = 10000
     node_labels      = join("\n", [for label, value in local.node_labels : "\"${label}\" = \"${value}\""])
     node_taints      = join("\n", [for taint, value in var.node_taints : "\"${taint}\" = \"${value}\""])
@@ -109,10 +89,31 @@ locals {
     desired_size = v.desired_size
 
     # This is dynamically creating the block device mappings based on the AMI type
-    block_device_mappings = var.use_bottlerocket ? local.base_block_device_mappings : [
+    block_device_mappings = var.use_bottlerocket ? [
       {
         device_name = "/dev/xvda"
-        ebs         = local.base_block_device_mappings[1].ebs
+        ebs = {
+          volume_size           = 8
+          volume_type           = "gp3"
+          delete_on_termination = true
+        }
+      },
+      {
+        device_name = "dev/xvdb"
+        ebs = {
+          volume_size           = try(v.volume_size, "300")
+          volume_type           = try(v.volume_type, "gp3")
+          delete_on_termination = try(v.delete_on_termination, true)
+        }
+      }
+      ] : [
+      {
+        device_name = "/dev/xvda"
+        ebs = {
+          volume_size           = try(v.volume_size, "300")
+          volume_type           = try(v.volume_type, "gp3")
+          delete_on_termination = try(v.delete_on_termination, true)
+        }
       }
     ]
 

@@ -18,12 +18,11 @@ variable "general_node_pool" {
   type        = any
   description = "General node pool, required for hosting core services"
   default = {
-    instance_type = "c5.2xlarge"
-    # ami_type      = "BOTTLEROCKET_x86_64"
-    desired_size                 = 3
-    max_size                     = 5
-    min_size                     = 2
-    use_custom_launch_template   = false
+    instance_type              = "c5.2xlarge"
+    desired_size               = 3
+    max_size                   = 5
+    min_size                   = 2
+    use_custom_launch_template = false
     # Map of label flags for kubelets.
     labels = { general = "true" }
     taints = {}
@@ -116,19 +115,19 @@ variable "node_https_ingress_cidr_blocks" {
   type        = list(string)
 }
 
-variable "node_volume_size" {
+variable "node_default_volume_size" {
   description = "The size of the volume to use for the nodes.  Defaults to 20"
   default     = 300
   type        = number
 }
 
-variable "node_volume_type" {
+variable "node_default_volume_type" {
   description = "The type of volume to use for the nodes.  Defaults to gp2"
   default     = "gp3"
   type        = string
 }
 
-variable "node_volume_delete_on_termination" {
+variable "node_default_volume_delete_on_termination" {
   description = "Whether the volume should be deleted when the node is terminated.  Defaults to true"
   default     = true
   type        = bool
@@ -411,4 +410,10 @@ variable "node_taints" {
   description = "The taints to apply to the EKS nodes"
   type        = map(string)
   default     = {}
+}
+
+variable "bottlerocket_pod_pids_limit" {
+  type        = number
+  default     = 1000
+  description = "The maximum number of processes that can be created in a pod"
 }

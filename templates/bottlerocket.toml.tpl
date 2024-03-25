@@ -1,12 +1,12 @@
 # settings.kubernetes section from bootstrap_extra_args in default template
-pod-pids-limit = 1000
+pod-pids-limit = ${pod_pids_limit}
 
 # Set autoscaling wait
 [settings.autoscaling]
 should-wait = true
 
 # The admin host container provides SSH access and runs with "superpowers".
-# It is disabled by default, but can be disabled explicitly.
+# It is disabled by default, but can be enabled explicitly.
 [settings.host-containers.admin]
 enabled = false
 
