@@ -115,24 +115,6 @@ variable "node_https_ingress_cidr_blocks" {
   type        = list(string)
 }
 
-variable "node_default_volume_size" {
-  description = "The size of the volume to use for the nodes.  Defaults to 20"
-  default     = 300
-  type        = number
-}
-
-variable "node_default_volume_type" {
-  description = "The type of volume to use for the nodes.  Defaults to gp2"
-  default     = "gp3"
-  type        = string
-}
-
-variable "node_default_volume_delete_on_termination" {
-  description = "Whether the volume should be deleted when the node is terminated.  Defaults to true"
-  default     = true
-  type        = bool
-}
-
 variable "alb_restricted_hosts" {
   type        = set(string)
   description = "A list of allowable host for private alb"
@@ -272,28 +254,10 @@ variable "create_cosign_iam_role" {
   type        = bool
 }
 
-variable "autoscaling_group_tags" {
-  description = "Tags to apply to all autoscaling groups created"
-  default     = {}
-  type        = map(any)
-}
-
 variable "ami_regex_override" {
   description = "Overrides default AMI lookup regex, which grabs latest AMI matching cluster_version by default"
   default     = ""
   type        = string
-}
-
-variable "node_schedule_shutdown_cron" {
-  type        = string
-  default     = ""
-  description = "The cron schedule for the cluster to be shutdown.  If left empty, the cluster will not be stopped. Will run every day otherwise."
-}
-
-variable "node_schedule_startup_cron" {
-  type        = string
-  default     = ""
-  description = "The cron schedule for the cluster to be restarted.  If left empty, the cluster will not be restarted after shutdown. Will run every weekday otherwise."
 }
 
 variable "node_schedule_shutdown_hour" {
@@ -346,11 +310,6 @@ variable "federated_access_role" {
 }
 
 
-variable "enable_self_managed_nodes" {
-  type        = bool
-  default     = true
-  description = "Enables self managed nodes"
-}
 
 variable "force_update_version" {
   type        = bool
