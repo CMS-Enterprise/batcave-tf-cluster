@@ -48,13 +48,13 @@ locals {
 ################################################################################
 locals {
   shared_node_labels = {
-    for k, v in var.custom_node_pools : k => {
+    for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
       for label_key, label_value in try(v.labels, {}) : label_key => label_value
     }
   }
 
   shared_node_taints = {
-    for k, v in var.custom_node_pools : k => [
+    for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => [
       for taint_key, taint_string in try(v.taints, {}) : {
         key    = taint_key
         value  = element(split(":", taint_string), 0)
