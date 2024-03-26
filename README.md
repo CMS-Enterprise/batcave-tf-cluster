@@ -157,7 +157,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_alb_ssl_security_policy"></a> [alb\_ssl\_security\_policy](#input\_alb\_ssl\_security\_policy) | ALB SSL Security Policy | `string` | `"ELBSecurityPolicy-TLS13-1-2-Res-2021-06"` | no |
 | <a name="input_alb_subnets_by_zone"></a> [alb\_subnets\_by\_zone](#input\_alb\_subnets\_by\_zone) | n/a | `map(string)` | n/a | yes |
 | <a name="input_ami_date"></a> [ami\_date](#input\_ami\_date) | n/a | `string` | `""` | no |
-| <a name="input_ami_owner_override"></a> [ami\_owner\_override](#input\_ami\_owner\_override) | Override the AWS Account owner used to look up AMI's for the cluster nodes | `list(string)` | <pre>[<br>  ""<br>]</pre> | no |
+| <a name="input_ami_owner_override"></a> [ami\_owner\_override](#input\_ami\_owner\_override) | Override the AWS Account owner used to look up AMI's for the cluster nodes | `string` | `""` | no |
 | <a name="input_ami_regex_override"></a> [ami\_regex\_override](#input\_ami\_regex\_override) | Overrides default AMI lookup regex, which grabs latest AMI matching cluster\_version by default | `string` | `""` | no |
 | <a name="input_bottlerocket_pod_pids_limit"></a> [bottlerocket\_pod\_pids\_limit](#input\_bottlerocket\_pod\_pids\_limit) | The maximum number of processes that can be created in a pod | `number` | `1000` | no |
 | <a name="input_cluster_additional_sg_prefix_lists"></a> [cluster\_additional\_sg\_prefix\_lists](#input\_cluster\_additional\_sg\_prefix\_lists) | n/a | `list(string)` | n/a | yes |
