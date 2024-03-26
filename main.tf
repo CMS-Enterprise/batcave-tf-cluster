@@ -4,6 +4,8 @@ locals {
   hoplimit_metadata = var.enable_hoplimit ? { http_put_response_hop_limit = 1 } : {}
 }
 
+# If an AMI owner is specified, use that owner.  Otherwise, use the CMS AMI by default,
+# with the capability to pass 'use_bottlerocket' var to use the bottlerocket AMI.
 data "aws_ami" "eks_ami" {
   most_recent = true
   name_regex  = var.use_bottlerocket ? "^bottlerocket-aws-k8s-${var.cluster_version}-x86_64-v1.17.0" : (var.ami_regex_override == "" ? "^amzn2-eks-${var.cluster_version}-gi-${var.ami_date}" : var.ami_regex_override)
@@ -45,17 +47,13 @@ locals {
 # EKS Fully managed nodes
 ################################################################################
 locals {
-  node_labels = merge(
-    var.node_labels
-  )
-
   bottlerocket_bootstrap_template = templatefile("${path.module}/templates/bottlerocket.toml.tpl", {
     cluster_name     = var.cluster_name
     cluster_endpoint = module.eks.cluster_endpoint
     cluster_ca_data  = module.eks.cluster_certificate_authority_data
     pod_pids_limit   = var.bottlerocket_pod_pids_limit
     max_namespaces   = 10000
-    node_labels      = join("\n", [for label, value in local.node_labels : "\"${label}\" = \"${value}\""])
+    node_labels      = join("\n", [for label, value in var.node_labels : "\"${label}\" = \"${value}\""])
     node_taints      = join("\n", [for taint, value in var.node_taints : "\"${taint}\" = \"${value}\""])
   })
 
