@@ -24,7 +24,7 @@ lockdown = "integrity"
 "user.max_user_namespaces" = "${max_namespaces}"
 
 [settings.kubernetes.node-labels]
-${node_labels}
+"${node_labels}"
 
 [settings.kubernetes.node-taints]
-${node_taints}
+"${node_taints}"
