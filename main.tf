@@ -78,7 +78,7 @@ locals {
     use_custom_launch_template = try(v.use_custom_launch_template, true)
     ami_type                   = var.use_bottlerocket ? "BOTTLEROCKET_x86_64" : "AL2_x86_64"
     platform                   = var.use_bottlerocket ? "bottlerocket" : "linux"
-    bootstrap_extra_args       = templatefile("${path.module}/templates/bottlerocket.toml.tpl", {
+    bootstrap_extra_args = templatefile("${path.module}/templates/bottlerocket.toml.tpl", {
       cluster_name     = var.cluster_name
       cluster_endpoint = module.eks.cluster_endpoint
       cluster_ca_data  = module.eks.cluster_certificate_authority_data

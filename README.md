@@ -157,7 +157,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_alb_ssl_security_policy"></a> [alb\_ssl\_security\_policy](#input\_alb\_ssl\_security\_policy) | ALB SSL Security Policy | `string` | `"ELBSecurityPolicy-TLS13-1-2-Res-2021-06"` | no |
 | <a name="input_alb_subnets_by_zone"></a> [alb\_subnets\_by\_zone](#input\_alb\_subnets\_by\_zone) | n/a | `map(string)` | n/a | yes |
 | <a name="input_ami_date"></a> [ami\_date](#input\_ami\_date) | n/a | `string` | `""` | no |
-| <a name="input_ami_owner_override"></a> [ami\_owner\_override](#input\_ami\_owner\_override) | AMI owner override | `list(string)` | <pre>[<br>  ""<br>]</pre> | no |
+| <a name="input_ami_owner_override"></a> [ami\_owner\_override](#input\_ami\_owner\_override) | Override the AWS Account owner used to look up AMI's for the cluster nodes | `list(string)` | <pre>[<br>  ""<br>]</pre> | no |
 | <a name="input_ami_regex_override"></a> [ami\_regex\_override](#input\_ami\_regex\_override) | Overrides default AMI lookup regex, which grabs latest AMI matching cluster\_version by default | `string` | `""` | no |
 | <a name="input_bottlerocket_pod_pids_limit"></a> [bottlerocket\_pod\_pids\_limit](#input\_bottlerocket\_pod\_pids\_limit) | The maximum number of processes that can be created in a pod | `number` | `1000` | no |
 | <a name="input_cluster_additional_sg_prefix_lists"></a> [cluster\_additional\_sg\_prefix\_lists](#input\_cluster\_additional\_sg\_prefix\_lists) | n/a | `list(string)` | n/a | yes |
@@ -185,11 +185,9 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_instance_tags"></a> [instance\_tags](#input\_instance\_tags) | Instance custom tags | `map(any)` | `null` | no |
 | <a name="input_logging_bucket"></a> [logging\_bucket](#input\_logging\_bucket) | Name of the S3 bucket to send load balancer access logs. | `string` | `null` | no |
 | <a name="input_node_https_ingress_cidr_blocks"></a> [node\_https\_ingress\_cidr\_blocks](#input\_node\_https\_ingress\_cidr\_blocks) | List of CIDR blocks to allow into the node over the HTTPs port | `list(string)` | <pre>[<br>  "10.0.0.0/8",<br>  "100.0.0.0/8"<br>]</pre> | no |
-| <a name="input_node_labels"></a> [node\_labels](#input\_node\_labels) | The labels to apply to the EKS nodes | `map(string)` | `{}` | no |
 | <a name="input_node_schedule_shutdown_hour"></a> [node\_schedule\_shutdown\_hour](#input\_node\_schedule\_shutdown\_hour) | The hour of the day (0-23) the cluster should be shutdown.  If left empty, the cluster will not be stopped. Will run every day otherwise. | `number` | `-1` | no |
 | <a name="input_node_schedule_startup_hour"></a> [node\_schedule\_startup\_hour](#input\_node\_schedule\_startup\_hour) | The hour of the day (0-23) the cluster should be restarted.  If left empty, the cluster will not be restarted after shutdown. Will run every weekday otherwise. | `number` | `-1` | no |
 | <a name="input_node_schedule_timezone"></a> [node\_schedule\_timezone](#input\_node\_schedule\_timezone) | The timezone of the schedule. Ex: 'America/New\_York', 'America/Chicago', 'America/Denver', 'America/Los\_Angeles', 'Pacific/Honolulu'  See: https://www.joda.org/joda-time/timezones.html | `string` | `"America/New_York"` | no |
-| <a name="input_node_taints"></a> [node\_taints](#input\_node\_taints) | The taints to apply to the EKS nodes | `map(string)` | `{}` | no |
 | <a name="input_openid_connect_audiences"></a> [openid\_connect\_audiences](#input\_openid\_connect\_audiences) | OpenID Connect Audiences | `list(string)` | `[]` | no |
 | <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | n/a | `list(any)` | n/a | yes |
 | <a name="input_s3_bucket_access_grants"></a> [s3\_bucket\_access\_grants](#input\_s3\_bucket\_access\_grants) | A list of s3 bucket names to grant the cluster roles R/W access to | `list(string)` | `null` | no |
