@@ -47,15 +47,21 @@ locals {
 # EKS Fully managed nodes
 ################################################################################
 locals {
-  bottlerocket_bootstrap_template = templatefile("${path.module}/templates/bottlerocket.toml.tpl", {
-    cluster_name     = var.cluster_name
-    cluster_endpoint = module.eks.cluster_endpoint
-    cluster_ca_data  = module.eks.cluster_certificate_authority_data
-    pod_pids_limit   = var.bottlerocket_pod_pids_limit
-    max_namespaces   = 10000
-    node_labels      = join("\n", [for label, value in var.node_labels : "\"${label}\" = \"${value}\""])
-    node_taints      = join("\n", [for taint, value in var.node_taints : "\"${taint}\" = \"${value}\""])
-  })
+  shared_node_labels = {
+    for k, v in var.custom_node_pools : k => {
+      for label_key, label_value in try(v.labels, {}) : label_key => label_value
+    }
+  }
+
+  shared_node_taints = {
+    for k, v in var.custom_node_pools : k => [
+      for taint_key, taint_string in try(v.taints, {}) : {
+        key    = taint_key
+        value  = element(split(":", taint_string), 0)
+        effect = "NO_SCHEDULE"
+      }
+    ]
+  }
 
   eks_node_pools = { for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
     group_name      = k
@@ -72,7 +78,15 @@ locals {
     use_custom_launch_template = try(v.use_custom_launch_template, true)
     ami_type                   = var.use_bottlerocket ? "BOTTLEROCKET_x86_64" : "AL2_x86_64"
     platform                   = var.use_bottlerocket ? "bottlerocket" : "linux"
-    bootstrap_extra_args       = local.bottlerocket_bootstrap_template
+    bootstrap_extra_args       = templatefile("${path.module}/templates/bottlerocket.toml.tpl", {
+      cluster_name     = var.cluster_name
+      cluster_endpoint = module.eks.cluster_endpoint
+      cluster_ca_data  = module.eks.cluster_certificate_authority_data
+      pod_pids_limit   = var.bottlerocket_pod_pids_limit
+      max_namespaces   = 10000
+      node_labels      = local.shared_node_labels[k]
+      node_taints      = local.shared_node_taints[k]
+    })
 
     subnet_ids = coalescelist(try(v.subnet_ids, []), var.host_subnets, var.private_subnets)
 
@@ -122,19 +136,6 @@ locals {
     metadata_options           = merge(local.hoplimit_metadata, try(v.metadata_options, {}))
 
     tags = merge(var.tags, local.instance_tags, try(v.tags, null))
-
-    taints = [
-      for taint_key, taint_string in try(v.taints, {}) : {
-        key    = taint_key
-        value  = element(split(":", taint_string), 0)
-        effect = "NO_SCHEDULE"
-      }
-    ]
-
-    labels = {
-      for label_key, label_value in try(v.labels, {}) :
-      label_key => label_value
-    }
 
     create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
     schedules = merge(
@@ -233,8 +234,8 @@ module "eks_managed_node_groups" {
   ami_type                          = each.value.ami_type
   metadata_options                  = each.value.metadata_options
   tags                              = each.value.tags
-  taints                            = each.value.taints
-  labels                            = each.value.labels
+  taints                            = local.shared_node_taints[each.key]
+  labels                            = local.shared_node_labels[each.key]
   create_schedule                   = each.value.create_schedule
   schedules                         = each.value.schedules
   force_update_version              = var.force_update_version

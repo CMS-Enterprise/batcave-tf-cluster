@@ -350,25 +350,13 @@ variable "ssm_tag_patch_window" {
 variable "ami_owner_override" {
   type        = list(string)
   default     = [""]
-  description = "AMI owner override"
+  description = "Override the AWS Account owner used to look up AMI's for the cluster nodes"
 }
 
 variable "use_bottlerocket" {
   type        = bool
   default     = false
   description = "Use Bottlerocket"
-}
-
-variable "node_labels" {
-  description = "The labels to apply to the EKS nodes"
-  type        = map(string)
-  default     = {}
-}
-
-variable "node_taints" {
-  description = "The taints to apply to the EKS nodes"
-  type        = map(string)
-  default     = {}
 }
 
 variable "bottlerocket_pod_pids_limit" {
