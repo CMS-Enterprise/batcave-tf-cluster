@@ -348,8 +348,8 @@ variable "ssm_tag_patch_window" {
 }
 
 variable "ami_owner_override" {
-  type        = list(string)
-  default     = [""]
+  type        = string
+  default     = ""
   description = "Override the AWS Account owner used to look up AMI's for the cluster nodes"
 }
 
