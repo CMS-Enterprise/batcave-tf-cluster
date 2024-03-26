@@ -9,7 +9,8 @@ locals {
 data "aws_ami" "eks_ami" {
   most_recent = true
   name_regex  = var.use_bottlerocket ? "^bottlerocket-aws-k8s-${var.cluster_version}-x86_64-v1.17.0" : (var.ami_regex_override == "" ? "^amzn2-eks-${var.cluster_version}-gi-${var.ami_date}" : var.ami_regex_override)
-  owners      = var.use_bottlerocket ? ["092701018921"] : (length(var.ami_owner_override) > 0 && var.ami_owner_override[0] != "" ? var.ami_owner_override : ["743302140042"])
+  # If an ami_owner_override is provided, use it.  Otherwise use the AWS AMI's for bottlerocket, and CMS AMIs AL2
+  owners      = var.ami_owner_override != "" ? [var.ami_owner_override] : (var.use_bottlerocket ? ["092701018921"] : ["743302140042"])
 }
 
 data "aws_security_groups" "delete_ebs_volumes_lambda_security_group" {
