@@ -14,21 +14,14 @@ variable "ami_date" {
   type    = string
 }
 
-## Default node group
-variable "platform" {
-  default = "bottlerocket"
-  type    = string
-}
-
 variable "general_node_pool" {
   type        = any
   description = "General node pool, required for hosting core services"
   default = {
-    instance_type = "c5.2xlarge"
-    # ami_type      = "BOTTLEROCKET_x86_64"
-    desired_size  = 3
-    max_size      = 5
-    min_size      = 2
+    instance_type              = "c5.2xlarge"
+    desired_size               = 3
+    max_size                   = 5
+    min_size                   = 2
     use_custom_launch_template = false
     # Map of label flags for kubelets.
     labels = { general = "true" }
@@ -261,27 +254,24 @@ variable "create_cosign_iam_role" {
   type        = bool
 }
 
-variable "autoscaling_group_tags" {
-  description = "Tags to apply to all autoscaling groups created"
-  default     = {}
-  type        = map(any)
-}
-
 variable "ami_regex_override" {
   description = "Overrides default AMI lookup regex, which grabs latest AMI matching cluster_version by default"
   default     = ""
   type        = string
 }
+
 variable "node_schedule_shutdown_hour" {
   type        = number
   default     = -1
   description = "The hour of the day (0-23) the cluster should be shutdown.  If left empty, the cluster will not be stopped. Will run every day otherwise."
 }
+
 variable "node_schedule_startup_hour" {
   type        = number
   default     = -1
   description = "The hour of the day (0-23) the cluster should be restarted.  If left empty, the cluster will not be restarted after shutdown. Will run every weekday otherwise."
 }
+
 variable "node_schedule_timezone" {
   type        = string
   default     = "America/New_York"
@@ -320,17 +310,6 @@ variable "federated_access_role" {
 }
 
 
-variable "enable_self_managed_nodes" {
-  type        = bool
-  default     = true
-  description = "Enables self managed nodes"
-}
-
-variable "enable_eks_managed_nodes" {
-  type        = bool
-  default     = false
-  description = "Enables eks managed nodes"
-}
 
 variable "force_update_version" {
   type        = bool
@@ -366,4 +345,22 @@ variable "ssm_tag_patch_window" {
   type        = string
   default     = "ITOPS-Wave1-Non-Mktplc-DevTestImpl-MW"
   description = "SSM Patching window for instances. For more information: https://cloud.cms.gov/patching-prerequisites"
+}
+
+variable "ami_owner_override" {
+  type        = string
+  default     = ""
+  description = "Override the AWS Account owner used to look up AMI's for the cluster nodes"
+}
+
+variable "use_bottlerocket" {
+  type        = bool
+  default     = false
+  description = "Use Bottlerocket"
+}
+
+variable "bottlerocket_pod_pids_limit" {
+  type        = number
+  default     = 1000
+  description = "The maximum number of processes that can be created in a pod"
 }

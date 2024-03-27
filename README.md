@@ -1,4 +1,4 @@
-# Launch template with managed groups example  
+# Launch template with managed groups example
 
 This is EKS example using workers custom launch template with managed groups feature in two different ways:
 
@@ -157,8 +157,9 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_alb_ssl_security_policy"></a> [alb\_ssl\_security\_policy](#input\_alb\_ssl\_security\_policy) | ALB SSL Security Policy | `string` | `"ELBSecurityPolicy-TLS13-1-2-Res-2021-06"` | no |
 | <a name="input_alb_subnets_by_zone"></a> [alb\_subnets\_by\_zone](#input\_alb\_subnets\_by\_zone) | n/a | `map(string)` | n/a | yes |
 | <a name="input_ami_date"></a> [ami\_date](#input\_ami\_date) | n/a | `string` | `""` | no |
+| <a name="input_ami_owner_override"></a> [ami\_owner\_override](#input\_ami\_owner\_override) | Override the AWS Account owner used to look up AMI's for the cluster nodes | `string` | `""` | no |
 | <a name="input_ami_regex_override"></a> [ami\_regex\_override](#input\_ami\_regex\_override) | Overrides default AMI lookup regex, which grabs latest AMI matching cluster\_version by default | `string` | `""` | no |
-| <a name="input_autoscaling_group_tags"></a> [autoscaling\_group\_tags](#input\_autoscaling\_group\_tags) | Tags to apply to all autoscaling groups created | `map(any)` | `{}` | no |
+| <a name="input_bottlerocket_pod_pids_limit"></a> [bottlerocket\_pod\_pids\_limit](#input\_bottlerocket\_pod\_pids\_limit) | The maximum number of processes that can be created in a pod | `number` | `1000` | no |
 | <a name="input_cluster_additional_sg_prefix_lists"></a> [cluster\_additional\_sg\_prefix\_lists](#input\_cluster\_additional\_sg\_prefix\_lists) | n/a | `list(string)` | n/a | yes |
 | <a name="input_cluster_enabled_log_types"></a> [cluster\_enabled\_log\_types](#input\_cluster\_enabled\_log\_types) | A list of the desired control plane logging to enable. For more information, see Amazon EKS Control Plane Logging documentation (https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html) | `list(string)` | <pre>[<br>  "api",<br>  "audit",<br>  "authenticator",<br>  "controllerManager",<br>  "scheduler"<br>]</pre> | no |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | n/a | `string` | n/a | yes |
@@ -170,14 +171,12 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_create_cosign_iam_role"></a> [create\_cosign\_iam\_role](#input\_create\_cosign\_iam\_role) | Flag to create Cosign IAM role | `bool` | `false` | no |
 | <a name="input_custom_node_policy_arns"></a> [custom\_node\_policy\_arns](#input\_custom\_node\_policy\_arns) | Custom node policy arns | `set(string)` | `[]` | no |
 | <a name="input_custom_node_pools"></a> [custom\_node\_pools](#input\_custom\_node\_pools) | n/a | `any` | `{}` | no |
-| <a name="input_enable_eks_managed_nodes"></a> [enable\_eks\_managed\_nodes](#input\_enable\_eks\_managed\_nodes) | Enables eks managed nodes | `bool` | `false` | no |
 | <a name="input_enable_hoplimit"></a> [enable\_hoplimit](#input\_enable\_hoplimit) | Enables a IMDSv2 hop limit of 1 on all nodes. Defaults to false | `bool` | `false` | no |
-| <a name="input_enable_self_managed_nodes"></a> [enable\_self\_managed\_nodes](#input\_enable\_self\_managed\_nodes) | Enables self managed nodes | `bool` | `true` | no |
 | <a name="input_enable_ssm_patching"></a> [enable\_ssm\_patching](#input\_enable\_ssm\_patching) | Enables Systems Manager to patch nodes | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | n/a | `string` | `"dev"` | no |
 | <a name="input_federated_access_role"></a> [federated\_access\_role](#input\_federated\_access\_role) | Federated access role | `string` | `"ct-ado-batcave-application-admin"` | no |
 | <a name="input_force_update_version"></a> [force\_update\_version](#input\_force\_update\_version) | Force update version | `bool` | `true` | no |
-| <a name="input_general_node_pool"></a> [general\_node\_pool](#input\_general\_node\_pool) | General node pool, required for hosting core services | `any` | <pre>{<br>  "desired_size": 3,<br>  "instance_type": "c5.2xlarge",<br>  "labels": {<br>    "general": "true"<br>  },<br>  "max_size": 5,<br>  "min_size": 2,<br>  "taints": {}<br>}</pre> | no |
+| <a name="input_general_node_pool"></a> [general\_node\_pool](#input\_general\_node\_pool) | General node pool, required for hosting core services | `any` | <pre>{<br>  "desired_size": 3,<br>  "instance_type": "c5.2xlarge",<br>  "labels": {<br>    "general": "true"<br>  },<br>  "max_size": 5,<br>  "min_size": 2,<br>  "taints": {},<br>  "use_custom_launch_template": false<br>}</pre> | no |
 | <a name="input_github_actions_role"></a> [github\_actions\_role](#input\_github\_actions\_role) | Github actions role | `string` | `"batcave-github-actions-role"` | no |
 | <a name="input_grant_delete_ebs_volumes_lambda_access"></a> [grant\_delete\_ebs\_volumes\_lambda\_access](#input\_grant\_delete\_ebs\_volumes\_lambda\_access) | When set to true, a cluster role and permissions will be created to grant the delete-ebs-volumes Lambda access to the PersistentVolumes API. | `bool` | `false` | no |
 | <a name="input_host_subnets"></a> [host\_subnets](#input\_host\_subnets) | Override the ec2 instance subnets.  By default, they are launche in private\_subnets, just like the EKS control plane. | `list(any)` | `[]` | no |
@@ -196,6 +195,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="input_ssm_tag_patch_group"></a> [ssm\_tag\_patch\_group](#input\_ssm\_tag\_patch\_group) | SSM Patching group for instances. For more information: https://cloud.cms.gov/patching-prerequisites | `string` | `"AL2"` | no |
 | <a name="input_ssm_tag_patch_window"></a> [ssm\_tag\_patch\_window](#input\_ssm\_tag\_patch\_window) | SSM Patching window for instances. For more information: https://cloud.cms.gov/patching-prerequisites | `string` | `"ITOPS-Wave1-Non-Mktplc-DevTestImpl-MW"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Global resource tags to apply to all resources | `map(any)` | `null` | no |
+| <a name="input_use_bottlerocket"></a> [use\_bottlerocket](#input\_use\_bottlerocket) | Use Bottlerocket | `bool` | `false` | no |
 | <a name="input_vpc_cidr_blocks"></a> [vpc\_cidr\_blocks](#input\_vpc\_cidr\_blocks) | List of VPC CIDR blocks | `list(string)` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | n/a | `string` | n/a | yes |
 

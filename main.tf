@@ -4,10 +4,13 @@ locals {
   hoplimit_metadata = var.enable_hoplimit ? { http_put_response_hop_limit = 1 } : {}
 }
 
+# If an AMI owner is specified, use that owner.  Otherwise, use the CMS AMI by default,
+# with the capability to pass 'use_bottlerocket' var to use the bottlerocket AMI.
 data "aws_ami" "eks_ami" {
   most_recent = true
-  name_regex  = var.ami_regex_override == "" ? "^bottlerocket-aws-k8s-1.27-x86_64-v1.17.0" : var.ami_regex_override
-  owners      = ["092701018921"]
+  name_regex  = var.use_bottlerocket ? "^bottlerocket-aws-k8s-${var.cluster_version}-x86_64-v1.17.0" : (var.ami_regex_override == "" ? "^amzn2-eks-${var.cluster_version}-gi-${var.ami_date}" : var.ami_regex_override)
+  # If an ami_owner_override is provided, use it.  Otherwise use the AWS AMI's for bottlerocket, and CMS AMIs AL2
+  owners = var.ami_owner_override != "" ? [var.ami_owner_override] : (var.use_bottlerocket ? ["092701018921"] : ["743302140042"])
 }
 
 data "aws_security_groups" "delete_ebs_volumes_lambda_security_group" {
@@ -21,114 +24,7 @@ data "aws_security_groups" "delete_ebs_volumes_lambda_security_group" {
 # EKS Module
 ################################################################################
 locals {
-  custom_node_pools = { for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
-    name                          = "${var.cluster_name}-${k}"
-    subnet_ids                    = coalescelist(try(v.subnet_ids, []), var.host_subnets, var.private_subnets)
-    ami_id                        = data.aws_ami.eks_ami.id
-    iam_role_path                 = var.iam_role_path
-    iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
-    instance_type = v.instance_type
-    desired_size  = v.desired_size
-    max_size      = v.max_size
-    min_size      = v.min_size
-
-    ## Define custom lines to the user_data script.  Separate commands with \n
-    pre_bootstrap_user_data  = try(v.pre_bootstrap_user_data, "sysctl -w net.ipv4.ip_forward=1\n")
-    post_bootstrap_user_data = try(v.post_bootstrap_user_data, "")
-    bootstrap_extra_args = join(" ",
-      ["--kubelet-extra-args '--node-labels=${k}=true", try(v.extra_args, "")],
-      ["--pod-max-pids=1000"],
-      [for label_key, label_value in try(v.labels, {}) : "--node-labels=${label_key}=${label_value}"],
-      [for taint_key, taint_value in try(v.taints, {}) : "--register-with-taints=${taint_key}=${taint_value}"],
-      ["'"]
-    )
-    create_security_group = false
-    block_device_mappings = [
-      {
-        device_name = "/dev/xvda"
-        ebs = {
-          volume_size           = try(v.volume_size, "300")
-          volume_type           = try(v.volume_type, "gp3")
-          delete_on_termination = try(v.volume_delete_on_termination, true)
-          encrypted             = true
-        }
-      }
-    ]
-
-    # On the general node group or any node group labeled "general", attach target groups
-    target_group_arns = (k == "general" || contains(keys(try(v.labels, {})), "general")) ? concat(
-      [aws_lb_target_group.batcave_alb_https.arn],
-      var.create_alb_proxy ? [aws_lb_target_group.batcave_alb_proxy_https[0].arn] : [],
-      var.create_alb_shared ? [aws_lb_target_group.batcave_alb_shared_https[0].arn] : []
-    ) : null
-
-    tags = merge(var.tags, local.instance_tags, try(v.tags, null))
-
-    metadata_options = merge(local.hoplimit_metadata, try(v.metadata_options, {}))
-
-    ## Tags that are applied _ONLY_ to the ASG resource and not propagated to the nodes
-    ## All the "tags" var will be applied to both ASG and Propagated out to the nodes
-    autoscaling_group_tags = merge(
-      {
-        "k8s.io/cluster-autoscaler/enabled"             = "true",
-        "k8s.io/cluster-autoscaler/${var.cluster_name}" = var.cluster_name
-      },
-      # Taint tags for Cluster Autoscaler hints
-      try({ for taint_key, taint_value in v.taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint_key}" => taint_value }, {}),
-      # Label tags for Cluster Autoscaler hints
-      { "k8s.io/cluster-autoscaler/node-template/label/${k}" = "true" },
-      try({ for label_key, label_value in v.labels : "k8s.io/cluster-autoscaler/node-template/label/${label_key}" => label_value }, {}),
-      var.autoscaling_group_tags,
-    )
-    enabled_metrics = [
-      "GroupAndWarmPoolDesiredCapacity",
-      "GroupAndWarmPoolTotalCapacity",
-      "GroupDesiredCapacity",
-      "GroupInServiceCapacity",
-      "GroupInServiceInstances",
-      "GroupMaxSize",
-      "GroupMinSize",
-      "GroupPendingCapacity",
-      "GroupPendingInstances",
-      "GroupStandbyCapacity",
-      "GroupStandbyInstances",
-      "GroupTerminatingCapacity",
-      "GroupTerminatingInstances",
-      "GroupTotalCapacity",
-      "GroupTotalInstances",
-      "WarmPoolDesiredCapacity",
-      "WarmPoolMinSize",
-      "WarmPoolPendingCapacity",
-      "WarmPoolTerminatingCapacity",
-      "WarmPoolTotalCapacity",
-      "WarmPoolWarmedCapacity",
-    ]
-    create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
-    schedules = merge(
-      var.node_schedule_shutdown_hour < 0 ? {} : {
-        shutdown = {
-          min_size     = 0
-          max_size     = 0
-          desired_size = 0
-          time_zone    = var.node_schedule_timezone
-          recurrence   = "0 ${var.node_schedule_shutdown_hour} * * *"
-        }
-      },
-      var.node_schedule_startup_hour < 0 ? {} : {
-        startup = {
-          min_size     = v.min_size
-          max_size     = v.max_size
-          desired_size = v.desired_size
-          time_zone    = var.node_schedule_timezone
-          recurrence   = "0 ${var.node_schedule_startup_hour} * * 1-5"
-        }
-      }
-    )
-
-    ## https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group#instance_refresh
-    instance_refresh = lookup(v, "instance_refresh", {})
-  } }
   instance_policy_tags = var.enable_ssm_patching ? { "Patch Group" = var.ssm_tag_patch_group, "Patch Window" = var.ssm_tag_patch_window } : {}
   instance_tags        = merge(local.instance_policy_tags, var.instance_tags)
 
@@ -152,51 +48,46 @@ locals {
 # EKS Fully managed nodes
 ################################################################################
 locals {
+  shared_node_labels = {
+    for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
+      for label_key, label_value in try(v.labels, {}) : label_key => label_value
+    }
+  }
+
+  shared_node_taints = {
+    for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => [
+      for taint_key, taint_string in try(v.taints, {}) : {
+        key    = taint_key
+        value  = element(split(":", taint_string), 0)
+        effect = "NO_SCHEDULE"
+      }
+    ]
+  }
+
   eks_node_pools = { for k, v in merge({ general = var.general_node_pool }, var.custom_node_pools) : k => {
     group_name      = k
-    name            = "${var.cluster_name}-${k}"
-    cluster_name    = local.name
-    cluster_version = local.cluster_version
+    name            = "${module.eks.cluster_name}-${k}"
+    cluster_name    = module.eks.cluster_name
+    cluster_version = module.eks.cluster_version
 
     iam_role_path                 = var.iam_role_path
     iam_role_permissions_boundary = var.iam_role_permissions_boundary
 
     ami_id = data.aws_ami.eks_ami.id
-    
+
     # Added for Bottlerocket
     use_custom_launch_template = try(v.use_custom_launch_template, true)
-    ami_type                   = var.platform == "bottlerocket" ? "BOTTLEROCKET_x86_64" : "AL2_x86_64" 
-    platform                   = try(var.platform, "linux") 
-    bootstrap_extra_args = <<-EOT
-      # settings.kubernetes section from bootstrap_extra_args in default template
-      pod-pids-limit = 1000
-      
-      # The admin host container provides SSH access and runs with "superpowers".
-      # It is disabled by default, but can be disabled explicitly.
-      [settings.host-containers.admin]
-      enabled = false
-
-      # The control host container provides out-of-band access via SSM.
-      # It is enabled by default, and can be disabled if you do not expect to use SSM.
-      # This could leave you with no way to access the API and change settings on an existing node!
-      [settings.host-containers.control]
-      enabled = true
-
-      # extra args added
-      [settings.kernel]
-      lockdown = "integrity"
-      
-      [settings.kernel.sysctl]
-      "user.max_user_namespaces" = "10000"
-
-      [settings.kubernetes.node-labels]
-      # label1 = "foo"
-      # label2 = "bar"
-
-      [settings.kubernetes.node-taints]
-      # dedicated = "experimental:PreferNoSchedule"
-      # special = "true:NoSchedule"
-    EOT
+    ami_type                   = var.use_bottlerocket ? "BOTTLEROCKET_x86_64" : "AL2_x86_64"
+    platform                   = var.use_bottlerocket ? "bottlerocket" : "linux"
+    bootstrap_extra_args = templatefile("${path.module}/templates/bottlerocket.toml.tpl", {
+      cluster_name     = var.cluster_name
+      cluster_endpoint = module.eks.cluster_endpoint
+      cluster_ca_data  = module.eks.cluster_certificate_authority_data
+      pod_pids_limit   = var.bottlerocket_pod_pids_limit
+      max_namespaces   = 10000
+      node_labels      = local.shared_node_labels[k]
+      node_taints      = local.shared_node_taints[k]
+    })
 
     subnet_ids = coalescelist(try(v.subnet_ids, []), var.host_subnets, var.private_subnets)
 
@@ -204,11 +95,12 @@ locals {
     max_size     = v.max_size
     desired_size = v.desired_size
 
-    block_device_mappings = [
+    # This is dynamically creating the block device mappings based on the AMI type
+    block_device_mappings = var.use_bottlerocket ? [
       {
         device_name = "/dev/xvda"
         ebs = {
-          volume_size           = "5"
+          volume_size           = 8
           volume_type           = "gp3"
           delete_on_termination = true
           encrypted             = true
@@ -219,7 +111,17 @@ locals {
         ebs = {
           volume_size           = try(v.volume_size, "300")
           volume_type           = try(v.volume_type, "gp3")
-          delete_on_termination = try(v.volume_delete_on_termination, true)
+          delete_on_termination = try(v.delete_on_termination, true)
+          encrypted             = true
+        }
+      }
+      ] : [
+      {
+        device_name = "/dev/xvda"
+        ebs = {
+          volume_size           = try(v.volume_size, "300")
+          volume_type           = try(v.volume_type, "gp3")
+          delete_on_termination = try(v.delete_on_termination, true)
           encrypted             = true
         }
       }
@@ -235,19 +137,6 @@ locals {
     metadata_options           = merge(local.hoplimit_metadata, try(v.metadata_options, {}))
 
     tags = merge(var.tags, local.instance_tags, try(v.tags, null))
-
-    taints = [
-      for taint_key, taint_string in try(v.taints, {}) : {
-        key    = taint_key
-        value  = element(split(":", taint_string), 0)
-        effect = "NO_SCHEDULE"
-      }
-    ]
-
-    labels = {
-      for label_key, label_value in try(v.labels, {}) :
-      label_key => label_value
-    }
 
     create_schedule = var.node_schedule_shutdown_hour >= 0 || var.node_schedule_startup_hour >= 0
     schedules = merge(
@@ -311,15 +200,8 @@ module "eks" {
     resources        = ["secrets"]
   }
 
-  self_managed_node_group_defaults = {
-    subnet_ids = coalescelist(var.host_subnets, var.private_subnets)
-  }
-
   ## CLUSTER Addons
   cluster_addons = {}
-
-  # Worker groups (using Launch Configurations)
-  self_managed_node_groups = var.enable_self_managed_nodes ? local.custom_node_pools : {}
 
   # apply any global tags to the cluster itself
   cluster_tags = var.tags
@@ -329,11 +211,11 @@ module "eks_managed_node_groups" {
   source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
   version = "19.21.0"
 
-  for_each = var.enable_eks_managed_nodes ? local.eks_node_pools : {}
+  for_each = local.eks_node_pools
 
   name                              = each.value.name
-  cluster_name                      = each.value.cluster_name
-  cluster_version                   = each.value.cluster_version
+  cluster_name                      = module.eks.cluster_name
+  cluster_version                   = module.eks.cluster_version
   cluster_endpoint                  = module.eks.cluster_endpoint
   cluster_auth_base64               = module.eks.cluster_certificate_authority_data
   create_iam_role                   = false
@@ -353,8 +235,8 @@ module "eks_managed_node_groups" {
   ami_type                          = each.value.ami_type
   metadata_options                  = each.value.metadata_options
   tags                              = each.value.tags
-  taints                            = each.value.taints
-  labels                            = each.value.labels
+  taints                            = local.shared_node_taints[each.key]
+  labels                            = local.shared_node_labels[each.key]
   create_schedule                   = each.value.create_schedule
   schedules                         = each.value.schedules
   force_update_version              = var.force_update_version
@@ -561,7 +443,7 @@ resource "aws_iam_role" "cosign" {
 #}
 
 resource "aws_autoscaling_attachment" "eks_managed_node_groups_alb_attachment" {
-  for_each               = var.enable_eks_managed_nodes ? { for np in local.eks_node_pools : np.name => np } : {}
+  for_each               = { for np in local.eks_node_pools : np.name => np }
   autoscaling_group_name = try(module.eks_managed_node_groups[each.value.group_name].node_group_autoscaling_group_names[0], "")
 
   lb_target_group_arn = aws_lb_target_group.batcave_alb_https.arn
@@ -572,7 +454,7 @@ resource "aws_autoscaling_attachment" "eks_managed_node_groups_alb_attachment" {
 }
 
 resource "aws_autoscaling_attachment" "eks_managed_node_groups_proxy_attachment" {
-  for_each               = var.create_alb_proxy && var.enable_eks_managed_nodes ? { for np in local.eks_node_pools : np.name => np } : {}
+  for_each               = var.create_alb_proxy ? { for np in local.eks_node_pools : np.name => np } : {}
   autoscaling_group_name = try(module.eks_managed_node_groups[each.value.group_name].node_group_autoscaling_group_names[0], "")
 
   lb_target_group_arn = var.create_alb_proxy ? aws_lb_target_group.batcave_alb_proxy_https[0].arn : null
@@ -583,7 +465,7 @@ resource "aws_autoscaling_attachment" "eks_managed_node_groups_proxy_attachment"
 }
 
 resource "aws_autoscaling_attachment" "eks_managed_node_groups_shared_attachment" {
-  for_each               = var.create_alb_shared && var.enable_eks_managed_nodes ? { for np in local.eks_node_pools : np.name => np } : {}
+  for_each               = var.create_alb_shared ? { for np in local.eks_node_pools : np.name => np } : {}
   autoscaling_group_name = try(module.eks_managed_node_groups[each.value.group_name].node_group_autoscaling_group_names[0], "")
 
   lb_target_group_arn = var.create_alb_shared ? aws_lb_target_group.batcave_alb_shared_https[0].arn : null
