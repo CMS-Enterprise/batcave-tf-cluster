@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 15.0.0
+* Upgrade to EKS 1.28
+
 ## 14.1.2
 * bugfix: correct issue when no hosts are provided
 
