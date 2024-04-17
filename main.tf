@@ -239,7 +239,7 @@ locals {
 module "eks" {
   ## https://github.com/terraform-aws-modules/terraform-aws-eks
   source  = "terraform-aws-modules/eks/aws"
-  version = "19.0.4"
+  version = "20.8.4"
 
   cluster_name    = local.name
   cluster_version = local.cluster_version
@@ -249,9 +249,9 @@ module "eks" {
   cluster_encryption_policy_path = var.iam_role_path
   # create_iam_role                = false
   # iam_role_arn                   = aws_iam_role.eks_node.arn
-
-  vpc_id     = var.vpc_id
-  subnet_ids = var.private_subnets
+  enable_cluster_creator_admin_permissions = true
+  vpc_id                                   = var.vpc_id
+  subnet_ids                               = var.private_subnets
 
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = false
@@ -279,7 +279,11 @@ module "eks" {
   }
 
   ## CLUSTER Addons
-  cluster_addons = {}
+  cluster_addons = {
+    eks-pod-identity-agent = {
+      most_recent = true
+    }
+  }
 
   # Worker groups (using Launch Configurations)
   self_managed_node_groups = var.enable_self_managed_nodes ? local.custom_node_pools : {}
@@ -290,7 +294,7 @@ module "eks" {
 
 module "eks_managed_node_groups" {
   source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  version = "19.21.0"
+  version = "20.8.4"
 
   for_each = var.enable_eks_managed_nodes ? local.eks_node_pools : {}
 
@@ -318,6 +322,7 @@ module "eks_managed_node_groups" {
   force_update_version              = var.force_update_version
   cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
   vpc_security_group_ids            = [module.eks.node_security_group_id]
+  cluster_service_cidr              = var.cluster_service_cidr
 
 }
 

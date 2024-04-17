@@ -8,6 +8,10 @@ variable "cluster_version" {
   default = "1.28"
   type    = string
 }
+variable "cluster_service_cidr" {
+  default = "172.20.0.0/16"
+  type    = string
+}
 
 variable "ami_date" {
   default = ""
