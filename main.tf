@@ -240,7 +240,6 @@ module "eks" {
   ## https://github.com/terraform-aws-modules/terraform-aws-eks
   source  = "terraform-aws-modules/eks/aws"
   version = "20.8.4"
-
   cluster_name    = local.name
   cluster_version = local.cluster_version
 
@@ -252,7 +251,6 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
   vpc_id                                   = var.vpc_id
   subnet_ids                               = var.private_subnets
-  manage_aws_auth_configmap                = false
 
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = false
