@@ -252,6 +252,7 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
   vpc_id                                   = var.vpc_id
   subnet_ids                               = var.private_subnets
+  manage_aws_auth_configmap                = false
 
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = false
