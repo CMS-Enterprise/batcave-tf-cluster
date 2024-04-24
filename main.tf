@@ -248,7 +248,7 @@ module "eks" {
   cluster_encryption_policy_path = var.iam_role_path
   # create_iam_role                = false
   # iam_role_arn                   = aws_iam_role.eks_node.arn
-  enable_cluster_creator_admin_permissions = true
+  enable_cluster_creator_admin_permissions = false
   vpc_id                                   = var.vpc_id
   subnet_ids                               = var.private_subnets
 
