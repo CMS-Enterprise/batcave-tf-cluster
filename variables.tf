@@ -370,3 +370,13 @@ variable "ssm_tag_patch_window" {
   default     = "ITOPS-Wave1-Non-Mktplc-DevTestImpl-MW"
   description = "SSM Patching window for instances. For more information: https://cloud.cms.gov/patching-prerequisites"
 }
+
+
+# ################################################################################
+# # Access Entry
+# ################################################################################
+variable "admin_principal_arns" {
+  description = "List of principal_arns that require admin access to the cluster"
+  default     = []
+  type        = list(string)
+}
