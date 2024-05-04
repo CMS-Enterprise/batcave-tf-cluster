@@ -355,9 +355,11 @@ resource "null_resource" "kubernetes_requirements" {
   ]
 }
 
-# # ################################################################################
-# # # Access Entry
-# # ################################################################################
+#################################################################################
+# Access Entry for Cluster access
+#################################################################################
+## The resources  access entry and policy association is targeting roles that require cluster admins
+## it can be repeated for roles that require different cluster policy
 
 resource "aws_eks_access_entry" "cluster_admin" {
   for_each = toset(var.admin_principal_arns)

@@ -375,6 +375,8 @@ variable "ssm_tag_patch_window" {
 # ################################################################################
 # # Access Entry
 # ################################################################################
+
+## variable below holds the list of principal arns that require cluster admins
 variable "admin_principal_arns" {
   description = "List of principal_arns that require admin access to the cluster"
   default     = []
