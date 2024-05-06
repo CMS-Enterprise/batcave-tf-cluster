@@ -58,7 +58,11 @@ resource "kubernetes_cluster_role" "persistent_volume_management" {
     resources  = ["persistentvolumes"]
     verbs      = ["create", "delete", "get", "list", "update", "watch"]
   }
-  depends_on = [null_resource.kubernetes_requirements]
+  depends_on = [
+    null_resource.kubernetes_requirements,
+    aws_eks_access_policy_association.cluster_admin,
+    aws_eks_access_policy_association.admin
+  ]
 }
 
 locals {
@@ -80,7 +84,11 @@ resource "kubernetes_cluster_role_binding" "delete_ebs_volumes_lambda" {
     kind      = "Group"
     name      = local.delete_ebs_volumes_lambda_subject_name
   }
-  depends_on = [null_resource.kubernetes_requirements]
+  depends_on = [
+    null_resource.kubernetes_requirements,
+    aws_eks_access_policy_association.cluster_admin,
+    aws_eks_access_policy_association.admin
+  ]
 }
 
 locals {
@@ -115,6 +123,8 @@ resource "kubernetes_config_map" "aws_auth" {
   }
   depends_on = [
     null_resource.kubernetes_requirements,
+    aws_eks_access_policy_association.cluster_admin,
+    aws_eks_access_policy_association.admin,
     kubernetes_cluster_role_binding.delete_ebs_volumes_lambda,
   ]
   # EKS managed nodes will update this configmap on their own, so we need to ignore changes to it
@@ -147,5 +157,9 @@ kind: Namespace
 metadata:
   name: batcave
 YAML
-  depends_on    = [null_resource.kubernetes_requirements]
+  depends_on = [
+    null_resource.kubernetes_requirements,
+    aws_eks_access_policy_association.cluster_admin,
+    aws_eks_access_policy_association.admin
+  ]
 }
