@@ -239,7 +239,7 @@ locals {
 module "eks" {
   ## https://github.com/terraform-aws-modules/terraform-aws-eks
   source          = "terraform-aws-modules/eks/aws"
-  version         = "20.8.4"
+  version         = "20.8.5"
   cluster_name    = local.name
   cluster_version = local.cluster_version
 
@@ -248,9 +248,9 @@ module "eks" {
   cluster_encryption_policy_path = var.iam_role_path
   # create_iam_role                = false
   # iam_role_arn                   = aws_iam_role.eks_node.arn
-  #enable_cluster_creator_admin_permissions = true
-  vpc_id     = var.vpc_id
-  subnet_ids = var.private_subnets
+  enable_cluster_creator_admin_permissions = var.enable_cluster_creator_admin_permissions
+  vpc_id                                   = var.vpc_id
+  subnet_ids                               = var.private_subnets
 
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = false
@@ -293,7 +293,7 @@ module "eks" {
 
 module "eks_managed_node_groups" {
   source  = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
-  version = "20.8.4"
+  version = "20.8.5"
 
   for_each = var.enable_eks_managed_nodes ? local.eks_node_pools : {}
 
@@ -352,62 +352,6 @@ resource "null_resource" "kubernetes_requirements" {
     aws_security_group_rule.allow_all_nodes_to_other_nodes,
     aws_security_group_rule.https-tg-ingress,
     aws_security_group_rule.https-vpc-ingress,
-  ]
-}
-
-#################################################################################
-# Access Entry for Cluster access
-#################################################################################
-## The resources  access entry and policy association is targeting roles that require cluster admins
-## it can be repeated for roles that require different cluster policy
-
-resource "aws_eks_access_entry" "cluster_admin" {
-  for_each = toset(var.admin_principal_arns)
-
-  cluster_name      = local.name
-  kubernetes_groups = []
-  principal_arn     = each.value
-  type              = "STANDARD"
-  user_name         = try(each.value.user_name, null)
-
-  depends_on = [
-    module.eks_managed_node_groups,
-  ]
-}
-
-resource "aws_eks_access_policy_association" "cluster_admin" {
-  for_each = toset(var.admin_principal_arns)
-
-  access_scope {
-    namespaces = []
-    type       = "cluster"
-  }
-
-  cluster_name = local.name
-
-  policy_arn    = "arn:${data.aws_partition.current.partition}:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-  principal_arn = each.value
-
-  depends_on = [
-    aws_eks_access_entry.cluster_admin,
-  ]
-}
-
-resource "aws_eks_access_policy_association" "admin" {
-  for_each = toset(var.admin_principal_arns)
-
-  access_scope {
-    namespaces = []
-    type       = "cluster"
-  }
-
-  cluster_name = local.name
-
-  policy_arn    = "arn:${data.aws_partition.current.partition}:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
-  principal_arn = each.value
-
-  depends_on = [
-    aws_eks_access_entry.cluster_admin,
   ]
 }
 
