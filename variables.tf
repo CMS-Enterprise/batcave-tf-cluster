@@ -8,6 +8,10 @@ variable "cluster_version" {
   default = "1.28"
   type    = string
 }
+variable "cluster_service_cidr" {
+  default = "172.20.0.0/16"
+  type    = string
+}
 
 variable "ami_date" {
   default = ""
@@ -293,29 +297,9 @@ variable "enable_hoplimit" {
   description = "Enables a IMDSv2 hop limit of 1 on all nodes. Defaults to false"
 }
 
-variable "configmap_custom_roles" {
-  default     = []
-  description = "A custom list of IAM role names to include in the aws-auth configmap"
-  type        = list(string)
-}
-
 variable "vpc_cidr_blocks" {
   description = "List of VPC CIDR blocks"
   type        = list(string)
-}
-
-variable "github_actions_role" {
-  type        = string
-  default     = "batcave-github-actions-role"
-  description = "Github actions role"
-}
-
-### Federated role will be added to the ConfigMap so that the users can have access to the Kubernetes objects of the cluster.
-### By default the users will not have access when the cluster is created by GitHub runner.
-variable "federated_access_role" {
-  type        = string
-  default     = "ct-ado-batcave-application-admin"
-  description = "Federated access role"
 }
 
 
@@ -365,4 +349,28 @@ variable "ssm_tag_patch_window" {
   type        = string
   default     = "ITOPS-Wave1-Non-Mktplc-DevTestImpl-MW"
   description = "SSM Patching window for instances. For more information: https://cloud.cms.gov/patching-prerequisites"
+}
+
+variable "enable_cluster_creator_admin_permissions" {
+  type        = bool
+  default     = true
+  description = "Grants the user who created the cluster admin permissions"
+}
+
+# ################################################################################
+# # Access Entry
+# ################################################################################
+
+## variable below holds the list of principal arns that require cluster access
+variable "admin_principal_arns" {
+  description = "List of principal_arns that require admin access to the cluster"
+  default     = []
+  type        = list(string)
+}
+
+
+variable "delete_ebs_volume_role_arn" {
+  description = "principal_arn for delete ebs volume role"
+  default     = ""
+  type        = string
 }
