@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 16.0.0
 * upgrade to EKS module 20.8.5
 * introducing eks access entries
+* updating delete_ebs_role dependency
 
 ## 15.0.0
 * Upgrade to EKS 1.28

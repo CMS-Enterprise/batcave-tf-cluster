@@ -38,7 +38,7 @@ resource "aws_eks_access_policy_association" "cluster_admin" {
 
 ## Creating access entry for delete_ebs_volumes_lambda with namespaced adminpolicy
 resource "aws_eks_access_entry" "delete_ebs_volume" {
-
+  count             = var.delete_ebs_volume_role_arn != "" ? 1 : 0
   cluster_name      = local.name
   kubernetes_groups = []
   principal_arn     = var.delete_ebs_volume_role_arn
@@ -51,7 +51,7 @@ resource "aws_eks_access_entry" "delete_ebs_volume" {
   ]
 }
 resource "aws_eks_access_policy_association" "delete_ebs_volume" {
-
+  count = var.delete_ebs_volume_role_arn != "" ? 1 : 0
   access_scope {
     namespaces = ["batcave"]
     type       = "namespace"
