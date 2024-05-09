@@ -2,7 +2,7 @@
 #################################################################################
 # Access Entry for Cluster access
 #################################################################################
-## The resources  access entry and policy association is targeting roles that require cluster admins
+## The resources  access entry and policy association is targeting roles that require cluster admins permissions
 ## it can be repeated for roles that require different cluster policy
 resource "aws_eks_access_entry" "cluster_admin" {
   for_each = toset(var.admin_principal_arns)
@@ -33,6 +33,39 @@ resource "aws_eks_access_policy_association" "cluster_admin" {
 
   depends_on = [
     aws_eks_access_entry.cluster_admin,
+  ]
+}
+
+## The resources  access entry and policy association is targeting roles that require cluster Admin ReadOnly Permissions
+resource "aws_eks_access_entry" "cluster_admin_readonly" {
+  for_each = toset(var.admin_readonly_principal_arns)
+
+  cluster_name      = local.name
+  kubernetes_groups = []
+  principal_arn     = each.value
+  type              = "STANDARD"
+  user_name         = try(each.value.user_name, null)
+
+  depends_on = [
+    module.eks_managed_node_groups,
+  ]
+}
+
+resource "aws_eks_access_policy_association" "cluster_admin_readonly" {
+  for_each = toset(var.admin_readonly_principal_arns)
+
+  access_scope {
+    namespaces = []
+    type       = "cluster"
+  }
+
+  cluster_name = local.name
+
+  policy_arn    = "arn:${data.aws_partition.current.partition}:eks::aws:cluster-access-policy/AmazonEKSAdminViewPolicy"
+  principal_arn = each.value
+
+  depends_on = [
+    aws_eks_access_entry.cluster_admin_readonly,
   ]
 }
 
