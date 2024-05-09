@@ -56,8 +56,10 @@ Note that this example may create resources which cost money. Run `terraform des
 | [aws_autoscaling_attachment.eks_managed_node_groups_proxy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_attachment) | resource |
 | [aws_autoscaling_attachment.eks_managed_node_groups_shared_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_attachment) | resource |
 | [aws_eks_access_entry.cluster_admin](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_access_entry) | resource |
+| [aws_eks_access_entry.cluster_admin_readonly](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_access_entry) | resource |
 | [aws_eks_access_entry.delete_ebs_volume](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_access_entry) | resource |
 | [aws_eks_access_policy_association.cluster_admin](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_access_policy_association) | resource |
+| [aws_eks_access_policy_association.cluster_admin_readonly](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_access_policy_association) | resource |
 | [aws_eks_access_policy_association.delete_ebs_volume](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_access_policy_association) | resource |
 | [aws_iam_policy.cloudwatch_logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.node_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
@@ -139,6 +141,7 @@ Note that this example may create resources which cost money. Run `terraform des
 |------|-------------|------|---------|:--------:|
 | <a name="input_acm_cert_base_domain"></a> [acm\_cert\_base\_domain](#input\_acm\_cert\_base\_domain) | Base domain of the certificate used for the ALB Proxy | `string` | `""` | no |
 | <a name="input_admin_principal_arns"></a> [admin\_principal\_arns](#input\_admin\_principal\_arns) | List of principal\_arns that require admin access to the cluster | `list(string)` | `[]` | no |
+| <a name="input_admin_readonly_principal_arns"></a> [admin\_readonly\_principal\_arns](#input\_admin\_readonly\_principal\_arns) | List of principal\_arns that require admin readonly access to the cluster | `list(string)` | `[]` | no |
 | <a name="input_alb_deletion_protection"></a> [alb\_deletion\_protection](#input\_alb\_deletion\_protection) | Enable/Disable ALB deletion protection for both ALBs | `bool` | `false` | no |
 | <a name="input_alb_drop_invalid_header_fields"></a> [alb\_drop\_invalid\_header\_fields](#input\_alb\_drop\_invalid\_header\_fields) | Indicates whether HTTP headers with header fields that are not valid are removed by the load balancer (true) or routed to targets (false). The default is false. Elastic Load Balancing requires that message header names contain only alphanumeric characters and hyphens. Only valid for Load Balancers of type application | `bool` | `true` | no |
 | <a name="input_alb_idle_timeout"></a> [alb\_idle\_timeout](#input\_alb\_idle\_timeout) | Default idle request timeout for the ALB | `string` | `"60"` | no |

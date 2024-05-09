@@ -368,6 +368,11 @@ variable "admin_principal_arns" {
   type        = list(string)
 }
 
+variable "admin_readonly_principal_arns" {
+  description = "List of principal_arns that require admin readonly access to the cluster"
+  default     = []
+  type        = list(string)
+}
 
 variable "delete_ebs_volume_role_arn" {
   description = "principal_arn for delete ebs volume role"
