@@ -281,6 +281,11 @@ module "eks" {
   cluster_addons = {
     eks-pod-identity-agent = {
       most_recent = true
+    },
+    vpc-cni = {
+      addon_version        = "v1.16.2-eksbuild.1"
+      configuration_values = "{\"enableNetworkPolicy\": \"true\"}"
+      before_compute       = true
     }
   }
 
