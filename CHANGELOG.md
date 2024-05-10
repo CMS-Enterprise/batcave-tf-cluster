@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 16.0.1
+* resolving syntax errors
+
 ## 16.0.0
 * upgrade to EKS module 20.8.5
 * introducing eks access entries and making updates
